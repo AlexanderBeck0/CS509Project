@@ -1,4 +1,5 @@
 'use client';
+import { AccountStatus } from "@/utils/AccountStatus";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -51,8 +52,9 @@ export default function RegisterPage(props: RegisterPageProps) {
             }
 
             // Response is ok (success)
-            const data = await response.json();
-            // Todo: Might want to add a Promise to Register to handle errors
+            // TODO: Add items type definition and bids type definition here
+            const data: {token: string, username: string, status: AccountStatus, profit: number, items: unknown[]} | {token: string, username: string, funds: number, bids: unknown[]} = await response.json();
+            // TODO: Might want to add a Promise to Register to handle errors
             await onRegister(data.token);
             setMessage("Registered!");
         } catch (error) {

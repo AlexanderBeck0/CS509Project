@@ -1,4 +1,6 @@
 'use client';
+import { AccountStatus } from "@/utils/AccountStatus";
+import Link from "next/link";
 import { useRef, useState } from "react";
 
 interface LoginPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -49,11 +51,11 @@ export default function LoginPage(props: LoginPageProps) {
             }
 
             // Response is ok (success)
-            const data = await response.json();
-            setMessage("Logging in");
-            // Todo: Might want to add a Promise to Login to handle errors
+            // TODO: Add items type definition and bids type definition here
+            const data: {token: string, username: string, status: AccountStatus, profit: number, items: unknown[]} | {token: string, username: string, funds: number, bids: unknown[]} = await response.json();
+            // TODO: Might want to add a Promise to Login to handle errors
             await onLogin(data.token);
-            setMessage("Logged in!");
+            setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
             // Handle error thrown
             if (error instanceof Error) {
@@ -92,6 +94,9 @@ export default function LoginPage(props: LoginPageProps) {
                     </button>
                 </div>
             </form>
+            <div>
+                <p>New user? <Link href={"/createAccount"}>Create Account</Link></p>
+            </div>
             <div className="text-xl">{message}</div>
             {props.children}
         </div>
