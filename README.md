@@ -19,7 +19,7 @@ Here are the Use Cases we have completed for Iteration One:
 
 ## Project Details
 
-The Auction House consists of three main actors: [Seller](#seller), [Buyer](#buyer), and [Customer](#customer). Additionally, there is a fourth actor, [Admin](#admin), which controls the freezing and unfreezing of accounts and items.
+The Auction House consists of three main actors: [Seller](#seller), [Buyer](#buyer), and [Customer](#customer). Additionally, there is a fourth actor, [Admin](#admin), which controls the freezing and unfreezing of items and managing the Auction House itself.
 
 ### Seller
 
@@ -35,7 +35,6 @@ A Seller is the only actor able to sell items on the Auction House. A Seller can
 * [Review Items](#review-items)
 * [Fulfill Item](#fulfill-item)
 * [Unpublish Item](#unpublish-item)
-* [Request Account Unfreeze](#request-account-unfreeze)
 * [Request Item Unfreeze](#request-item-unfreeze)
 
 #### Create Account
@@ -52,7 +51,7 @@ A seller can login to their account through the login page. The seller cannot lo
 
 #### Add Item
 
-A seller can add an item to their account if they are not frozen. The item will initially be inactive, and the seller has to add all the information such as the item name, image, description, and initial price.
+A seller can add an item to their account if they are active. The item will initially be inactive, and the seller has to add all the information such as the item name, image, description, and initial price.
 
 #### Remove Inactive Item
 
@@ -78,13 +77,9 @@ An active seller is responsible for fulfilling an item whose ending time has exp
 
 An active seller can unpublish an active item that does not have any current bids. Unpublishing an item makes the item inactive.
 
-#### Request Account Unfreeze
-
-If a seller's account is frozen, the seller can request it be unfrozen by Admin.
-
 #### Request Item Unfreeze
 
-If a seller's item is frozen, and the seller themselves are not frozen, the seller can request the item be unfrozen by Admin.
+If a seller's item is frozen, the seller can request the item be unfrozen by Admin.
 
 ### Buyer
 
@@ -100,7 +95,6 @@ A Buyer is the only actor able to place bids on an item. A Buyer can...
 * [Place Bid](#place-bid)
 * [Review Active Bids](#review-active-bids)
 * [Review Purchases](#review-purchases)
-* [Request Unfreeze](#request-unfreeze)
 
 #### Open Account
 
@@ -144,21 +138,7 @@ A Customer can view an active item (with only the highest bid shown, or initial 
 
 ### Admin
 
-There only exists one Admin within the Auction House. Admin has the ability to [Freeze](#freeze-buyer)/[Unfreeze](#unfreeze-buyer) buyer, [Freeze](#freeze-seller)/[Unfreeze](#unfreeze-seller) seller, and [Freeze](#freeze-item)/[Unfreeze](#unfreeze-item) items. Additionally, Admin can [Generate Auction Report](#generate-auction-report) and [Generate Forensics Report](#generate-forensics-report).
-
-#### Freeze Buyer
-
-Admin can freeze a buyer (that is not already frozen). Once frozen, the buyer is unable to place any bids. Additionally, all the buyer's active bids are canceled. The buyer can login and request their account to be unfrozen.
-
-#### Unfreeze Buyer
-
-Admin can unfreeze a buyer that is frozen. Once unfrozen, all the buyer's capabilities return to normal, but all bids that were canceled are not reinstated. The buy is able to bid on the items where their bids were canceled again if the bid has not expired.
-
-#### Freeze Seller
-
-Admin can freeze a seller (that is not already frozen). When Admin freezes a seller account, all of the items that seller has (which are active) are then frozen. Once frozen, the seller can only login to their account where they can request to be unfrozen.
-
-#### Unfreeze Seller
+There only exists one Admin within the Auction House. Admin has the ability to [Freeze](#freeze-item) and [Unfreeze](#unfreeze-item) items. Additionally, Admin can [Generate Auction Report](#generate-auction-report) and [Generate Forensics Report](#generate-forensics-report).
 
 #### Freeze Item
 
