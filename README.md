@@ -25,18 +25,18 @@ The Auction House consists of three main actors: [Seller](#seller), [Buyer](#buy
 
 A Seller is the only actor able to sell items on the Auction House. A Seller can...
 
-* [Create Account](create-account)
-* [Close Account](close-account)
-* [Login Account](login-account)
-* [Add Item](add-item)
-* [Remove Inactive Item](remove-inactive-item)
-* [Edit Item](edit-item)
-* [Publish Item](publish-item)
-* [Review Items](review-items)
-* [Fulfill Item](fulfill-item)
-* [Unpublish Item](unpublish-item)
-* [Request Account Unfreeze](request-account-unfreeze)
-* [Request Item Unfreeze](request-item-unfreeze)
+* [Create Account](#create-account)
+* [Close Account](#close-account)
+* [Login Account](#login-account)
+* [Add Item](#add-item)
+* [Remove Inactive Item](#remove-inactive-item)
+* [Edit Item](#edit-item)
+* [Publish Item](#publish-item)
+* [Review Items](#review-items)
+* [Fulfill Item](#fulfill-item)
+* [Unpublish Item](#unpublish-item)
+* [Request Account Unfreeze](#request-account-unfreeze)
+* [Request Item Unfreeze](#request-item-unfreeze)
 
 #### Create Account
 
