@@ -1,4 +1,5 @@
 'use client';
+import Link from "next/link";
 import { useRef, useState } from "react";
 
 interface LoginPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -49,11 +50,10 @@ export default function LoginPage(props: LoginPageProps) {
             }
 
             // Response is ok (success)
-            const data = await response.json();
-            setMessage("Logging in");
+            const data: {token: string, username: string, profit: number, status: string} = await response.json();
             // Todo: Might want to add a Promise to Login to handle errors
             await onLogin(data.token);
-            setMessage("Logged in!");
+            setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
             // Handle error thrown
             if (error instanceof Error) {
@@ -92,6 +92,9 @@ export default function LoginPage(props: LoginPageProps) {
                     </button>
                 </div>
             </form>
+            <div>
+                <p>New user? <Link href={"/createAccount"}>Create Account</Link></p>
+            </div>
             <div className="text-xl">{message}</div>
             {props.children}
         </div>
