@@ -1,11 +1,10 @@
 import Image from "next/image";
-import RegisterPage from "./components/RegisterPage";
+import LoginPage from "./components/LoginPage";
 
 export default function Home() {
-
-  async function onRegister(token: string): Promise<void> {
+  async function onLogin(token: string): Promise<void> {
     "use server";
-    console.log("onRegister recieved: " + token);
+    console.log("onLogin token provided " + token);
   }
 
   return (
@@ -103,7 +102,7 @@ export default function Home() {
           Go to nextjs.org →
         </a>
       </footer>
-      <RegisterPage onRegister={onRegister} />
+      <LoginPage onLogin={onLogin} />
     </div>
   );
 }
