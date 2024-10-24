@@ -1,4 +1,5 @@
 'use client';
+import { AccountStatus } from "@/utils/AccountStatus";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -50,8 +51,9 @@ export default function LoginPage(props: LoginPageProps) {
             }
 
             // Response is ok (success)
-            const data: {token: string, username: string, profit: number, status: string} = await response.json();
-            // Todo: Might want to add a Promise to Login to handle errors
+            // TODO: Add items type definition and bids type definition here
+            const data: {token: string, username: string, status: AccountStatus, profit: number, items: unknown[]} | {token: string, username: string, funds: number, bids: unknown[]} = await response.json();
+            // TODO: Might want to add a Promise to Login to handle errors
             await onLogin(data.token);
             setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
