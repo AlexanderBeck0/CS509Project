@@ -2,6 +2,8 @@
  * # AccountStatus
  * * `Active`: Default AccountStatus. An account is Active when it is in its normal state.
  * * `Frozen`: An account is Frozen when the Admin decides to freeze it. While frozen, the buyer/seller can only login to their account where they can request to be unfrozen.
+ *      * When a buyer is frozen, all bids by that buyer in **active** auctions are removed. If that buyer becomes unfrozen, they can once again place new bids.
+ *      * When a seller is frozen, all of the items that seller has (which are active) are then frozen.
  * * `Requested`: An account is Requested when it was Frozen by the Admin and the seller/buyer requested for it to be unfrozen.
  * * `Closed`: An account is Closed when it has been closed by the seller/buyer. It cannot be logged into. The username of the closed account is reserved and cannot be used again. An account cannot be closed when there are active bids/items for sale.
  * 
