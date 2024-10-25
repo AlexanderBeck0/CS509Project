@@ -1,5 +1,8 @@
 import mysql from 'mysql';
 
+/**
+ * @param {{username: string, password: string}} event The login event
+ */
 export const handler = async (event) => {
     console.log('Creating MySQL pool...');
     var pool = mysql.createPool({
@@ -27,9 +30,18 @@ export const handler = async (event) => {
         // TODO: Salt passwords
         // TODO: Generate tokens
 
-        const query = "SELECT * FROM Buyer WHERE username = '" + event['username'] + "'"
-                    + "UNION SELECT * FROM Seller WHERE username = '" + event['username'] + "';";
-        pool.query(query, (error, results) => {
+        const query = `
+        SELECT username, status, profit FROM Seller
+        WHERE username = ?
+        UNION
+        SELECT username, status, funds FROM Buyer
+        WHERE username = ?
+        UNION
+        SELECT username FROM Admin
+        WHERE username = ?;
+        `;
+
+        pool.query(query, [event['username'], event['username'], event['username']], (error, results) => {
             if (error) {
                 console.error(error);
                 reject(error);
@@ -42,7 +54,7 @@ export const handler = async (event) => {
                 });
             }
 
-            if (results[0] && results[0]['status'] === "Closed") {
+            if (results[0] && results[0]['status'].toLowerCase() === "closed") {
                 console.error("Account is closed");
                 reject({
                     statusCode: 400,
