@@ -7,17 +7,19 @@ CREATE TABLE `Admin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `Bid` (
-  `ID` int NOT NULL,
+  `id` int NOT NULL,
   `bid` int NOT NULL,
   `timeOfBid` datetime NOT NULL,
   `buyer_username` varchar(20) NOT NULL,
   `item_id` int DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `bidID_UNIQUE` (`ID`),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bidID_UNIQUE` (`id`),
   KEY `buyer_id_idx` (`buyer_username`),
   KEY `item_id_idx` (`item_id`),
   CONSTRAINT `buyer_id` FOREIGN KEY (`buyer_username`) REFERENCES `Buyer` (`username`),
-  CONSTRAINT `item_id` FOREIGN KEY (`item_id`) REFERENCES `Item` (`ID`)
+  CONSTRAINT `fk_buyer` FOREIGN KEY (`buyer_username`) REFERENCES `Buyer` (`username`),
+  CONSTRAINT `fk_item` FOREIGN KEY (`item_id`) REFERENCES `Item` (`id`),
+  CONSTRAINT `item_id` FOREIGN KEY (`item_id`) REFERENCES `Item` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `Buyer` (
@@ -30,7 +32,7 @@ CREATE TABLE `Buyer` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `Item` (
-  `ID` int NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(45) NOT NULL DEFAULT 'ExampleItem',
   `description` varchar(100) NOT NULL DEFAULT 'InsertDescription',
   `image` varchar(200) NOT NULL DEFAULT 'ADDIMAGEURL',
@@ -41,9 +43,10 @@ CREATE TABLE `Item` (
   `archived` tinyint NOT NULL,
   `status` varchar(20) NOT NULL,
   `seller_username` varchar(20) NOT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `itemID_UNIQUE` (`ID`),
-  KEY `seller_id_idx` (`seller_username`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`) /*!80000 INVISIBLE */,
+  KEY `seller_username_idx` (`seller_username`),
+  CONSTRAINT `seller_username` FOREIGN KEY (`seller_username`) REFERENCES `Seller` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `Seller` (
