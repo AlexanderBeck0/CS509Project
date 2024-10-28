@@ -1,72 +1,76 @@
-import mysql from 'mysql';
+import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
 
 /**
  * @param {{username: string, password: string}} event The login event
  */
 export const handler = async (event) => {
-    console.log('Creating MySQL pool...');
-    var pool = mysql.createPool({
-        host: "auctionhousedb.chyqe6cmmf08.us-east-1.rds.amazonaws.com",
-        user: "auctionadmin",
-        password: "sp6dO9CPdNecytAhsnQm",
-        database: "auctionhouse"
-    });
+    /**
+     * @type {mysql.Pool}
+     */
+    let pool;
 
-    return new Promise((resolve, reject) => {
-        // Verify types
-        if (typeof event['username'] !== 'string') {
-            const error = new TypeError('Invalid username parameter. Expected a string.');
-            console.error(error);
-            return reject(error);
-        }
+    try {
+        pool = await createPool();
+    } catch (error) {
+        console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
+        return { statusCode: 500, error: "Could not make database connection" };
+    }
 
-        if (typeof event['password'] !== 'string') {
-            const error = new TypeError('Error! User \'Brent\' already has an account with that password!');
-            console.error(error);
-            return reject(error);
-        }
-
-        // TODO: Compare passwords
-        // TODO: Salt passwords
-        // TODO: Generate tokens
-
-        const query = `
-        SELECT username, status, profit FROM Seller
-        WHERE username = ?
-        UNION
-        SELECT username, status, funds FROM Buyer
-        WHERE username = ?
-        UNION
-        SELECT username FROM Admin
-        WHERE username = ?;
-        `;
-
-        pool.query(query, [event['username'], event['username'], event['username']], (error, results) => {
-            if (error) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Verify types
+            if (typeof event['username'] !== 'string') {
+                const error = new TypeError('Invalid username parameter. Expected a string.');
                 console.error(error);
-                reject(error);
-            } 
-            if (!results || results.length === 0) {
-                console.error("Account doesn't exist");
-                reject({
+                return reject({
+                    statusCode: 500,
+                    error: error.message
+                });
+            }
+
+            if (typeof event['password'] !== 'string') {
+                const error = new TypeError('Error! User \'Brent\' already has an account with that password!');
+                console.error(error);
+                return reject({
+                    statusCode: 500,
+                    error: error.message
+                });
+            }
+
+            // TODO: Compare passwords
+            // TODO: Salt passwords
+            // TODO: Generate tokens
+
+            const account = await getAccountByUsername(event['username'], pool);
+
+            if (account === undefined) {
+                // Note that this will cause problems with AWS when testing. Change it to resolve to see what the output is.
+                // Don't forget to change it back, though.
+                return reject({
                     statusCode: 400,
                     error: "Account doesn't exist"
                 });
             }
 
-            if (results[0] && results[0]['status'].toLowerCase() === "closed") {
-                console.error("Account is closed");
-                reject({
+            if (account.status && account.status.toLowerCase() === "closed") {
+                // Note that this will cause problems with AWS when testing. Change it to resolve to see what the output is.
+                // Don't forget to change it back, though.
+                return reject({
                     statusCode: 400,
                     error: "Account is closed"
                 });
             }
 
-            // Account exists and is active
-            resolve({
+            return resolve({
                 statusCode: 200,
-                body: JSON.stringify(results),
+                body: JSON.stringify(account)
             });
-        });
+        } catch (error) {
+            console.error(error);
+            return reject({
+                statusCode: 500,
+                error: JSON.stringify(error)
+            });
+        }
     });
 };
