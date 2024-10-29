@@ -39,7 +39,7 @@ body {
 
 .heading {
   width: 100%;
-  background-color: red;
+  background-color: darkgray;
   color: white;
   padding: 1rem;
   display: flex;
@@ -71,3 +71,25 @@ body {
   align-items: center;
 }
 
+.searchBar {
+  background-color: white;
+}
+
+.search {
+  display: flex; 
+  align-items: center;
+}
+
+.search-input {
+  color: black;
+}
+
+.dropdown {
+  color:black;
+  font-size: 16px;
+  position: absolute;
+  padding: 0; margin: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1;
+}
