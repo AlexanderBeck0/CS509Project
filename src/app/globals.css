@@ -73,6 +73,21 @@ body {
 
 .searchBar {
   background-color: white;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.icon {
+  display: inline-block;
+  transition: transform 0.3s ease; 
+}
+
+.icon.open {
+  transform: rotate(0deg); 
+}
+
+.icon.closed {
+  transform: rotate(90deg); 
 }
 
 .search {
@@ -82,6 +97,8 @@ body {
 
 .search-input {
   color: black;
+  padding: 1rem;
+  background-color: transparent;
 }
 
 .dropdown {

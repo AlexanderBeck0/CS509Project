@@ -2,7 +2,7 @@
 import LoginPage from "./components/LoginPage";
 import HomePage from "./components/HomePage";
 import { Routes, Route, Link, HashRouter, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect, createContext, useContext, useRef } from "react";
 
 function AppContent() {
   async function onLogin(token: string): Promise<void> {
@@ -16,6 +16,15 @@ function AppContent() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Start");
   const [isAscending, setIsAscending] = useState(true);
+
+  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownButtonWidth, setDropdownButtonWidth] = useState(0);
+
+  useEffect(() => {
+    if (dropdownButtonRef.current) {
+      setDropdownButtonWidth(dropdownButtonRef.current.offsetWidth);
+    }
+  }, [dropdownButtonRef]);
 
   const handleOptionClick = (option:any) => {
     if(selectedOption === option) {
@@ -60,54 +69,58 @@ function AppContent() {
 
   return (
     <main className="main-container">
-            <div className="heading">
-            <Link to="/"><button className="HomeButton">Auction House</button></Link>
-            <div className="search">
-              <div className="searchBar">
-                <input
-                  className="search-input input-bordered w-full max-w-xs max-h-9 input-primary focus:outline-accent"
-                  type="text"
-                  maxLength={20}
-                  value={tempSearchInput}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  onChange={handleInputChange}
-                  placeholder="Search here..."
-                />
-                <button onClick={handleSearch}>&nbsp;🔎&nbsp;</button> 
-              </div>  
-              <div style={{ position: "relative", marginLeft: "8px" }}>
-                <button onClick={() => setIsOpen(!isOpen)}>
-                  ▼
-                </button>
-                {isOpen && (
-                  <ul className="dropdown" style={{ top: "0", left: "100%" }}>
-                    {["Name", "Price", "Start", "End"].map((option) => (
-                      <li
-                        key={option}
-                        onClick={() => handleOptionClick(option)}
-                        style={{
-                          display: "flex", alignItems: "center", cursor: "pointer",
-                          padding: "8px",
-                          backgroundColor: option === selectedOption ? "#f0f0f0" : "white", // Highlight selected option
-                          fontWeight: option === selectedOption ? "bold" : "normal",        // Bold selected option
-                        }}
-                      >
-                        {option === selectedOption && (isAscending ? "▼" : "▲")} 
-                        <span style={{ marginLeft: "4px" }}>{option}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )} 
-              </div> 
-            </div>
-            <Link to="/Login"><button className="AccountButton">Account</button></Link>
-            </div>
-            <div className="content">
-            <Routes>
-            <Route path="/" element={<HomePage searchInput={searchInput} sortBy={sortBy}/>} />
-            <Route path="/Login" element = {<LoginPage onLogin={onLogin}/>} />
-            </Routes>
-            </div>  
+      <div className="heading">
+        <Link to="/"><button className="HomeButton">Auction House</button></Link>
+        <div className="search">
+          <div className="searchBar">
+            <input
+              className="search-input input-bordered w-full max-w-xs max-h-9 input-primary focus:outline-accent"
+              type="text"
+              maxLength={20}
+              value={tempSearchInput}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              onChange={handleInputChange}
+              placeholder="Search here..."
+            />
+            <button onClick={handleSearch}>&nbsp;🔎&nbsp;</button> 
+          </div>  
+          <div style={{ position: "relative", marginLeft: "8px" }}>
+            <button ref={dropdownButtonRef} onClick={() => setIsOpen(!isOpen)}>
+              <span className={`icon ${isOpen ? "open" : "closed"}`}>▼</span>
+            </button>
+            {isOpen && (
+              <ul className="dropdown" style={{ right: `${dropdownButtonWidth / 2}px`, top: "120%" }}>
+                {["Name", "Price", "Start", "End"].map((option) => (
+                  <li
+                    key={option}
+                    onClick={() => handleOptionClick(option)}
+                    style={{
+                      display: "flex", alignItems: "center", cursor: "pointer",
+                      padding: "8px",
+                      backgroundColor: option === selectedOption ? "#f0f0f0" : "white", // Highlight selected option
+                      fontWeight: option === selectedOption ? "bold" : "normal",        // Bold selected option
+                    }}
+                  >
+                    {option === selectedOption && (isAscending ? "▼" : "▲")} 
+                    <span style={{ marginLeft: "4px" }}>{option}</span>
+                  </li>
+                ))}
+              </ul>
+            )} 
+          </div> 
+        </div>
+        <Link to="/Login">
+          <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
+            <img src="accountSymbol.png" style={{ height: "40px", width: "auto", objectFit: "contain" }} alt="Account"/>
+          </button>
+        </Link>
+      </div>
+      <div className="content">
+        <Routes>
+          <Route path="/" element={<HomePage searchInput={searchInput} sortBy={sortBy}/>} />
+          <Route path="/Login" element = {<LoginPage onLogin={onLogin}/>} />
+        </Routes>
+      </div>  
     </main>
   );
 }
