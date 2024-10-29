@@ -2,7 +2,7 @@ CREATE TABLE `Admin` (
   `username` varchar(20) NOT NULL,
   `password` varchar(20) NOT NULL,
   PRIMARY KEY (`username`,`password`),
-  UNIQUE KEY `idAdmin_UNIQUE` (`username`),
+  UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `password_UNIQUE` (`password`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
