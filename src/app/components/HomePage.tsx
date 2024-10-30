@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from 'react';
 
 export default function HomePage(props: {searchInput: String, sortBy: String}) {
-    const [result, setResult] = useState(null);
+    const [result, setResult] = useState<any[]>([]);
 
     useEffect(() => {
       console.log("Search: "+props.searchInput);
@@ -33,6 +33,16 @@ export default function HomePage(props: {searchInput: String, sortBy: String}) {
     return (
         <div className="ItemDisplay">
             {/*do something with result here*/}
+            {result.length > 0 ? (
+                result.map((item, index) => (
+                    <div key={index} className="item">
+                        <h3>{item.name}</h3>
+                        <p>{item.description}</p>
+                    </div>
+                ))
+            ) : (
+                <p>No items found.</p>
+            )}
         </div>
     );
 }

@@ -62,7 +62,12 @@ body {
   gap: 1rem;
   padding: 1rem;
   justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-items: left;
 }
+
 
 .content {
   display: flex;
@@ -93,6 +98,7 @@ body {
 .search {
   display: flex; 
   align-items: center;
+  align-content: left;
 }
 
 .search-input {
