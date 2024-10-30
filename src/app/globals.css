@@ -3,14 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #171717;
+  --foreground: #ffffff;
 }
 
+@media (min-width: 640px) {
+  .main-container {
+      padding: 5rem;
+  }
+  .content {
+      align-items: flex-start;
+  }
+}
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ededed;
+    --foreground: #0a0a0a;
   }
 }
 
@@ -18,4 +26,132 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.main-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  padding: 0;
+  gap: 4rem;
+  font-family: var(--font-geist-sans);
+}
+
+.heading {
+  width: 100%;
+  background-color: rgb(103, 103, 103);
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  font-size: 1.5rem;
+}
+
+.HomeButton {
+  justify-content: left;
+}
+
+.AccountButton {
+  justify-content: right;
+}
+
+.ItemDisplay {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-items: left;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+.searchBar {
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.icon {
+  display: inline-block;
+  transition: transform 0.3s ease; 
+}
+
+.icon.open {
+  transform: rotate(0deg); 
+}
+
+.icon.closed {
+  transform: rotate(90deg); 
+}
+
+.search {
+  display: flex; 
+  align-items: center;
+  align-content: left;
+}
+
+.search-input {
+  color: black;
+  padding: 1rem;
+  background-color: transparent;
+}
+
+.dropdown {
+  color:black;
+  font-size: 16px;
+  position: absolute;
+  padding: 0; margin: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1;
+}
+
+.sellerContent {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 1rem;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-items: center;
+}
+
+.sellerContentColumn {
+  display: flex;
+  flex-direction: column;
+  margin: 3rem;
+}
+
+.container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  padding: 1rem;
+}
+
+.scrollItem {
+  width: 100vw;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.accountButton {
+  border-radius: 8px;
+  border: 1px solid black;
+  margin-top: 1rem;
 }
