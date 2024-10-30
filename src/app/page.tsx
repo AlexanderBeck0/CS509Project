@@ -1,10 +1,11 @@
 'use client';
 import LoginPage from "./components/LoginPage";
 import HomePage from "./components/HomePage";
-import { Routes, Route, Link, HashRouter, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect, createContext, useContext, useRef } from "react";
-import Dropdown from "./components/Dropdown";
+import { Routes, Route, Link, HashRouter } from 'react-router-dom';
+import React, { useState } from "react";
+import SortDropdown from "./components/SortDropdown";
 import SearchBar from "./components/SearchBar";
+import AccountPage from "./components/AccountPage";
 
 function AppContent() {
   async function onLogin(token: string): Promise<void> {
@@ -25,7 +26,7 @@ function AppContent() {
         <Link to="/"><button className="HomeButton">Auction House</button></Link>
         <div className="search">{/* Need to disable if seller */}
           <SearchBar handleSearch={handleSearch}/>
-          <Dropdown setSortBy={setSortBy}/> 
+          <SortDropdown setSortBy={setSortBy}/> 
         </div>
         <Link to="/Login"> {/* Need link to other pages if logged in */}
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
@@ -36,7 +37,8 @@ function AppContent() {
       <div className="content">
         <Routes>
           <Route path="/" element={<HomePage searchInput={searchInput} sortBy={sortBy}/>} />
-          <Route path="/Login" element = {<LoginPage onLogin={onLogin}/>} />
+          <Route path="/Login" element = {<LoginPage onLogin={onLogin}/>}/>
+          <Route path="/Account" element={<AccountPage accountType={"seller"}/>} />
         </Routes>
       </div>  
     </main>
