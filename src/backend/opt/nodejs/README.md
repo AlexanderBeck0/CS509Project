@@ -8,6 +8,9 @@ Go to the Lambda function that you wish to add the shared code to, and scroll al
 
 ## How to update the shared Lambda functions
 
-To update the Lambda function, zip up the entire [nodejs](/src/backend/opt/nodejs/) folder (not the contents, the folder). Then, go to AWS and click `Lambda`, and click `Layers` on the left navbar. It should be under `Additional Resources`. Click on `utils` and then `Create version`. Add an option message as to why you are updating the layer, and upload the zipped nodejs folder. Click `x86_64`, and choose `Node.js 20.x` under compatible runtimes. You can leave the License section blank. Click `Create`.
+To update the Lambda function, zip up the entire [nodejs](/src/backend/opt/nodejs/) folder (not the contents, the folder).
+> **_Note:_** Remember to `npm install` if the [node_modules](/src/backend/opt/nodejs/node_modules) folder is missing.
+
+Then, go to AWS and click `Lambda`, and click `Layers` on the left navbar. It should be under `Additional Resources`. Click on `utils` and then `Create version`. Add an option message as to why you are updating the layer, and upload the zipped nodejs folder. Click `x86_64`, and choose `Node.js 20.x` under compatible runtimes. You can leave the License section blank. Click `Create`.
 
 Then, scroll down and click the **second newest** version. Then, scroll down and click `Functions using this version`. Select all of them, click `Edit`, and make the dropdown the latest version. Finally, click `Update functions`.
