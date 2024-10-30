@@ -17,20 +17,35 @@ export const handler = async (event) => {
         return { statusCode: 500, error: "Could not make database connection" };
     }
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
         try {
             // Verify types
             if (typeof event.username !== 'string') {
                 const error = new TypeError('Invalid username parameter. Expected a string.');
                 console.error(error);
-                return reject({ statusCode: 400, error: error.message });
+                return resolve({
+                    statusCode: 400,
+                    error: error.message
+                });
             }
 
             const username = event.username;
             const account = await getAccountByUsername(username, pool);
 
-            if (!account) {
-                return reject({ statusCode: 404, error: "Account not found" });
+            if (account === undefined) {
+                // Note that this will cause problems with AWS when testing. Change it to resolve to see what the output is.
+                // Don't forget to change it back, though.
+                return resolve({
+                    statusCode: 400,
+                    error: "Account doesn't exist"
+                });
+            }
+
+            if (account.accountType === 'Admin') {
+                return resolve({
+                    statusCode: 400,
+                    error: "Cannot close an Admin account"
+                });
             }
 
             const closedQuery = `SELECT isActive FROM Account WHERE username = ${mysql.escape(username)}`;
@@ -39,14 +54,14 @@ export const handler = async (event) => {
             pool.query(closedQuery, (checkError, checkResults) => {
                 if (checkError) {
                     console.error('Check query error:', checkError);
-                    return reject({ statusCode: 500, error: checkError.message });
+                    return resolve({ statusCode: 500, error: checkError.message });
                 }
 
                 const isActive = checkResults[0]?.isActive;
                 if (isActive === 0) {
                     const error = new Error('This user is already a closed account');
                     console.error(error);
-                    return reject({ statusCode: 400, error: error.message });
+                    return resolve({ statusCode: 400, error: error.message });
                 }
 
                 const bidQuery = `
@@ -61,14 +76,14 @@ export const handler = async (event) => {
                 pool.query(bidQuery, (bidError, bidResults) => {
                     if (bidError) {
                         console.error('Bid query error:', bidError);
-                        return reject({ statusCode: 500, error: bidError.message });
+                        return resolve({ statusCode: 500, error: bidError.message });
                     }
 
                     const bidCount = bidResults[0]?.bidCount;
                     if (bidCount > 0) {
                         const error = new Error('You cannot close an account with Active bids');
                         console.error(error);
-                        return reject({ statusCode: 400, error: error.message });
+                        return resolve({ statusCode: 400, error: error.message });
                     }
 
                     const itemQuery = `
@@ -82,14 +97,14 @@ export const handler = async (event) => {
                     pool.query(itemQuery, (itemError, itemResults) => {
                         if (itemError) {
                             console.error('Item query error:', itemError);
-                            return reject({ statusCode: 500, error: itemError.message });
+                            return resolve({ statusCode: 500, error: itemError.message });
                         }
 
                         const itemCount = itemResults[0]?.itemCount;
                         if (itemCount > 0) {
                             const error = new Error('You cannot close an account with Active items');
                             console.error(error);
-                            return reject({ statusCode: 400, error: error.message });
+                            return resolve({ statusCode: 400, error: error.message });
                         }
 
                         const closeQuery = `
@@ -102,7 +117,7 @@ export const handler = async (event) => {
                         pool.query(closeQuery, (closeError, closeResults) => {
                             if (closeError) {
                                 console.error('Close query error:', closeError);
-                                return reject({ statusCode: 500, error: closeError.message });
+                                return resolve({ statusCode: 500, error: closeError.message });
                             }
 
                             console.log('Close query results:', closeResults);
@@ -116,7 +131,7 @@ export const handler = async (event) => {
             });
         } catch (error) {
             console.error('Unexpected error:', error);
-            reject({ statusCode: 500, error: error.message });
+            resolve({ statusCode: 500, error: error.message });
         }
     });
 };
