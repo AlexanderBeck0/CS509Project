@@ -1,5 +1,4 @@
 'use client';
-import { AccountStatus } from "@/utils/AccountStatus";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -48,7 +47,7 @@ export default function LoginPage(props: LoginPageProps) {
             }
 
             // TODO: Add items type definition and bids type definition here
-            const data: { token: string, username: string, status: AccountStatus, profit: number, items: unknown[] } | { token: string, username: string, funds: number, bids: unknown[] } = json;
+            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json;
             await onLogin(data.token);
             setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
