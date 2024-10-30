@@ -1,16 +1,53 @@
+'use client';
 import LoginPage from "./components/LoginPage";
+import HomePage from "./components/HomePage";
+import { Routes, Route, Link, HashRouter } from 'react-router-dom';
+import React, { useState } from "react";
+import SortDropdown from "./components/SortDropdown";
+import SearchBar from "./components/SearchBar";
+import AccountPage from "./components/AccountPage";
 
-export default function Home() {
+function AppContent() {
   async function onLogin(token: string): Promise<void> {
-    "use server";
+    //"use server"; // removed bc causing compile issues
     console.log("onLogin token provided " + token);
   }
 
+  const [searchInput, setSearchInput] = useState("");
+  const [sortBy, setSortBy] = useState("startDate_ASC");
+
+  const handleSearch = (input: any) => {
+    setSearchInput(input);
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <LoginPage onLogin={onLogin} />
-      </main>
-    </div>
+    <main className="main-container">
+      <div className="heading">
+        <Link to="/"><button className="HomeButton">Auction House</button></Link>
+        <div className="search">{/* Need to disable if seller */}
+          <SearchBar handleSearch={handleSearch}/>
+          <SortDropdown setSortBy={setSortBy}/> 
+        </div>
+        <Link to="/Login"> {/* Need link to other pages if logged in */}
+          <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
+            <img src="accountSymbol.png" style={{ height: "40px", width: "auto", objectFit: "contain" }} alt="Account"/>
+          </button>
+        </Link>
+      </div>
+      <div className="content">
+        <Routes>
+          <Route path="/" element={<HomePage searchInput={searchInput} sortBy={sortBy}/>} />
+          <Route path="/Login" element = {<LoginPage onLogin={onLogin}/>}/>
+          <Route path="/Account" element={<AccountPage accountType={"seller"}/>} />
+        </Routes>
+      </div>  
+    </main>
+  );
+}
+export default function Home() {
+  return (
+    <HashRouter basename='/'>
+      <AppContent />
+    </HashRouter>
   );
 }
