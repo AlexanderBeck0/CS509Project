@@ -1,15 +1,16 @@
--- Insert an Admin User
-INSERT IGNORE INTO Admin (username, password) VALUES ('admin1', 'admin123');
+-- Insert Admin
+INSERT IGNORE INTO Account (username, password, accountType, isActive, balance) VALUES 
+('admin1', 'admin123', 'Admin', True, 0);
 
 -- Insert Buyers
-INSERT IGNORE INTO Buyer (username, password, status, funds) VALUES 
-('B1', 'B123', 'Active', 1000),
-('B2', 'B234', 'Active', 500);
+INSERT IGNORE INTO Account (username, password, accountType, isActive, balance) VALUES 
+('B1', 'B123', 'Buyer', True, 1000),
+('B2', 'B234', 'Buyer', True, 500);
 
 -- Insert Sellers
-INSERT IGNORE INTO Seller (username, password, status, profit) VALUES 
-('S1', 'S123', 'Active', 100),
-('S2', 'S234', 'Active', 0);
+INSERT IGNORE INTO Account (username, password, accountType, isActive, balance) VALUES 
+('S1', 'S123', 'Seller', True, 100),
+('S2', 'S234', 'Seller', True, 0);
 
 -- Insert Items for Each Seller
 INSERT IGNORE INTO Item (id, name, description, image, initialPrice, price, startDate, endDate, archived, status, seller_username) VALUES 
@@ -24,9 +25,3 @@ INSERT IGNORE INTO Bid (id, bid, timeOfBid, buyer_username, item_id) VALUES
 (2, 650, '2024-10-23 10:30:00', 'B1', 2),
 (3, 320, '2024-10-23 11:00:00', 'B2', 3),
 (4, 210, '2024-10-23 11:20:00', 'B2', 4);
-
-
--- Ensure that Foreign Keys Exist
-ALTER TABLE Bid 
-ADD CONSTRAINT fk_buyer FOREIGN KEY (buyer_username) REFERENCES Buyer(username),
-ADD CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES Item(id);

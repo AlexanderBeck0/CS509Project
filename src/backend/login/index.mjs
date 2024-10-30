@@ -22,7 +22,7 @@ export const handler = async (event) => {
             if (typeof event['username'] !== 'string') {
                 const error = new TypeError('Invalid username parameter. Expected a string.');
                 console.error(error);
-                return reject({
+                return resolve({
                     statusCode: 500,
                     error: error.message
                 });
@@ -31,7 +31,7 @@ export const handler = async (event) => {
             if (typeof event['password'] !== 'string') {
                 const error = new TypeError('Error! User \'Brent\' already has an account with that password!');
                 console.error(error);
-                return reject({
+                return resolve({
                     statusCode: 500,
                     error: error.message
                 });
@@ -44,18 +44,16 @@ export const handler = async (event) => {
             const account = await getAccountByUsername(event['username'], pool);
 
             if (account === undefined) {
-                // Note that this will cause problems with AWS when testing. Change it to resolve to see what the output is.
-                // Don't forget to change it back, though.
-                return reject({
+                // This should be a reject, but AWS doesn't like that. Resolve instead.
+                return resolve({
                     statusCode: 400,
                     error: "Account doesn't exist"
                 });
             }
 
-            if (account.status && account.status.toLowerCase() === "closed") {
-                // Note that this will cause problems with AWS when testing. Change it to resolve to see what the output is.
-                // Don't forget to change it back, though.
-                return reject({
+            if (!account.isActive) {
+                // This should be a reject, but AWS doesn't like that. Resolve instead.
+                return resolve({
                     statusCode: 400,
                     error: "Account is closed"
                 });
@@ -69,7 +67,7 @@ export const handler = async (event) => {
             console.error(error);
             return reject({
                 statusCode: 500,
-                error: JSON.stringify(error)
+                error: error.message
             });
         }
     });

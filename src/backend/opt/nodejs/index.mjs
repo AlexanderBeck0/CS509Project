@@ -8,7 +8,14 @@ import mysql from 'mysql';
  * @returns {mysql.Pool} A mysql pool
  * @example
  * ```JS
- * let pool = createPool();
+ * import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+ * let pool;
+ * try {
+ *      pool = await createPool();
+ * } catch (error) {
+ *      console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
+ *      return { statusCode: 500, error: "Could not make database connection" };
+ * }
  * ```
  */
 export async function createPool() {
@@ -23,17 +30,23 @@ export async function createPool() {
 }
 
 /**
- * **Important**: As of 10/25/2024, getAccountByUsername does NOT look at Admin.
- * 
  * Gets the account from the pool based on the username.
  * @param {string!} username The username to get. Must be defined and cannot be an empty string.
  * @param {mysql.Pool} pool The pool to get the username from.
  * @param {boolean} [debug=false] A flag to tell the function to print its findings to the console. Defaults to false.
- * @returns {Promise<{username: string} | undefined>} The account found or `undefined` if the account was not found.
+ * @returns {Promise<{username: string, accountType: "Seller" | "Buyer" | "Admin", balance: number, isActive: boolean} | undefined>} The account found or `undefined` if the account was not found.
  * @throws {TypeError} Thrown if there is an issue with the input.
  * @example
  * ```JS
- * const account = await getAccountByUsername(event['username'], pool);
+ * import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+ * let pool;
+ * try {
+ *      pool = await createPool();
+ * } catch (error) {
+ *      console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
+ *      return { statusCode: 500, error: "Could not make database connection" };
+ * }
+ * const account = await getAccountByUsername(username, pool);
  * ```
  */
 export async function getAccountByUsername(username, pool, debug = false) {
@@ -58,17 +71,13 @@ export async function getAccountByUsername(username, pool, debug = false) {
     }
 
     // Valid username and pool at this point
-    // BUG: Will not work with adding Admin due to different table sizes.
     const query = `
-        SELECT username, status, profit FROM Seller
+        SELECT username, accountType, isActive, balance FROM Account
         WHERE username = ?
-        UNION
-        SELECT username, status, funds FROM Buyer
-        WHERE username = ?;
         `;
 
     return new Promise((resolve, reject) => {
-        pool.query(query, [username, username, username], (error, results) => {
+        pool.query(query, [username], (error, results) => {
             if (error) {
                 if (debug) console.error("MySQL Query error: " + JSON.stringify(error));
                 return reject(error);
