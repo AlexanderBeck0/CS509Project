@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 interface DropdownMenuProps {
-    setSortBy: (sort: string) => void;
+  setSortBy: (sort: string) => void;
 }
 
 export function SortDropdown({ setSortBy }: DropdownMenuProps) {
@@ -19,10 +19,10 @@ export function SortDropdown({ setSortBy }: DropdownMenuProps) {
 
   const handleOptionClick = (option: string) => {
     if (selectedOption === option) {
-        setIsAscending(!isAscending);
+      setIsAscending(!isAscending);
     } else {
-        setSelectedOption(option);
-        setIsAscending(true);
+      setSelectedOption(option);
+      setIsAscending(true);
     }
     setIsOpen(false);
   };
@@ -34,10 +34,10 @@ export function SortDropdown({ setSortBy }: DropdownMenuProps) {
       Start: "startDate",
       End: "endDate",
     };
-  
+
     const sortKey = optionMap[selectedOption] || "name";
     setSortBy(`${sortKey}_${isAscending ? "ASC" : "DESC"}`);
-  }, [selectedOption, isAscending]);
+  }, [selectedOption, isAscending, setSortBy]);
 
   return (
     <div style={{ position: "relative", marginLeft: "8px" }}>
