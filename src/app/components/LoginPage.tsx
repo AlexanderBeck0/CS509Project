@@ -43,19 +43,19 @@ export default function LoginPage(props: LoginPageProps) {
             }
 
             const json = await response.json();
-            if (json['status'] !== 200) {
+            if (json['statusCode'] !== 200) {
                 throw new Error(json['error']);
             }
 
             // TODO: Add items type definition and bids type definition here
-            const data: {token: string, username: string, status: AccountStatus, profit: number, items: unknown[]} | {token: string, username: string, funds: number, bids: unknown[]} = json;
+            const data: { token: string, username: string, status: AccountStatus, profit: number, items: unknown[] } | { token: string, username: string, funds: number, bids: unknown[] } = json;
             await onLogin(data.token);
             setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
             // Handle error thrown
             if (error instanceof Error) {
-                console.error("Error while logging in: " + (error.message ?? error ));
-                setMessage("Error while logging in: " + (error.message ?? error));
+                console.error("Error while logging in: " + error.message);
+                setMessage("Error while logging in: " + error.message);
             } else {
                 // A non-Error error was thrown.
                 console.error("An unknown error has occurred.");
