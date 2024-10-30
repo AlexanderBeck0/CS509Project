@@ -1,5 +1,5 @@
 'use client';
-import Link from "next/link";
+import { Link } from 'react-router-dom';
 import { useRef, useState } from "react";
 
 interface LoginPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -89,7 +89,7 @@ export default function LoginPage(props: LoginPageProps) {
                 </div>
             </form>
             <div>
-                <p>New user? <Link href={"/createAccount"}>Create Account</Link></p>
+                <p>New user? <Link to={"/createAccount"}>Create Account</Link></p>
             </div>
             <div className="text-xl">{message}</div>
             {props.children}

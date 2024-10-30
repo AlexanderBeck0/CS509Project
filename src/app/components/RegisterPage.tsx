@@ -1,5 +1,5 @@
 'use client';
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 
 interface RegisterPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -28,7 +28,7 @@ export default function RegisterPage(props: RegisterPageProps) {
 
         // Do post request to login here
         try {
-            const response = await fetch("//localhost:8000/createAccount", {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/createAccount", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -106,7 +106,7 @@ export default function RegisterPage(props: RegisterPageProps) {
                     </button>
                 </div>
                 <div>
-                    <p>Existing user? <Link href="/login">Sign in</Link></p>
+                    <p>Existing user? <Link to="/login">Sign in</Link></p>
                 </div>
             </form>
             <div className="text-xl">{message}</div>
