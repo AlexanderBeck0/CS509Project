@@ -1,5 +1,4 @@
 'use client';
-import { AccountStatus } from "@/utils/AccountStatus";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -51,12 +50,15 @@ export default function RegisterPage(props: RegisterPageProps) {
                 throw new Error(errorMessage);
             }
 
-            // Response is ok (success)
+            const json = await response.json();
+            if (json['statusCode'] !== 200) {
+                throw new Error(json['error']);
+            }
+
             // TODO: Add items type definition and bids type definition here
-            const data: {token: string, username: string, status: AccountStatus, profit: number, items: unknown[]} | {token: string, username: string, funds: number, bids: unknown[]} = await response.json();
-            // TODO: Might want to add a Promise to Register to handle errors
+            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = JSON.parse(json.body);
             await onRegister(data.token);
-            setMessage("Registered!");
+            setMessage(`Registered!`);
         } catch (error) {
             // Handle error thrown
             if (error instanceof Error) {
