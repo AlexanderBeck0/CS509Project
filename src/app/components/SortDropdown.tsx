@@ -4,7 +4,7 @@ interface DropdownMenuProps {
     setSortBy: (sort: string) => void;
 }
 
-export function Dropdown({ setSortBy }: DropdownMenuProps) {
+export function SortDropdown({ setSortBy }: DropdownMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
   const [dropdownButtonWidth, setDropdownButtonWidth] = useState(0);
@@ -65,4 +65,4 @@ export function Dropdown({ setSortBy }: DropdownMenuProps) {
     </div>
   );
 }
-export default Dropdown;
+export default SortDropdown;
