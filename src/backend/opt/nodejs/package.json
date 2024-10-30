@@ -19,6 +19,8 @@
   "homepage": "https://github.com/AlexanderBeck0/auction-house/tree/main#readme",
   "type": "commonjs",
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1"
   }
 }
