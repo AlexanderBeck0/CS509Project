@@ -1,13 +1,21 @@
 import mysql from 'mysql';
+import { createPool } from "../opt/nodejs/index.mjs";
 
+/**
+ * @param {{username: string, password: string, accountType: string}} event The login event
+ */
 export const handler = async (event) => {
-    console.log('Creating MySQL pool...');
-    var pool = mysql.createPool({
-        host: "auctionhousedb.chyqe6cmmf08.us-east-1.rds.amazonaws.com",
-        user: "auctionadmin",
-        password: "sp6dO9CPdNecytAhsnQm",
-        database: "auctionhouse"
-    });
+    /**
+     * @type {mysql.Pool}
+     */
+    let pool;
+
+    try {
+        pool = await createPool();
+    } catch (error) {
+        console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
+        return { statusCode: 500, error: "Could not make database connection" };
+    }
 
     const username = event.username;
     const password = event.password;
@@ -32,7 +40,7 @@ export const handler = async (event) => {
         }
 
         // Check if username already exists
-        const checkQuery = `SELECT status FROM ${mysql.escapeId(accountType)} WHERE username = ${mysql.escape(username)}`;
+        const checkQuery = `SELECT isActive FROM Account WHERE username = ${mysql.escape(username)}`;
         console.log('Executing check query:', checkQuery);
         pool.query(checkQuery, (checkError, checkResults) => {
             if (checkError) {
@@ -41,8 +49,8 @@ export const handler = async (event) => {
             }
 
             if (checkResults.length > 0) {
-                const status = checkResults[0].status;
-                if (status === 'closed') {
+                const isActive = checkResults[0].isActive;
+                if (isActive === 'closed') {
                     const error = new Error('This user has permanently closed an account with that username.');
                     console.error(error);
                     return reject(error);
@@ -55,8 +63,8 @@ export const handler = async (event) => {
 
             // Proceed with insertion
             const insertQuery = `
-                INSERT INTO ${mysql.escapeId(accountType)} (username, password, status, funds)
-                VALUES (${mysql.escape(username)}, ${mysql.escape(password)}, 'active', 0)
+                INSERT INTO Account (username, password, accountType, isActive, balance)
+                VALUES (${mysql.escape(username)}, ${mysql.escape(password)}, ${mysql.escape(accountType)}, True, 0)
             `;
             console.log('Executing insert query:', insertQuery);
             pool.query(insertQuery, (insertError, insertResults) => {
