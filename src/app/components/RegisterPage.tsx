@@ -1,6 +1,5 @@
 'use client';
-import { AccountStatus } from "@/utils/AccountStatus";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 
 interface RegisterPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -29,7 +28,7 @@ export default function RegisterPage(props: RegisterPageProps) {
 
         // Do post request to login here
         try {
-            const response = await fetch("//localhost:8000/createAccount", {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/createAccount", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -51,12 +50,15 @@ export default function RegisterPage(props: RegisterPageProps) {
                 throw new Error(errorMessage);
             }
 
-            // Response is ok (success)
+            const json = await response.json();
+            if (json['statusCode'] !== 200) {
+                throw new Error(json['error']);
+            }
+
             // TODO: Add items type definition and bids type definition here
-            const data: {token: string, username: string, status: AccountStatus, profit: number, items: unknown[]} | {token: string, username: string, funds: number, bids: unknown[]} = await response.json();
-            // TODO: Might want to add a Promise to Register to handle errors
+            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = JSON.parse(json.body);
             await onRegister(data.token);
-            setMessage("Registered!");
+            setMessage(`Registered!`);
         } catch (error) {
             // Handle error thrown
             if (error instanceof Error) {
@@ -104,7 +106,7 @@ export default function RegisterPage(props: RegisterPageProps) {
                     </button>
                 </div>
                 <div>
-                    <p>Existing user? <Link href="/login">Sign in</Link></p>
+                    <p>Existing user? <Link to="/login">Sign in</Link></p>
                 </div>
             </form>
             <div className="text-xl">{message}</div>
