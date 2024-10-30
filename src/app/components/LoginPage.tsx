@@ -1,5 +1,4 @@
 'use client';
-import { AccountStatus } from "@/utils/AccountStatus";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -29,7 +28,7 @@ export default function LoginPage(props: LoginPageProps) {
 
         // Do post request to login here
         try {
-            const response = await fetch("//localhost:8000/login", {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -38,22 +37,17 @@ export default function LoginPage(props: LoginPageProps) {
                 })
             });
             if (!response.ok) {
-                // There was a bad response
-                if (response.status === 400) {
-                    // Handle 400 response
-                    const errorMessage = await response.json();
-                    throw new Error(errorMessage.error);
-                }
-
-                // Other, unknown error
                 const errorMessage = await response.json();
                 throw new Error(errorMessage);
             }
 
-            // Response is ok (success)
+            const json = await response.json();
+            if (json['statusCode'] !== 200) {
+                throw new Error(json['error']);
+            }
+
             // TODO: Add items type definition and bids type definition here
-            const data: {token: string, username: string, status: AccountStatus, profit: number, items: unknown[]} | {token: string, username: string, funds: number, bids: unknown[]} = await response.json();
-            // TODO: Might want to add a Promise to Login to handle errors
+            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json;
             await onLogin(data.token);
             setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
