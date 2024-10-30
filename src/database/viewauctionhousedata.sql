@@ -1,11 +1,5 @@
 -- View Admins
-SELECT * FROM Admin;
-
--- View Buyers
-SELECT * FROM Buyer;
-
--- View Sellers
-SELECT * FROM Seller;
+SELECT * FROM Account;
 
 -- View Items
 SELECT * FROM Item;
