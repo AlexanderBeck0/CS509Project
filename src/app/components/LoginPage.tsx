@@ -29,7 +29,7 @@ export default function LoginPage(props: LoginPageProps) {
 
         // Do post request to login here
         try {
-            const response = await fetch("//localhost:8000/login", {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
