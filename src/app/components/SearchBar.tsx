@@ -22,7 +22,7 @@ export function SearchBar({ handleSearch }: SearchBarProps) {
         onChange={handleInputChange}
         placeholder="Search here..."
       />
-      <button onClick={() => handleSearch(tempSearchInput)}>&nbsp;🔎&nbsp;</button>
+      <button className='searchButton' style={{borderRadius: "8px"}} onClick={() => handleSearch(tempSearchInput)}>&nbsp;🔎&nbsp;</button>
     </div>
   );
 }

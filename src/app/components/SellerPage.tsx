@@ -1,7 +1,46 @@
-// import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
 
 export default function SellerPage() {
+    const [selectedOption, setSelectedOption] = useState("All");
+    const [filterItemsBy, setFilter] = useState("");
+    const [filteredItemresult, setFilteredItemresult] = useState<any[]>([]);
+
+    const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedOption(event.target.value);
+    };
+
+    useEffect(() => {    
+        const sortKey = selectedOption === "All" ? "" : selectedOption.toLowerCase();
+        setFilter(`${sortKey}`);
+    }, [selectedOption, setFilter]);
+
+    useEffect(() => {
+        console.log("Filter: " + filterItemsBy);
+        const fetchData = async () => {
+          const payload = {
+            username: "", // get seller username from token
+            filter: filterItemsBy,
+          };
+          try {
+            const response = await fetch('',
+              {
+                method: 'POST',
+                body: JSON.stringify(payload),
+              });
+    
+            const resultData = await response.json();
+            console.log(resultData);
+            if (resultData.statusCode == 200) {
+                setFilteredItemresult(resultData.items);
+            }
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        }
+        fetchData();
+      }, [filterItemsBy]);
+    
 
     /*get JSON of seller id from database*/
 
@@ -17,49 +56,56 @@ export default function SellerPage() {
 
     return (
         <div className='content'>
-            <div> {/* heading of seller */}
-                <Image src="/accountSymbol.png" alt="Seller Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
-                <p><b>Seller:</b> {"SELLERNAME"}</p>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center"}}> {/* heading of seller */}
+                <Image src="/accountSymbol.png" alt="Seller Account Symbol" width={100} height={100} style={{ objectFit: "contain", margin: "1rem"}} />
+                <b>{"SELLERNAME"}</b>
             </div>
             <div className="sellerContent"> {/* item content */}
-                <div className='sellerContentColumn' style={{ width: "33.33%", }}>
+                <div className='sellerContentColumn' style={{ width: "25%", }}>
                     <p><b>Profit:</b></p>
-                    {"PROFIT NUMBER"}
+                    ${"PROFIT NUMBER"}
                     <div className='buttons'>
+                        {/* on clicks */}
                         <button className='accountButton'>Close Account</button>
                         <button className='accountButton'>Log out</button>
                     </div>
                 </div>
-                <div className='sellerContentColumn' style={{ width: "66.66%", }}>
-                    <div className='flex row'>
+                <div className='sellerContentColumn' style={{ width: "60%", }}>
+                    <div className='flex row' style={{ justifyContent: "space-between", alignItems: "center" }}>
                         <p><b>Items:</b></p>
-                        <div>{"DROPDOWN"}</div>
+                        <select value={selectedOption} onChange={handleSelectChange}>
+                            <option value={"All"}>All</option>
+                            <option value={"Inactive"}>Inactive</option>
+                            <option value={"Active"}>Active</option>
+                            <option value={"Failed"}>Failed</option>
+                            <option value={"Archived"}>Archived</option>
+                            <option value={"Completed"}>Completed</option>
+                        </select>
                     </div>
                     <div className='flex row'>
+                        {/* Get items based on filter, not sold prob?? */}
                         <div className="container" onWheel={handleScroll}>
-                            <div className="scrollItem">
-                                1
+                        {Array.from({ length: 50 }, (_, index) => (
+                            <div className="scrollItem" key={index}>
+                                {index + 1}
                             </div>
-                            <div className="scrollItem">
-                                2
-                            </div>
-                            <div className="scrollItem">
-                                3
-                            </div>
+                        ))}
                         </div>
-                        <button className='' style={{ fontSize: "50px" }}><b>+</b></button>
                     </div>
                     <div className="container" onWheel={handleScroll}>
-                        <div className="scrollItem">
-                            1
-                        </div>
-                        <div className="scrollItem">
-                            2
-                        </div>
-                        <div className="scrollItem">
-                            3
-                        </div>
+                        {/* Get sold Items */}
+                            {Array.from({ length: 10 }, (_, index) => (
+                            <div className="scrollItem" key={index}>
+                            {index + 1}
+                            </div>
+                        ))}
                     </div>
+                </div>
+                <div className='sellerContentColumn' style={{ width: "6%", justifyContent: "center", alignItems: "center"}}>
+                    {/* on click!!! open addItemPage */} 
+                    <button style={{ fontSize: "5vw", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                        <b>+</b>
+                    </button>
                 </div>
             </div>
         </div>

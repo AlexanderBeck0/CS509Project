@@ -50,12 +50,16 @@ export function SortDropdown({ setSortBy }: DropdownMenuProps) {
             <li
               key={option}
               onClick={() => handleOptionClick(option)}
-              style={{
+              style={{ borderRadius: "8px",
                 display: "flex", alignItems: "center", cursor: "pointer",
-                padding: "8px",
-                backgroundColor: option === selectedOption ? "#f0f0f0" : "white",
+                padding: "8px", 
+                backgroundColor: option === selectedOption ? "#f0f0f0" : "",
                 fontWeight: option === selectedOption ? "bold" : "normal",
-              }}>
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#ccc")}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = option === selectedOption ? "#f0f0f0" : "")
+              }>
               {option === selectedOption && (isAscending ? "▼" : "▲")}
               <span style={{ marginLeft: "4px" }}>{option}</span>
             </li>
