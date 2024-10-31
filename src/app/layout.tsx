@@ -20,7 +20,6 @@ export const metadata: Metadata = {
     "icon": "favicon/favicon.ico",
     "apple": "favicon/apple-touch-icon.png",
   },
-  manifest: "favicon/site.webmanifest",
   authors: [
     { name: "Alexander Beck", url: "https://github.com/AlexanderBeck0" },
     { name: "Emilia Krum", url: "https://github.com/MurkingtonWizard" },
