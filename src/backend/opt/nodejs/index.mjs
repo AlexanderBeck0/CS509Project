@@ -159,13 +159,33 @@ export async function getUsernameFromToken(token) {
 }
 
 /**
+ * Verifies the authenticity of a given JWT (jsonwebtoken)
  * @param {string} token The token to verify.
  * @returns {Promise<boolean>} A Promise of the validitity of `Token`
+ * @example
+ * ```JS
+ * // Synchronous
+ * const isValid = await verifyToken(token);
+ * ```
+ * @example
+ * ```JS
+ * // Asynchronous
+ * return new Promise((resolve) => {
+ *      verifyToken(token).then(isValid => {
+ *          return resolve({
+ *              statusCode: 200,
+ *              body: JSON.stringify({ valid: isValid })
+ *          });
+ *      });
+ * });
+ * ```
  */
 export async function verifyToken(token) {
     return new Promise((resolve, reject) => {
         return jwt.verify(token, JWT_KEY, (err, decoded) => {
             if (err) {
+                // Ensure that TokenExpiredError does not reject but rather resolves false
+                if (err.name === 'TokenExpiredError') return resolve(false);
                 console.error(err);
                 return reject(err);
             }

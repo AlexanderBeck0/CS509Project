@@ -58,13 +58,13 @@ export const handler = async (event) => {
                 });
             }
 
-            const token = generateToken(account);
+            const token = await generateToken(account);
             return resolve({
                 statusCode: 200,
-                body: JSON.stringify({
+                body: {
                     token,
                     ...account
-                })
+                }
             });
         } catch (error) {
             console.error(error);

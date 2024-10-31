@@ -1,0 +1,19 @@
+{
+  "name": "verifytoken",
+  "version": "1.0.0",
+  "description": "API Endpoint used to verify a token",
+  "main": "index.mjs",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexanderBeck0/auction-house.git#main"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlexanderBeck0/auction-house/issues"
+  },
+  "homepage": "https://github.com/AlexanderBeck0/auction-house/tree/main#readme"
+}
