@@ -1,12 +1,12 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 
 interface SearchBarProps {
-  handleSearch: (input: String) => void;
+  handleSearch: (input: string) => void;
 }
 
 export function SearchBar({ handleSearch }: SearchBarProps) {
   const [tempSearchInput, setTempSearchInput] = useState("");
-  
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTempSearchInput(e.target.value);
   };

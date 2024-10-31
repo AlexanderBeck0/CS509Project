@@ -2,10 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/*
+This forces dark mode on my machine which makes the UI impossible to use.
+*/
+/* :root {
   --background: #171717;
   --foreground: #ffffff;
-}
+} */
 
 @media (min-width: 640px) {
   .main-container {
