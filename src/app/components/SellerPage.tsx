@@ -1,10 +1,12 @@
 import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
+import { Link } from 'react-router-dom';
 
 export default function SellerPage() {
     const [selectedOption, setSelectedOption] = useState("All");
     const [filterItemsBy, setFilter] = useState("");
     const [filteredItemresult, setFilteredItemresult] = useState<any[]>([]);
+    const [sellerResult, setSellerResult] = useState<any[]>([]);
 
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
@@ -43,6 +45,32 @@ export default function SellerPage() {
     
 
     /*get JSON of seller id from database*/
+
+    useEffect (() => {
+        console.log("Seller: USERNAME");
+        const fetchData = async () => {
+            const payload = {
+              username: "USERNAME", // get seller username from token
+              token: "TOKEN"
+            };
+            try {
+              const response = await fetch('',
+                {
+                  method: 'POST',
+                  body: JSON.stringify(payload),
+                });
+      
+              const resultData = await response.json();
+              console.log(resultData);
+              if (resultData.statusCode == 200) {
+                  setSellerResult(resultData);
+              }
+            } catch (error) {
+              console.error('Error fetching data:', error);
+            }
+          }
+          fetchData();
+    }, [sellerResult]);
 
     const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
         const container = event.target as HTMLDivElement;
@@ -103,9 +131,9 @@ export default function SellerPage() {
                 </div>
                 <div className='sellerContentColumn' style={{ width: "6%", justifyContent: "center", alignItems: "center"}}>
                     {/* on click!!! open addItemPage */} 
-                    <button style={{ fontSize: "5vw", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <Link to="/addItem"><button style={{ fontSize: "5vw", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
                         <b>+</b>
-                    </button>
+                    </button></Link>
                 </div>
             </div>
         </div>

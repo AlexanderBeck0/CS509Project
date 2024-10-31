@@ -8,6 +8,7 @@ import SortDropdown from "./components/SortDropdown";
 import SearchBar from "./components/SearchBar";
 import AccountPage from "./components/AccountPage";
 import RegisterPage from "./components/RegisterPage";
+import AddItemPage from "./components/AddItemPage";
 
 function AppContent() {
   async function onLogin(token: string): Promise<void> {
@@ -47,6 +48,7 @@ function AppContent() {
           <Route path="/login" element={<LoginPage onLogin={onLogin} />} />
           <Route path="/createAccount" element={<RegisterPage onRegister={onRegister} />} />
           <Route path="/account" element={<AccountPage accountType={"seller"} />} />
+          <Route path="/addItem" element={<AddItemPage/>} />
         </Routes>
       </div>
     </main>

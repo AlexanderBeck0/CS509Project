@@ -107,10 +107,19 @@ body {
   align-content: left;
 }
 
-.search-input {
-  color: black;
+input {
   padding: 1rem;
-  background-color: transparent;
+  width: 100%;
+  max-width: 20rem;
+  max-height: 2.25rem;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  color: black;
+}
+
+input:focus {
+  border: 1px solid black
 }
 
 .dropdown {
@@ -163,6 +172,7 @@ body {
   border-radius: 8px;
   border: 1px solid black;
   margin-top: 1rem;
+  padding: .25rem;
 }
 
 .accountButton:hover {
@@ -170,5 +180,13 @@ body {
 }
 
 .searchButton:hover {
-  background-color:#ccc
+  background-color:#ccc;
+}
+.searchButton {
+  border-radius: 8px;
+}
+
+.itemPageInput {
+  background-color: transparent;
+  width: auto;
 }
