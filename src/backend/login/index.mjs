@@ -1,4 +1,4 @@
-import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+import { createPool, generateToken, getAccountByUsername } from "../opt/nodejs/index.mjs";
 
 /**
  * @param {{username: string, password: string}} event The login event
@@ -39,7 +39,6 @@ export const handler = async (event) => {
 
             // TODO: Compare passwords
             // TODO: Salt passwords
-            // TODO: Generate tokens
 
             const account = await getAccountByUsername(event['username'], pool);
 
@@ -59,9 +58,13 @@ export const handler = async (event) => {
                 });
             }
 
+            const token = await generateToken(account);
             return resolve({
                 statusCode: 200,
-                body: JSON.stringify(account)
+                body: {
+                    token,
+                    ...account
+                }
             });
         } catch (error) {
             console.error(error);

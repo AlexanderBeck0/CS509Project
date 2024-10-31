@@ -1,9 +1,9 @@
 {
-  "name": "utils",
+  "name": "verifytoken",
   "version": "1.0.0",
-  "description": "Utility code for use in Layers in AWS Lambda",
-  "private": true,
+  "description": "API Endpoint used to verify a token",
   "main": "index.mjs",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,16 +11,9 @@
     "type": "git",
     "url": "git+https://github.com/AlexanderBeck0/auction-house.git#main"
   },
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/AlexanderBeck0/auction-house/issues"
   },
-  "homepage": "https://github.com/AlexanderBeck0/auction-house/tree/main#readme",
-  "type": "commonjs",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "jsonwebtoken": "^9.0.2",
-    "mysql": "^2.18.1"
-  }
+  "homepage": "https://github.com/AlexanderBeck0/auction-house/tree/main#readme"
 }
