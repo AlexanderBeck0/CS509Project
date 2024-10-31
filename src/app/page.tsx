@@ -1,31 +1,62 @@
 'use client';
-import LoginPage from "./components/LoginPage";
-import HomePage from "./components/HomePage";
-import { Routes, Route, Link, HashRouter } from 'react-router-dom';
 import Image from 'next/image';
-import React, { useState, useEffect } from "react";
-import SortDropdown from "./components/SortDropdown";
-import SearchBar from "./components/SearchBar";
+import { useEffect, useState } from "react";
+import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import AccountPage from "./components/AccountPage";
+import HomePage from "./components/HomePage";
+import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
+import SearchBar from "./components/SearchBar";
+import SortDropdown from "./components/SortDropdown";
 
 function AppContent() {
-  async function onLogin(token: string): Promise<void> {
-    //"use server"; // removed bc causing compile issues
-    console.log("onLogin token provided " + token);
-  }
-
-  async function onRegister(token: string): Promise<void> {
-    //"use server"; // removed bc causing compile issues
-    console.log("onRegister token provided " + token);
-  }
-
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("startDate_ASC");
+
+  // Called whenever token changes
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (token === undefined || token === null) {
+        setIsLoggedIn(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/verifyToken", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        });
+
+        const data = await response.json();
+
+        // Use === true to ensure that it won't become undefined if data.valid is undefined
+        setIsLoggedIn(data.body.valid === true);
+      } catch (error) {
+        console.error("Failure to verify token: " + error);
+        setIsLoggedIn(false);
+      }
+    }
+    verifyToken();
+  }, [token]);
 
   const handleSearch = (input: string) => {
     setSearchInput(input);
   };
+
+  function onLogin(newToken: string): void {
+    setToken(newToken);
+    localStorage.setItem('token', newToken); //Store token in localStorage
+  }
+
+  function onRegister(newToken: string): void {
+    setToken(newToken);
+    localStorage.setItem('token', newToken); //Store token in localStorage
+  }
 
   return (
     <main className="main-container">
@@ -35,7 +66,7 @@ function AppContent() {
           <SearchBar handleSearch={handleSearch} />
           <SortDropdown setSortBy={setSortBy} />
         </div>
-        <Link to="/login"> {/* Need link to other pages if logged in */}
+        <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
             <Image src="/accountSymbol.png" height={40} width={40} style={{ height: "40px", width: "auto", objectFit: "contain" }} alt="Account" />
           </button>
@@ -44,9 +75,15 @@ function AppContent() {
       <div className="content">
         <Routes>
           <Route path="/" element={<HomePage searchInput={searchInput} sortBy={sortBy} />} />
-          <Route path="/login" element={<LoginPage onLogin={onLogin} />} />
-          <Route path="/createAccount" element={<RegisterPage onRegister={onRegister} />} />
-          <Route path="/account" element={<AccountPage accountType={"seller"} />} />
+          <Route path="/login" element={
+            (!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to={"/account"} />)
+          } />
+          <Route path="/createAccount" element={
+            (!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to={"/account"} />)
+          } />
+          <Route path="/account" element={
+            (isLoggedIn ? <AccountPage accountType={"seller"} /> : <Navigate to={"/"} />)
+            } />
         </Routes>
       </div>
     </main>
