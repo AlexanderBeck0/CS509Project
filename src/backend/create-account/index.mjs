@@ -1,5 +1,6 @@
 import mysql from 'mysql';
 import { createPool } from "../opt/nodejs/index.mjs";
+import bcrypt from 'bcryptjs';
 
 /**
  * @param {{username: string, password: string, accountType: string}} event The login event
@@ -18,7 +19,7 @@ export const handler = async (event) => {
     }
 
     const username = event.username;
-    const password = event.password;
+    let password = event.password;
     const accountType = event.accountType;
 
     return new Promise((resolve, reject) => {
@@ -42,7 +43,7 @@ export const handler = async (event) => {
         // Check if username already exists
         const checkQuery = `SELECT isActive FROM Account WHERE username = ${mysql.escape(username)}`;
         console.log('Executing check query:', checkQuery);
-        pool.query(checkQuery, (checkError, checkResults) => {
+        pool.query(checkQuery, async (checkError, checkResults) => {
             if (checkError) {
                 console.error('Check query error:', checkError);
                 return reject(checkError);
@@ -61,13 +62,17 @@ export const handler = async (event) => {
                 }
             }
 
+            var salt = bcrypt.genSaltSync(10);
+            var password = bcrypt.hashSync("B4c0/\/", salt);
+            console.log("hashed password: ", password)
             // Proceed with insertion
             const insertQuery = `
                 INSERT INTO Account (username, password, accountType, isActive, balance)
-                VALUES (${mysql.escape(username)}, ${mysql.escape(password)}, ${mysql.escape(accountType)}, True, 0)
+                VALUES (?, ?, ?, True, 0)
             `;
             console.log('Executing insert query:', insertQuery);
-            pool.query(insertQuery, (insertError, insertResults) => {
+            pool.query(insertQuery, [username, password, accountType], (insertError, insertResults) => {
+
                 if (insertError) {
                     console.error('Insert query error:', insertError);
                     return reject(insertError);
