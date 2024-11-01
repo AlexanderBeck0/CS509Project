@@ -90,17 +90,12 @@ describe.sequential("Register example", () => {
         fireEvent.click(submitButton);
 
         // Check that it is Registering
-        let message = screen.getByText(/Registering/);
+        const message = screen.getByText(/Registering/);
         expect(message).toBeDefined();
 
         // Wait for response to be sent
-        // Use a value of 3600 for 3.6 seconds, and 4100 as a slightly longer timeout
-        await waitFor(() => new Promise((resolve) => setTimeout(resolve, 3600)), { timeout: 4100 })
-            .then(() => {
-                // BUG: This is causing statusCode of 400 as of PR 14 (before this code was pushed to main for the first time)
-                message = screen.getByText(/Registered/);
-                expect(message).toBeDefined();
-            });
+        await waitFor(() => screen.getByText(/Registered/), { timeout: 5000 })
+            .then((currentMessage) => expect(currentMessage).toBeDefined());
     });
 
     test.todo("Token exists");

@@ -1,8 +1,23 @@
-import mysql from 'mysql';
+import bcrypt from 'bcryptjs';
 import { createPool } from "../opt/nodejs/index.mjs";
 
 /**
- * @param {{username: string, password: string, accountType: string}} event The login event
+ * Uses 10 salts to hash a password.
+ * @param {string} password The password to hash.
+ * @returns {Promise<string>} A hashed password.
+ */
+async function hashPassword(password) {
+    return new Promise((resolve, reject) => {
+        const saltCount = 10;
+        bcrypt.hash(password, saltCount, function (err, hash) {
+            if (err) return reject(err);
+            return resolve(hash);
+        });
+    });
+}
+
+/**
+ * @param {{username: string, password: string, accountType: string}} event The login event.
  */
 export const handler = async (event) => {
     /**
@@ -17,9 +32,7 @@ export const handler = async (event) => {
         return { statusCode: 500, error: "Could not make database connection" };
     }
 
-    const username = event.username;
-    const password = event.password;
-    const accountType = event.accountType;
+    const { username, password, accountType } = event;
 
     return new Promise((resolve, reject) => {
         // Type check all args
@@ -40,9 +53,9 @@ export const handler = async (event) => {
         }
 
         // Check if username already exists
-        const checkQuery = `SELECT isActive FROM Account WHERE username = ${mysql.escape(username)}`;
+        const checkQuery = `SELECT isActive FROM Account WHERE username = ?`;
         console.log('Executing check query:', checkQuery);
-        pool.query(checkQuery, (checkError, checkResults) => {
+        pool.query(checkQuery, [username], async (checkError, checkResults) => {
             if (checkError) {
                 console.error('Check query error:', checkError);
                 return reject(checkError);
@@ -64,10 +77,13 @@ export const handler = async (event) => {
             // Proceed with insertion
             const insertQuery = `
                 INSERT INTO Account (username, password, accountType, isActive, balance)
-                VALUES (${mysql.escape(username)}, ${mysql.escape(password)}, ${mysql.escape(accountType)}, True, 0)
+                VALUES (?, ?, ?, True, 0)
             `;
             console.log('Executing insert query:', insertQuery);
-            pool.query(insertQuery, (insertError, insertResults) => {
+
+            const hashedPassword = await hashPassword(password);
+            pool.query(insertQuery, [username, hashedPassword, accountType], (insertError, insertResults) => {
+
                 if (insertError) {
                     console.error('Insert query error:', insertError);
                     return reject(insertError);

@@ -1,9 +1,9 @@
 'use client';
-import { Link } from "react-router-dom";
 import { useId, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface RegisterPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-    onRegister: (token: string) => Promise<void> | void,
+    onRegister: (token: string) => void,
 };
 
 export default function RegisterPage(props: RegisterPageProps) {
@@ -59,9 +59,9 @@ export default function RegisterPage(props: RegisterPageProps) {
             }
 
             // TODO: Add items type definition and bids type definition here
-            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = JSON.parse(json.body);
-            await onRegister(data.token);
-            setMessage(`Registered!`);
+            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json.body
+            onRegister(data.token);
+            setMessage("Registered!");
         } catch (error) {
             // Handle error thrown
             if (error instanceof Error) {
