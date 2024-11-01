@@ -1,6 +1,6 @@
 'use client';
 import { Link } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 interface RegisterPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
     onRegister: (token: string) => Promise<void> | void,
@@ -17,6 +17,9 @@ export default function RegisterPage(props: RegisterPageProps) {
     const usernameRef = useRef<HTMLInputElement | null>(null);
     const passwordRef = useRef<HTMLInputElement | null>(null);
     const accountTypeRef = useRef<HTMLSelectElement | null>(null);
+    const usernameId = useId();
+    const passwordId = useId();
+    const accountTypeId = useId();
 
     /**
      * The callback for when the user tries to create an account.
@@ -77,25 +80,25 @@ export default function RegisterPage(props: RegisterPageProps) {
             <form onSubmit={handleSubmit}>
                 <div>
                     <div>
-                        <label className="text-lg select-none" htmlFor="username">Username</label>
+                        <label className="text-lg select-none" htmlFor={usernameId}>Username</label>
                     </div>
                     <input className="input input-bordered w-full max-w-xs max-h-9 input-primary focus:outline-accent"
                         type="text" name="username" autoComplete="username" data-length="20" required
-                        ref={usernameRef}></input>
+                        ref={usernameRef} id={usernameId}></input>
                 </div>
                 <div className="mb-2">
                     <div>
-                        <label className="text-lg select-none" htmlFor="password">Password</label>
+                        <label className="text-lg select-none" htmlFor={passwordId}>Password</label>
                     </div>
                     <input className="input input-bordered w-full max-w-xs max-h-9 input-primary focus:outline-accent"
                         type="password" name="password" autoComplete="current-password" required
-                        ref={passwordRef}></input>
+                        ref={passwordRef} id={passwordId}></input>
                 </div>
                 <div className="mb-2">
                     <div>
-                        <label className="text-lg select-none" htmlFor="accountType">Account Type:</label>
+                        <label className="text-lg select-none" htmlFor={accountTypeId}>Account Type:</label>
                     </div>
-                    <select className="select-none" name="accountType" ref={accountTypeRef}>
+                    <select className="select-none" name="accountType" ref={accountTypeRef} id={accountTypeId}>
                         <option value="Buyer">Buyer</option>
                         <option value="Seller">Seller</option>
                     </select>
