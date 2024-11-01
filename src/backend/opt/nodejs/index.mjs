@@ -8,7 +8,7 @@ import mysql from 'mysql';
  * @returns {mysql.Pool} A mysql pool
  * @example
  * ```JS
- * import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+ * import { createPool } from "../opt/nodejs/index.mjs";
  * let pool;
  * try {
  *      pool = await createPool();
