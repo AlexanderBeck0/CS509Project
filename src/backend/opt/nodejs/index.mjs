@@ -1,7 +1,12 @@
-import mysql from 'mysql';
 // ######################################################
 // Please see README.md for information as to this folder
 // ######################################################
+
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import mysql from 'mysql';
+dotenv.config();
+const JWT_KEY = `${process.env.WEB_TOKEN_KEY}`;
 
 /**
  * Creates a mysql pool
@@ -91,6 +96,106 @@ export async function getAccountByUsername(username, pool, debug = false) {
             // Account was found
             if (debug) console.log("Account was found: " + JSON.stringify(results[0]));
             return resolve(results[0]);
+        });
+    });
+}
+
+/**
+ * @param {{username: string, accountType: "Seller" | "Buyer" | "Admin", isActive: boolean, balance: number}} account The account to generate a token for
+ * @returns {Promise<string>} The token that is being returned.
+ * @example
+ * ```JS
+ * import { createPool, getAccountByUsername, generateToken } from "../opt/nodejs/index.mjs";
+ * let pool;
+ * try {
+ *      pool = await createPool();
+ * } catch (error) {
+ *      console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
+ *      return { statusCode: 500, error: "Could not make database connection" };
+ * }
+ * const account = await getAccountByUsername(username, pool);
+ * if (account) {
+ *      const token = await generateToken(account);
+ * }
+ * ```
+ */
+export async function generateToken(account) {
+    const payload = {
+        username: account.username,
+    };
+
+    return new Promise(async (resolve, reject) => {
+        if (!account) reject("Account must be defined");
+        return jwt.sign(payload, JWT_KEY, { expiresIn: '1h' }, (err, token) => {
+            if (err) return reject(err);
+            return resolve(token);
+        });
+    });
+}
+
+
+/**
+ * @param {string} token The token to get the username from.
+ * @returns {Promise<string | undefined>} The username from `token`, or `undefined` if the username is not proper.
+ * @example
+ * ```JS
+ * import { getUsernameFromToken } from "../opt/nodejs/index.mjs";
+ * const username = await getUsernameFromToken(token);
+ * ```
+ */
+export async function getUsernameFromToken(token) {
+    return new Promise(async (resolve, reject) => {
+        if (!token) reject("Token must be defined");
+        try {
+            const decoded = jwt.decode(token, JWT_KEY);
+            const username = decoded.username;
+
+            return resolve(username);
+        } catch (error) {
+            console.error("Failed to get username from token: " + error);
+            return resolve(undefined);
+        }
+    });
+}
+
+/**
+ * Verifies the authenticity of a given JWT (jsonwebtoken)
+ * @param {string} token The token to verify.
+ * @returns {Promise<boolean>} A Promise of the validitity of `Token`
+ * @example
+ * ```JS
+ * // Synchronous
+ * const isValid = await verifyToken(token);
+ * ```
+ * @example
+ * ```JS
+ * // Asynchronous
+ * return new Promise((resolve) => {
+ *      verifyToken(token).then(isValid => {
+ *          return resolve({
+ *              statusCode: 200,
+ *              body: JSON.stringify({ valid: isValid })
+ *          });
+ *      });
+ * });
+ * ```
+ */
+export async function verifyToken(token) {
+    return new Promise((resolve, reject) => {
+        return jwt.verify(token, JWT_KEY, (err, decoded) => {
+            if (err) {
+                // Ensure that TokenExpiredError does not reject but rather resolves false
+                if (err.name === 'TokenExpiredError') return resolve(false);
+                console.error(err);
+                return reject(err);
+            }
+
+            // Token is expired
+            if (decoded.exp < Date.now() / 1000) {
+                return resolve(false);
+            }
+
+            return resolve(true);
         });
     });
 }

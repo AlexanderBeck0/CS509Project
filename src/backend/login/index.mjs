@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+import { createPool, generateToken, getAccountByUsername } from "../opt/nodejs/index.mjs";
 
 /**
  * @param {string} username The username to get the password for. 
@@ -38,7 +38,7 @@ export const handler = async (event) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { username, password } = event;
-            
+
             // Verify types
             if (typeof username !== 'string') {
                 const error = new TypeError('Invalid username parameter. Expected a string.');
@@ -58,8 +58,6 @@ export const handler = async (event) => {
                 });
             }
 
-            // TODO: Generate tokens
-
             const account = await getAccountByUsername(username, pool);
 
             if (account === undefined) {
@@ -77,15 +75,18 @@ export const handler = async (event) => {
                     error: "Account is closed"
                 });
             }
-
             // At this point we KNOW that the account exists. No need to handle the error
             const newPassword = await getPasswordFromUser(username, pool);
             const isMatch = await bcrypt.compare(password, newPassword);
             if (isMatch) {
                 // Correct password
+                const token = await generateToken(account);
                 return resolve({
                     statusCode: 200,
-                    body: JSON.stringify(account)
+                    body: {
+                        token,
+                        ...account
+                    }
                 });
             }
 
