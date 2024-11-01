@@ -18,6 +18,6 @@
   "homepage": "https://github.com/AlexanderBeck0/auction-house/tree/main#readme",
   "type": "commonjs",
   "dependencies": {
-    "mysql": "^2.18.1"
+    "bcryptjs": "^2.4.3"
   }
 }

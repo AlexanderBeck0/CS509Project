@@ -13,7 +13,7 @@ const JWT_KEY = `${process.env.WEB_TOKEN_KEY}`;
  * @returns {mysql.Pool} A mysql pool
  * @example
  * ```JS
- * import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+ * import { createPool } from "../opt/nodejs/index.mjs";
  * let pool;
  * try {
  *      pool = await createPool();
