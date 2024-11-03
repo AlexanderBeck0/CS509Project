@@ -32,12 +32,18 @@ describe("iPhone bid demo", () => {
 
     test.todo("Create Seller"); // Should end up on seller page
     test.todo("Seller creates & publishes iPhone");
+    test.todo("Logout Seller");
     test.todo("Create Buyer1"); // Add funds too
     test.todo("Buyer1 bids on iPhone");
+    test.todo("Logout Buyer1");
     test.todo("Create Buyer2");
     test.todo("Buyer2 bids on iPhone"); // Add funds too
+    test.todo("Logout Buyer2");
+    test.todo("Login Buyer1");
     test.todo("Buyer1 bids on iPhone");
     test.todo("Buyer1 wins bid");
+    test.todo("Logout Buyer1");
+    test.todo("Login Seller");
     test.todo("Seller fulfills bid");
     describe("Aftermath of bid", () => {
         test.todo("iPhone is archived"); // With a status of fulfilled

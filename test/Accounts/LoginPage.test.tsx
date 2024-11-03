@@ -1,6 +1,15 @@
-import { describe, test } from 'vitest';
+import { afterEach, beforeEach, describe, test } from 'vitest';
+import { logout } from '../utils';
+import { cleanup, render } from '@testing-library/react';
+import Home from '@/app/page';
 
 describe("Login", () => {
+    beforeEach(() => {
+        render(<Home />);
+    });
+
+    afterEach(logout);
+    afterEach(cleanup);
     describe("Base cases", () => {
         test.todo("Seller");
         test.todo("Buyer");
@@ -15,15 +24,9 @@ describe("Login", () => {
 });
 
 describe("Logout", () => {
-    describe("Base cases", () => {
-        test.todo("Seller");
-        test.todo("Buyer");
-        test.todo("Admin");
-    });
-
-    describe("Edge cases", () => {
-        test.todo("Cannot logout while not logged in"); // Should disallow
-    });
+    test.todo("Seller");
+    test.todo("Buyer");
+    test.todo("Admin");
 });
 
 describe("Components Exist", () => {

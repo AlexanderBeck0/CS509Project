@@ -110,7 +110,6 @@ describe("Components Exist", () => {
     afterEach(cleanup);
 
     test("Login link exists", () => {
-        // Ensure that the location is on the homepage
         expect(window.location.hash.replaceAll('#', '')).toBe('/createAccount');
 
         const links = screen.getAllByRole('link');
