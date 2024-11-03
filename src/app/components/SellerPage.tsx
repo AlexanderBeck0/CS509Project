@@ -1,7 +1,11 @@
 // import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
 
-export default function SellerPage() {
+interface SellerPageProps {
+    logout: () => void;
+}
+
+export default function SellerPage(props: SellerPageProps) {
 
     /*get JSON of seller id from database*/
 
@@ -13,6 +17,14 @@ export default function SellerPage() {
             left: container.scrollLeft + scrollAmount,
             behavior: 'smooth'
         });
+    };
+
+    /**
+     * Used to call `logout()`
+     * @param event The event object.
+     */
+    const handleLogout = () => {
+        props.logout();
     };
 
     return (
@@ -27,7 +39,7 @@ export default function SellerPage() {
                     {"PROFIT NUMBER"}
                     <div className='buttons'>
                         <button className='accountButton'>Close Account</button>
-                        <button className='accountButton'>Log out</button>
+                        <button className='accountButton' onClick={handleLogout}>Log out</button>
                     </div>
                 </div>
                 <div className='sellerContentColumn' style={{ width: "66.66%", }}>
