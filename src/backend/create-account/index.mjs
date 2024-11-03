@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { createPool } from "../opt/nodejs/index.mjs";
+import { createPool, generateToken, getAccountByUsername } from "../opt/nodejs/index.mjs";
 
 /**
  * Uses 10 salts to hash a password.
@@ -82,16 +82,20 @@ export const handler = async (event) => {
             console.log('Executing insert query:', insertQuery);
 
             const hashedPassword = await hashPassword(password);
-            pool.query(insertQuery, [username, hashedPassword, accountType], (insertError, insertResults) => {
+            pool.query(insertQuery, [username, hashedPassword, accountType], async (insertError) => {
 
                 if (insertError) {
                     console.error('Insert query error:', insertError);
                     return reject(insertError);
                 } else {
-                    console.log('Insert query results:', insertResults);
+                    const account = await getAccountByUsername(username, pool);
+                    const token = await generateToken(account);
                     return resolve({
                         statusCode: 200,
-                        body: JSON.stringify(insertResults),
+                        body: {
+                            token,
+                            ...account
+                        }
                     });
                 }
             });
