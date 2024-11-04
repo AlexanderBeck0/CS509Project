@@ -1,7 +1,11 @@
 // import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
 
-export default function AdminPage() {
+interface AccountPageProps {
+    logout: () => void;
+}
+
+export default function AdminPage(props: AccountPageProps) {
 
     async function handleClick(tableName: string) {
         const payload = {
@@ -17,6 +21,14 @@ export default function AdminPage() {
         const result = await response.json();
         displayResult(result.body);
     }
+
+    /**
+     * Used to call `logout()`
+     * @param event The event object.
+     */
+    const handleLogout = () => {
+        props.logout();
+    };
 
     function displayResult(data: string) {
         const resultDiv = document.getElementById("result");
@@ -63,6 +75,7 @@ export default function AdminPage() {
                 <button onClick={() => handleClick('Bid')}>Bid</button>
                 <div id="result"></div>
             </div>
+            <button className='accountButton' onClick={handleLogout}>Log out</button>
         </div>
     );
 }
