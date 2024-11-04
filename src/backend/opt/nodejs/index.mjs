@@ -173,6 +173,30 @@ export async function getUsernameFromToken(token) {
 }
 
 /**
+ * @param {string} token The token to get the accountType from.
+ * @returns {Promise<string | undefined>} The accountType from `token`, or `undefined` if the token is invalid.
+ * @example
+ * ```JS
+ * import { getAccountTypeFromToken } from "../opt/nodejs/index.mjs";
+ * const accountType = await getAccountTypeFromToken(token);
+ * ```
+ */
+export async function getAccountTypeFromToken(token) {
+    return new Promise(async (resolve, reject) => {
+        if (!token) reject("Token must be defined");
+        try {
+            const decoded = jwt.decode(token, JWT_KEY);
+            const accountType = decoded.accountType
+
+            return resolve(accountType);
+        } catch (error) {
+            console.error("Failed to get accountType from token: " + error);
+            return resolve(undefined);
+        }
+    });
+}
+
+/**
  * Verifies the authenticity of a given JWT (jsonwebtoken)
  * @param {string} token The token to verify.
  * @returns {Promise<boolean>} A Promise of the validitity of `Token`
