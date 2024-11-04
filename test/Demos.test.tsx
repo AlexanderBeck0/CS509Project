@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { generateRandomString } from './utils';
 
-describe("iPhone bid demo", () => {
+describe.sequential("iPhone bid demo", () => {
     // TODO: Remove this ignore line once this is implemented
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const sellerName = generateRandomString(10);

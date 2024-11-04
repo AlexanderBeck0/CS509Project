@@ -1,7 +1,7 @@
 import Home from "@/app/page";
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "vitest";
-import { generateRandomString, mockLocalStorage } from "../utils";
+import { generateRandomString, mockLocalStorage, navigateToLogin } from "../utils";
 
 Object.defineProperty(window, "localStorage", {
     value: mockLocalStorage,
@@ -32,14 +32,7 @@ describe.sequential("Register example", () => {
         // 1. Click profile to login
         // Get the login button by its role as a button and by the class AccountButton
         // There is a MUCH better example down in Login link exists
-        const loginButtons = screen.getAllByRole('button').filter((elm: HTMLElement) => elm.className.includes("AccountButton"));
-        expect(loginButtons.length).toBe(1);
-
-        // loginButton[0] is the only login button at this point
-        fireEvent.click(loginButtons[0]);
-
-        // Should be at /login
-        expect(window.location.hash.replaceAll('#', '')).toBe('/login');
+        navigateToLogin();
 
         // 2. Click Create Account link
         const createAccountQuery = screen.getAllByText(/Create Account/);
@@ -56,7 +49,7 @@ describe.sequential("Register example", () => {
         expect(window.location.hash.replaceAll('#', '')).toBe('/createAccount');
     });
 
-    test("Fill out form", async () => {
+    test.sequential("Fill out form", async () => {
         // Ensure that the window location is /createAccount.
         expect(window.location.hash.replaceAll('#', '')).toBe('/createAccount');
 
