@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SellerPage from './SellerPage';
+import AdminPage from './AdminPage';
 import { AccountType } from '@/utils/types';
 
 interface AccountPageProps {
