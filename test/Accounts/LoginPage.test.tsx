@@ -28,7 +28,7 @@ describe.sequential("Login", () => {
         const attempts = [
             { name: "Account does not exist", username: "ThisAccountDoesntExist", password: "12345", error: /does(?:n'?t|\snot) exist/i },
             { name: "Incorrect password", username: "admin1", password: "12345", error: /incorrect password/i },
-            { name: "Closed Account", username: "AlexBeck", password: "Brent", error: /closed/i },
+            { name: "Closed Account", username: "closedSeller", password: "Salty", error: /closed/i },
         ]
         beforeAll(() => {
             render(<Home />);
