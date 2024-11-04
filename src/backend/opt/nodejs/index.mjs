@@ -136,6 +136,7 @@ export async function getAccountByUsername(username, pool, debug = false) {
 export async function generateToken(account) {
     const payload = {
         username: account.username,
+        accountType: account.accountType
     };
 
     return new Promise(async (resolve, reject) => {
@@ -199,20 +200,21 @@ export async function getAccountTypeFromToken(token) {
 /**
  * Verifies the authenticity of a given JWT (jsonwebtoken)
  * @param {string} token The token to verify.
- * @returns {Promise<boolean>} A Promise of the validitity of `Token`
+ * @returns {Promise<{username: string | null, accountType: ("Seller" | "Buyer" | "Admin") | null}>} A Promise of the validitity of `Token`
  * @example
  * ```JS
  * // Synchronous
- * const isValid = await verifyToken(token);
+ * const {username, accountType} = await verifyToken(token);
+ * const isValid = username && accountType;
  * ```
  * @example
  * ```JS
  * // Asynchronous
  * return new Promise((resolve) => {
- *      verifyToken(token).then(isValid => {
+ *      verifyToken(token).then(({username, accountType}) => {
  *          return resolve({
  *              statusCode: 200,
- *              body: JSON.stringify({ valid: isValid })
+ *              body: JSON.stringify(username, accountType)
  *          });
  *      });
  * });
@@ -233,7 +235,7 @@ export async function verifyToken(token) {
                 return resolve(false);
             }
 
-            return resolve(true);
+            return resolve({ username: decoded.username, accountType: decoded.accountType });
         });
     });
 }

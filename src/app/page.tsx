@@ -36,8 +36,8 @@ function AppContent() {
 
         const data = await response.json();
 
-        // Use === true to ensure that it won't become undefined if data.valid is undefined
-        setIsLoggedIn(data.body.valid === true);
+        setIsLoggedIn(data.body.username && data.body.accountType);
+        setAccountType(data.body.accountType ?? null);
       } catch (error) {
         console.error("Failure to verify token: " + error);
         setIsLoggedIn(false);
@@ -54,11 +54,13 @@ function AppContent() {
     setToken(newToken);
     setAccountType(accountType);
     localStorage.setItem('token', newToken); //Store token in localStorage
+    redirect('/account');
   }
 
   function onRegister(newToken: string, accountType: AccountType): void {
     setToken(newToken);
     setAccountType(accountType);
+    redirect('/account');
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
@@ -73,6 +75,7 @@ function AppContent() {
 
     setToken(null);
     setIsLoggedIn(false);
+    setAccountType(null);
     redirect('/');
   }
 
