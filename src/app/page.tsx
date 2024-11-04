@@ -8,9 +8,11 @@ import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import SearchBar from "./components/SearchBar";
 import SortDropdown from "./components/SortDropdown";
+import { AccountType } from '@/utils/types';
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("startDate_ASC");
@@ -34,8 +36,8 @@ function AppContent() {
 
         const data = await response.json();
 
-        // Use === true to ensure that it won't become undefined if data.valid is undefined
-        setIsLoggedIn(data.body.valid === true);
+        setIsLoggedIn(data.body.username && data.body.accountType);
+        setAccountType(data.body.accountType ?? null);
       } catch (error) {
         console.error("Failure to verify token: " + error);
         setIsLoggedIn(false);
@@ -48,13 +50,17 @@ function AppContent() {
     setSearchInput(input);
   };
 
-  function onLogin(newToken: string): void {
+  function onLogin(newToken: string, accountType: AccountType): void {
     setToken(newToken);
+    setAccountType(accountType);
     localStorage.setItem('token', newToken); //Store token in localStorage
+    redirect('/account');
   }
 
-  function onRegister(newToken: string): void {
+  function onRegister(newToken: string, accountType: AccountType): void {
     setToken(newToken);
+    setAccountType(accountType);
+    redirect('/account');
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
@@ -69,6 +75,7 @@ function AppContent() {
 
     setToken(null);
     setIsLoggedIn(false);
+    setAccountType(null);
     redirect('/');
   }
 
@@ -96,7 +103,7 @@ function AppContent() {
             (!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to={"/account"} />)
           } />
           <Route path="/account" element={
-            (isLoggedIn ? <AccountPage accountType={"Seller"} logout={logout} /> : <Navigate to={"/"} />)
+            (isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to={"/"} />)
           } />
         </Routes>
       </div>

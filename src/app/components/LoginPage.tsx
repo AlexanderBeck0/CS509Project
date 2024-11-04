@@ -1,9 +1,10 @@
 'use client';
+import { AccountType } from "@/utils/types";
 import { useId, useRef, useState } from "react";
 import { Link } from 'react-router-dom';
 
 interface LoginPageProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-    onLogin: (token: string) => void,
+    onLogin: (token: string, accountType: AccountType) => void,
 };
 
 export default function LoginPage(props: LoginPageProps) {
@@ -49,8 +50,8 @@ export default function LoginPage(props: LoginPageProps) {
             }
 
             // TODO: Add items type definition and bids type definition here
-            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json.body;
-            onLogin(data.token);
+            const data: { token: string, accountType: AccountType, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, accountType: AccountType, isActive: boolean, balance: number, bids: unknown[] } = json.body;
+            onLogin(data.token, data.accountType);
             setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
             // Handle error thrown

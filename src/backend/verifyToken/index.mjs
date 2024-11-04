@@ -31,11 +31,12 @@ export const handler = async (event) => {
 
             // Async verifyToken
             // Note that nothing is being caught here to allow it to be caught in the below catch statement
-            verifyToken(token).then(isValid => {
+            verifyToken(token).then(({ username, accountType }) => {
                 return resolve({
                     statusCode: 200,
                     body: {
-                        valid: isValid
+                        username,
+                        accountType
                     }
                 });
             });
