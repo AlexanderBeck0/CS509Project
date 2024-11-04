@@ -13,7 +13,7 @@ const JWT_KEY = `${process.env.WEB_TOKEN_KEY}`;
  * @returns {mysql.Pool} A mysql pool
  * @example
  * ```JS
- * import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+ * import { createPool } from "../opt/nodejs/index.mjs";
  * let pool;
  * try {
  *      pool = await createPool();
@@ -21,6 +21,17 @@ const JWT_KEY = `${process.env.WEB_TOKEN_KEY}`;
  *      console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
  *      return { statusCode: 500, error: "Could not make database connection" };
  * }
+ * 
+ * return new Promise((resolve) => {
+ *      try {
+ *          // Your code here
+ *      } catch (error) {
+ *          // Your code here
+ *      } finally {
+ *          // Close the connection to the pool
+ *          pool.end();
+ *      }
+ * });
  * ```
  */
 export async function createPool() {
@@ -50,6 +61,9 @@ export async function createPool() {
  * } catch (error) {
  *      console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
  *      return { statusCode: 500, error: "Could not make database connection" };
+ * } finally {
+ *      // Close the connection to the pool
+ *      pool.end();
  * }
  * const account = await getAccountByUsername(username, pool);
  * ```

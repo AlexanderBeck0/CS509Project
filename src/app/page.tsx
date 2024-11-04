@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Link, Navigate, redirect, Route, Routes } from 'react-router-dom';
 import AccountPage from "./components/AccountPage";
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
@@ -59,6 +59,20 @@ function AppContent() {
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
+  /**
+   * Logs the user out by deleting their token from local storage and changing the React states.
+   * 
+   * Redirects user to `/`.
+   */
+  function logout(): void {
+    // Remove the token from local storage
+    localStorage.removeItem("token");
+
+    setToken(null);
+    setIsLoggedIn(false);
+    redirect('/');
+  }
+
   return (
     <main className="main-container">
       <div className="heading">
@@ -84,8 +98,8 @@ function AppContent() {
             (!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to={"/account"} />)
           } />
           <Route path="/account" element={
-            (isLoggedIn ? <AccountPage accountType={"seller"} /> : <Navigate to={"/"} />)
-            } />
+            (isLoggedIn ? <AccountPage accountType={"Seller"} logout={logout} /> : <Navigate to={"/"} />)
+          } />
         </Routes>
       </div>
     </main>

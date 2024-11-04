@@ -1,8 +1,14 @@
 import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
 import { Link } from 'react-router-dom';
+    
+interface SellerPageProps {
+    logout: () => void;
+}
 
-export default function SellerPage() {
+export default function SellerPage(props: SellerPageProps) {
+
+    /*get JSON of seller id from database*/
     const [selectedOption, setSelectedOption] = useState("All");
     const [filterItemsBy, setFilter] = useState("");
     const [filteredItemresult, setFilteredItemresult] = useState<any[]>([]);
@@ -42,35 +48,6 @@ export default function SellerPage() {
         }
         fetchData();
       }, [filterItemsBy]);
-    
-
-    /*get JSON of seller id from database*/
-
-    useEffect (() => {
-        console.log("Seller: USERNAME");
-        const fetchData = async () => {
-            const payload = {
-              username: "USERNAME", // get seller username from token
-              token: "TOKEN"
-            };
-            try {
-              const response = await fetch('',
-                {
-                  method: 'POST',
-                  body: JSON.stringify(payload),
-                });
-      
-              const resultData = await response.json();
-              console.log(resultData);
-              if (resultData.statusCode == 200) {
-                  setSellerResult(resultData);
-              }
-            } catch (error) {
-              console.error('Error fetching data:', error);
-            }
-          }
-          fetchData();
-    }, [sellerResult]);
 
     const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
         const container = event.target as HTMLDivElement;
@@ -80,6 +57,14 @@ export default function SellerPage() {
             left: container.scrollLeft + scrollAmount,
             behavior: 'smooth'
         });
+    };
+
+    /**
+     * Used to call `logout()`
+     * @param event The event object.
+     */
+    const handleLogout = () => {
+        props.logout();
     };
 
     return (
@@ -95,7 +80,7 @@ export default function SellerPage() {
                     <div className='buttons'>
                         {/* on clicks */}
                         <button className='accountButton'>Close Account</button>
-                        <button className='accountButton'>Log out</button>
+                        <button className='accountButton' onClick={handleLogout}>Log out</button>
                     </div>
                 </div>
                 <div className='sellerContentColumn' style={{ width: "60%", }}>
