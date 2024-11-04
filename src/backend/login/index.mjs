@@ -101,6 +101,9 @@ export const handler = async (event) => {
                 statusCode: 500,
                 error: error.message
             });
+        } finally {
+            // Close the pool's connection
+            pool.end();
         }
     });
 };

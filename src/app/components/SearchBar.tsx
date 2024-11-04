@@ -16,11 +16,12 @@ export function SearchBar({ handleSearch }: SearchBarProps) {
       <input
         className="search-input input-bordered w-full max-w-xs max-h-9 input-primary focus:outline-accent"
         type="text"
-        maxLength={20}
+        maxLength={50}
         value={tempSearchInput}
         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSearch(tempSearchInput)}
         onChange={handleInputChange}
         placeholder="Search here..."
+        role="searchbox" // I'm not quite sure what the difference between "search" and "searchbox" are...
       />
       <button onClick={() => handleSearch(tempSearchInput)}>&nbsp;🔎&nbsp;</button>
     </div>
