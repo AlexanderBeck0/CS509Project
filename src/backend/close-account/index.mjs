@@ -1,8 +1,7 @@
-import mysql from 'mysql';
-import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+import { createPool, getAccountByUsername, getUsernameFromToken } from "../opt/nodejs/index.mjs";
 
 /**
- * @param {{username: string, password: string}} event The login event
+ * @param {{token: string}} event The close account event
  */
 export const handler = async (event) => {
     /**
@@ -19,9 +18,10 @@ export const handler = async (event) => {
 
     return new Promise(async (resolve) => {
         try {
+            const { token } = event;
             // Verify types
-            if (typeof event.username !== 'string') {
-                const error = new TypeError('Invalid username parameter. Expected a string.');
+            if (typeof token !== 'string') {
+                const error = new TypeError('Invalid token parameter. Expected a string.');
                 console.error(error);
                 return resolve({
                     statusCode: 400,
@@ -29,7 +29,7 @@ export const handler = async (event) => {
                 });
             }
 
-            const username = event.username;
+            const username = getUsernameFromToken(token);
             const account = await getAccountByUsername(username, pool);
 
             if (account === undefined) {
@@ -48,10 +48,10 @@ export const handler = async (event) => {
                 });
             }
 
-            const closedQuery = `SELECT isActive FROM Account WHERE username = ${mysql.escape(username)}`;
+            const closedQuery = `SELECT isActive FROM Account WHERE username = ?`;
             console.log('Executing closed query:', closedQuery);
 
-            pool.query(closedQuery, (checkError, checkResults) => {
+            pool.query(closedQuery, [username], (checkError, checkResults) => {
                 if (checkError) {
                     console.error('Check query error:', checkError);
                     return resolve({ statusCode: 500, error: checkError.message });
@@ -65,15 +65,15 @@ export const handler = async (event) => {
                 }
 
                 const bidQuery = `
-          SELECT COUNT(*) as bidCount 
-          FROM Bid 
-          JOIN Item ON Bid.item_id = Item.id
-          WHERE Bid.buyer_username = ${mysql.escape(username)} 
-          AND Item.status = 'Active'
-        `;
+                SELECT COUNT(*) as bidCount 
+                FROM Bid 
+                JOIN Item ON Bid.item_id = Item.id
+                WHERE Bid.buyer_username = ?
+                AND Item.status = 'Active'
+                `;
                 console.log('Executing bid query:', bidQuery);
 
-                pool.query(bidQuery, (bidError, bidResults) => {
+                pool.query(bidQuery, [username], (bidError, bidResults) => {
                     if (bidError) {
                         console.error('Bid query error:', bidError);
                         return resolve({ statusCode: 500, error: bidError.message });
@@ -87,14 +87,14 @@ export const handler = async (event) => {
                     }
 
                     const itemQuery = `
-            SELECT COUNT(*) as itemCount 
-            FROM Item 
-            WHERE seller_username = ${mysql.escape(username)} 
-            AND status = 'Active'
-          `;
+                    SELECT COUNT(*) as itemCount 
+                    FROM Item 
+                    WHERE seller_username = ?
+                    AND status = 'Active'
+                    `;
                     console.log('Executing item query:', itemQuery);
 
-                    pool.query(itemQuery, (itemError, itemResults) => {
+                    pool.query(itemQuery, [username], (itemError, itemResults) => {
                         if (itemError) {
                             console.error('Item query error:', itemError);
                             return resolve({ statusCode: 500, error: itemError.message });
@@ -110,11 +110,11 @@ export const handler = async (event) => {
                         const closeQuery = `
                         UPDATE Account 
                         SET isActive = 0
-                        WHERE username = ${mysql.escape(username)}
+                        WHERE username = ?
                         `;
                         console.log('Executing close query:', closeQuery);
 
-                        pool.query(closeQuery, (closeError, closeResults) => {
+                        pool.query(closeQuery, [username], (closeError, closeResults) => {
                             if (closeError) {
                                 console.error('Close query error:', closeError);
                                 return resolve({ statusCode: 500, error: closeError.message });
@@ -123,7 +123,7 @@ export const handler = async (event) => {
                             console.log('Close query results:', closeResults);
                             resolve({
                                 statusCode: 200,
-                                body: JSON.stringify({ message: 'Account successfully closed', results: closeResults }),
+                                valid: true
                             });
                         });
                     });
@@ -132,6 +132,9 @@ export const handler = async (event) => {
         } catch (error) {
             console.error('Unexpected error:', error);
             resolve({ statusCode: 500, error: error.message });
+        } finally {
+            // Close the pool's connection
+            pool.end();
         }
     });
 };
