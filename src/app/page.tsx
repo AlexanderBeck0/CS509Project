@@ -16,6 +16,15 @@ function AppContent() {
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("startDate_ASC");
 
+  const [userData, setUserData] = useState<{accountType: string, username: string } | null>(null);
+  useEffect(() => {
+    if(userData == null) {
+      console.log("Data is null");
+      return;
+    }
+    console.log(userData);
+  }, [userData])
+
   // Called whenever token changes
   useEffect(() => {
     const verifyToken = async () => {
@@ -34,15 +43,20 @@ function AppContent() {
         });
 
         const data = await response.json();
-
         // Use === true to ensure that it won't become undefined if data.valid is undefined
-        setIsLoggedIn(data.body.valid === true);
+        if(data.statusCode === 200) {
+          setIsLoggedIn(true);
+          const user: {accountType:string, username:string} = data.body;
+          setUserData(user);
+        }
       } catch (error) {
         console.error("Failure to verify token: " + error);
         setIsLoggedIn(false);
+        setUserData(null);
       }
     }
     verifyToken();
+    console.log("Logged In: "+isLoggedIn);
   }, [token]);
 
   const handleSearch = (input: string) => {
@@ -70,6 +84,7 @@ function AppContent() {
 
     setToken(null);
     setIsLoggedIn(false);
+    setUserData(null);
     redirect('/');
   }
 
@@ -98,7 +113,7 @@ function AppContent() {
             (!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to={"/account"} />)
           } />
           <Route path="/account" element={
-            (isLoggedIn ? <AccountPage accountType={"Seller"} logout={logout} /> : <Navigate to={"/"} />)
+            (isLoggedIn && userData != null ? <AccountPage userData={userData} logout={logout} /> : <Navigate to={"/login"} />)
           } />
         </Routes>
       </div>

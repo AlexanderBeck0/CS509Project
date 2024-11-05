@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import SellerPage from './SellerPage';
 
 interface AccountPageProps {
-    accountType: "Seller" | "Buyer" | "Admin";
+    userData: {accountType: string, username: string}; // can never be null
     logout: () => void;
 }
 
 export default function AccountPage(props: AccountPageProps) {
-
-    if (props.accountType === "Seller") {
+    console.log(props.userData);
+    if (props.userData.accountType === "Seller") {
         return (
-            <SellerPage logout={props.logout} />
+            <SellerPage userData={props.userData} logout={props.logout} />
         );
     } else {
         return (
             <div>
-                Account page
+                account page
             </div>
         );
     }

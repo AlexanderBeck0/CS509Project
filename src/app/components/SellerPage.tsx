@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Link } from 'react-router-dom';
     
 interface SellerPageProps {
+    userData: {accountType: string, username: string} 
     logout: () => void;
 }
 
@@ -115,7 +116,6 @@ export default function SellerPage(props: SellerPageProps) {
                     </div>
                 </div>
                 <div className='sellerContentColumn' style={{ width: "6%", justifyContent: "center", alignItems: "center"}}>
-                    {/* on click!!! open addItemPage */} 
                     <Link to="/addItem"><button style={{ fontSize: "5vw", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
                         <b>+</b>
                     </button></Link>

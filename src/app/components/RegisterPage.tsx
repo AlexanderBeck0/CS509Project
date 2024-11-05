@@ -59,7 +59,7 @@ export default function RegisterPage(props: RegisterPageProps) {
             }
 
             // TODO: Add items type definition and bids type definition here
-            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json.body
+            const data: { token: string, accountType: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, accountType: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json.body
             onRegister(data.token);
             setMessage("Registered!");
         } catch (error) {
@@ -104,12 +104,12 @@ export default function RegisterPage(props: RegisterPageProps) {
                     </select>
                 </div>
                 <div>
-                    <button className="btn btn-primary" type="submit" name="createAccountButton">
+                    <button className="accountButton btn btn-primary" type="submit" name="createAccountButton">
                         Create Account
                     </button>
                 </div>
                 <div>
-                    <p>Existing user? <Link to="/login">Sign in</Link></p>
+                    <p>Existing user? <Link className="hyperlink" to="/login">Sign in</Link></p>
                 </div>
             </form>
             <div className="text-xl">{message}</div>

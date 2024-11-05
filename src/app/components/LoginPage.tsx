@@ -49,8 +49,9 @@ export default function LoginPage(props: LoginPageProps) {
             }
 
             // TODO: Add items type definition and bids type definition here
-            const data: { token: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json.body;
+            const data: { token: string, accountType: string, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, accountType: string, username: string, isActive: boolean, balance: number, bids: unknown[] } = json.body;
             onLogin(data.token);
+            
             setMessage(`Logged in as ${data.username}!`);
         } catch (error) {
             // Handle error thrown
@@ -85,13 +86,13 @@ export default function LoginPage(props: LoginPageProps) {
                         ref={passwordRef} id={passwordId}></input>
                 </div>
                 <div>
-                    <button className="btn btn-primary" type="submit" name="loginButton">
+                    <button className="accountButton btn btn-primary" type="submit" name="loginButton">
                         Login
                     </button>
                 </div>
             </form>
             <div>
-                <p>New user? <Link to={"/createAccount"}>Create Account</Link></p>
+                <p>New user? <Link className="hyperlink" to={"/createAccount"}>Create Account</Link></p>
             </div>
             <div className="text-xl">{message}</div>
             {props.children}
