@@ -10,6 +10,7 @@ interface BuyerPageProps {
 export default function BuyerPage(props: BuyerPageProps) {
     const fundsRef = useRef<HTMLInputElement | null>(null);
     const [account, setAccount] = useState<any>(null);
+    const [funds, setFunds] = useState<number>(0);
 
     useEffect(() => {
         const fetchAccountData = async () => {
@@ -33,6 +34,11 @@ export default function BuyerPage(props: BuyerPageProps) {
         };
         fetchAccountData().then((accountInfo) => setAccount(accountInfo)).catch((error) => console.error(error.message));
     }, []);
+
+    useEffect(() => {
+        if (account === null || account === undefined) return;
+        setFunds(account.balance);
+    }, [account]);
 
     /*get JSON of buyer id from database*/
 
@@ -103,6 +109,7 @@ export default function BuyerPage(props: BuyerPageProps) {
             }
 
             account.balance = data.newBalance;
+            setFunds(data.newBalance);
         } catch (error) {
             console.error(error instanceof Error ? error.message : error);
             throw error
@@ -117,7 +124,7 @@ export default function BuyerPage(props: BuyerPageProps) {
             </div>
             <div className="flex flex-row gap-4 p-4 justify-center w-full max-w-6xl m-0 justify-items-center"> {/* item content */}
                 <div className='flex flex-col m-12 w-1/3'>
-                    <p><b>Funds:</b> ${account?.balance || 0}</p>
+                    <p><b>Funds:</b> ${funds}</p>
                     <div className='buttons'>
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
