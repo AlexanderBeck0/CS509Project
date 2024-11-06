@@ -1,6 +1,6 @@
 // import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface BuyerPageProps {
     logout: () => void;
@@ -9,7 +9,30 @@ interface BuyerPageProps {
 
 export default function BuyerPage(props: BuyerPageProps) {
     const fundsRef = useRef<HTMLInputElement | null>(null);
-    const [funds, setFunds] = useState<number>(0);
+    const [account, setAccount] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchAccountData = async () => {
+            try {
+                const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        token: localStorage.getItem('token')
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.statusCode !== 200) throw new Error(data.error);
+                return data.account;
+            } catch (error) {
+                console.error(error instanceof Error ? error.message : error);
+                throw error
+            }
+        };
+        fetchAccountData().then((accountInfo) => setAccount(accountInfo)).catch((error) => console.error(error.message));
+    }, []);
 
     /*get JSON of buyer id from database*/
 
@@ -70,6 +93,7 @@ export default function BuyerPage(props: BuyerPageProps) {
 
             if (!response.ok) {
                 const errorMessage = await response.json();
+                console.log(errorMessage)
                 throw new Error(errorMessage);
             }
 
@@ -78,10 +102,10 @@ export default function BuyerPage(props: BuyerPageProps) {
                 throw new Error(data['error']);
             }
 
-            // TODO: Display success message of funds being added here
-            setFunds(data.newBalance);
+            account.balance = data.newBalance;
         } catch (error) {
-            console.error(error);
+            console.error(error instanceof Error ? error.message : error);
+            throw error
         }
     }
 
@@ -89,11 +113,11 @@ export default function BuyerPage(props: BuyerPageProps) {
         <div className='content'>
             <div> {/* heading of buyer */}
                 <Image src="/accountSymbol.png" alt="Buyer Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
-                <p><b>Buyer:</b> {"BUYERNAME"}</p>
+                <p><b>Buyer:</b> {account?.username || "Unknown"}</p>
             </div>
             <div className="flex flex-row gap-4 p-4 justify-center w-full max-w-6xl m-0 justify-items-center"> {/* item content */}
                 <div className='flex flex-col m-12 w-1/3'>
-                    <p><b>Funds:</b> ${funds}</p>
+                    <p><b>Funds:</b> ${account?.balance || 0}</p>
                     <div className='buttons'>
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>

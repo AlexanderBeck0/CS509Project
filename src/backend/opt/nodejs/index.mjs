@@ -71,7 +71,7 @@ export async function createPool() {
 export async function getAccountByUsername(username, pool, debug = false) {
     // Validate username
     if (username === undefined || username === null || typeof username !== 'string') {
-        const error = new TypeError('Invalid username parameter. Expected a string.');
+        const error = new TypeError(`Invalid username parameter. Expected a string. Instead recieved '${username}' of type ${typeof username}`);
         if (debug) console.error(error);
         throw error;
     }
@@ -216,6 +216,11 @@ export async function getAccountTypeFromToken(token) {
  *              statusCode: 200,
  *              body: JSON.stringify(username, accountType)
  *          });
+ *      }).catch(error => {
+ *          return resolve({
+ *              statusCode: 400,
+ *              body: JSON.stringify(error instanceof Error ? error.message : error)
+ *          });
  *      });
  * });
  * ```
@@ -225,14 +230,14 @@ export async function verifyToken(token) {
         return jwt.verify(token, JWT_KEY, (err, decoded) => {
             if (err) {
                 // Ensure that TokenExpiredError does not reject but rather resolves false
-                if (err.name === 'TokenExpiredError') return resolve(false);
+                // if (err.name === 'TokenExpiredError') return resolve(false);
                 console.error(err);
                 return reject(err);
             }
 
             // Token is expired
             if (decoded.exp < Date.now() / 1000) {
-                return resolve(false);
+                return reject("Token is expired");
             }
 
             return resolve({ username: decoded.username, accountType: decoded.accountType });
