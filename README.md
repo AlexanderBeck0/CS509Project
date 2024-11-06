@@ -15,7 +15,17 @@ Link to active site: [Link to active site goes here](#)
 
 Here are the Use Cases we have completed for Iteration One:
 
-* List use cases here
+* [Seller: Create Account](#create-account)
+* [Seller: Close Account](#close-account)
+* [Seller: Login Account](#login-account)
+* [Seller: Add Item](#login-account)
+* [Buyer: Open Account](#open-account)
+* [Buyer: Close an Account](#close-an-account)
+* [Buyer: Login](#login)
+* [Buyer: Add Funds](#add-funds)
+* [Customer: Search Items](#search-items)
+* [Customer: Sort Items](#sort-items)
+* [Customer: View Items](#view-items)
 
 ## Project Details
 
