@@ -2,7 +2,7 @@
 
 This is an Auction House application created using Typescript, NextJS, and AWS. It is for the graduate course CS 509: Design of Software Systems at WPI.
 
-Link to active site: [Link to active site goes here](#)
+Link to active site: [Link to active site goes here](http://auctionhouse2024.s3-website-us-east-1.amazonaws.com/)
 
 ## Authors
 
