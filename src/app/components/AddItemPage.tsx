@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useRef} from 'react';
+import React, { useState, ChangeEvent, useRef, useEffect} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface AddItemPageProps {
@@ -54,6 +54,17 @@ export default function AddItemPage( props :AddItemPageProps) {
           fetchData();
     }
 
+    useEffect(() => {
+        const today = new Date().toISOString().split('T')[0]; 
+
+        if (startDateRef.current) {
+            startDateRef.current.min = today;
+        }
+        if (endDateRef.current) {
+            endDateRef.current.min = today;
+        }
+    }, []);
+
     const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         addItem();
@@ -66,7 +77,7 @@ export default function AddItemPage( props :AddItemPageProps) {
                 <input className="itemPageInput" ref={nameRef} style={{fontSize: "30px"}} type="text" name="ItemName" data-length="20" required
                     placeholder="Item Name"/>
                 <div style={{border: "1px solid black", borderRadius: "8px", height: "200px", maxHeight: "200px", maxWidth: "200px", margin: "1rem",}}>
-                    <img src={userImage || "https://www.thesaurus.com/e/wp-content/uploads/2022/01/20211220_personFirst_question_1000x700-790x310.png"} alt={userImage}/>
+                    <img src={userImage || "BlankImage.jpg"} alt={userImage} style={{borderRadius: "8px"}}/>
                 </div>
                 <input className="itemPageInput" style={{fontSize: "16px"}} type="text" name="ItemURL" data-length="20"
                     placeholder="Image URL" value={userImage} onChange={handleURLChange}/>
@@ -90,7 +101,7 @@ export default function AddItemPage( props :AddItemPageProps) {
                     </div>
                 </div>
             </div>
-            <div className='sellerContentColumn'> {/* buttons */}
+            <div className='sellerContentColumn' style={{marginTop: "auto"}}> {/* buttons */}
                 <button className='save accountButton' type="submit">💾 Save</button>
                 <Link to="/account">
                     <button className='cancel accountButton' style={{color: "red", border: "1px solid red",}}>

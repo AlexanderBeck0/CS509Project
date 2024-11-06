@@ -79,7 +79,7 @@ export default function SellerPage(props: SellerPageProps) {
                 <div className='sellerContentColumn' style={{ width: "25%", }}>
                     <p><b>Profit:</b></p>
                     ${props.userData!.balance}
-                    <div className='buttons'>
+                    <div className='buttons' style={{marginTop: "auto"}}>
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
                     </div>
