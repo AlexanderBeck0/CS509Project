@@ -7,6 +7,7 @@ import ItemDisplay from './ItemDisplay';
 interface SellerPageProps {
     userData: {username:string,accountType:string,isActive:number,balance:number}
     logout: () => void;
+    closeAccount: () => void;
 }
 
 export default function SellerPage(props: SellerPageProps) {
@@ -54,12 +55,18 @@ export default function SellerPage(props: SellerPageProps) {
     };
 
     /**
-     * Used to call `logout()`
-     * @param event The event object.
+     * Used to call `props.logout()`
      */
     const handleLogout = () => {
         props.logout();
     };
+
+    /**
+     * Used to call `props.clorseAccount()`
+     */
+    const handleCloseAccount = () => {
+        props.closeAccount();
+    }
 
     return (
         <div className='content'>
@@ -73,8 +80,7 @@ export default function SellerPage(props: SellerPageProps) {
                     <p><b>Profit:</b></p>
                     ${props.userData!.balance}
                     <div className='buttons'>
-                        {/* on clicks */}
-                        <button className='accountButton'>Close Account</button>
+                        <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
                     </div>
                 </div>

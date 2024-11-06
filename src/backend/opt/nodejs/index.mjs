@@ -71,7 +71,7 @@ export async function createPool() {
 export async function getAccountByUsername(username, pool, debug = false) {
     // Validate username
     if (username === undefined || username === null || typeof username !== 'string') {
-        const error = new TypeError('Invalid username parameter. Expected a string.');
+        const error = new TypeError(`Invalid username parameter. Expected a string. Instead recieved '${username}' of type ${typeof username}`);
         if (debug) console.error(error);
         throw error;
     }
@@ -136,6 +136,7 @@ export async function getAccountByUsername(username, pool, debug = false) {
 export async function generateToken(account) {
     const payload = {
         username: account.username,
+        accountType: account.accountType
     };
 
     return new Promise(async (resolve, reject) => {
@@ -173,22 +174,52 @@ export async function getUsernameFromToken(token) {
 }
 
 /**
+ * @param {string} token The token to get the accountType from.
+ * @returns {Promise<string | undefined>} The accountType from `token`, or `undefined` if the token is invalid.
+ * @example
+ * ```JS
+ * import { getAccountTypeFromToken } from "../opt/nodejs/index.mjs";
+ * const accountType = await getAccountTypeFromToken(token);
+ * ```
+ */
+export async function getAccountTypeFromToken(token) {
+    return new Promise(async (resolve, reject) => {
+        if (!token) reject("Token must be defined");
+        try {
+            const decoded = jwt.decode(token, JWT_KEY);
+            const accountType = decoded.accountType
+
+            return resolve(accountType);
+        } catch (error) {
+            console.error("Failed to get accountType from token: " + error);
+            return resolve(undefined);
+        }
+    });
+}
+
+/**
  * Verifies the authenticity of a given JWT (jsonwebtoken)
  * @param {string} token The token to verify.
- * @returns {Promise<boolean>} A Promise of the validitity of `Token`
+ * @returns {Promise<{username: string | null, accountType: ("Seller" | "Buyer" | "Admin") | null}>} A Promise of the validitity of `Token`
  * @example
  * ```JS
  * // Synchronous
- * const isValid = await verifyToken(token);
+ * const {username, accountType} = await verifyToken(token);
+ * const isValid = username && accountType;
  * ```
  * @example
  * ```JS
  * // Asynchronous
  * return new Promise((resolve) => {
- *      verifyToken(token).then(isValid => {
+ *      verifyToken(token).then(({username, accountType}) => {
  *          return resolve({
  *              statusCode: 200,
- *              body: JSON.stringify({ valid: isValid })
+ *              body: JSON.stringify(username, accountType)
+ *          });
+ *      }).catch(error => {
+ *          return resolve({
+ *              statusCode: 400,
+ *              body: JSON.stringify(error instanceof Error ? error.message : error)
  *          });
  *      });
  * });
@@ -199,17 +230,17 @@ export async function verifyToken(token) {
         return jwt.verify(token, JWT_KEY, (err, decoded) => {
             if (err) {
                 // Ensure that TokenExpiredError does not reject but rather resolves false
-                if (err.name === 'TokenExpiredError') return resolve(false);
+                // if (err.name === 'TokenExpiredError') return resolve(false);
                 console.error(err);
                 return reject(err);
             }
 
             // Token is expired
             if (decoded.exp < Date.now() / 1000) {
-                return resolve(false);
+                return reject("Token is expired");
             }
 
-            return resolve(true);
+            return resolve({ username: decoded.username, accountType: decoded.accountType });
         });
     });
 }
