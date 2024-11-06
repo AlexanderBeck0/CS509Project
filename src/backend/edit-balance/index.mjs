@@ -71,9 +71,7 @@ export const handler = async (event) => {
                     // successful
                     return resolve({
                         statusCode: 200,
-                        body: {
-                            newBalance
-                        }
+                        newBalance
                     });
                 }
             });
@@ -101,9 +99,7 @@ export const handler = async (event) => {
                         // successful
                         return resolve({
                             statusCode: 200,
-                            body: {
-                                newBalance
-                            }
+                            newBalance
                         });
                     }
                 });
