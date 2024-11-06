@@ -105,12 +105,12 @@ export default function RegisterPage(props: RegisterPageProps) {
                     </select>
                 </div>
                 <div>
-                    <button className="btn btn-primary" type="submit" name="createAccountButton">
+                    <button className="accountButton btn btn-primary" type="submit" name="createAccountButton">
                         Create Account
                     </button>
                 </div>
                 <div>
-                    <p>Existing user? <Link to="/login">Sign in</Link></p>
+                    <p>Existing user? <Link className="hyperlink" to="/login">Sign in</Link></p>
                 </div>
             </form>
             <div className="text-xl">{message}</div>

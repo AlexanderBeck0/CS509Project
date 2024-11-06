@@ -2,6 +2,7 @@ import SellerPage from './SellerPage';
 import AdminPage from './AdminPage';
 import { AccountType } from '@/utils/types';
 import BuyerPage from './BuyerPage';
+import { useEffect, useState } from 'react';
 
 interface AccountPageProps {
     accountType: AccountType | null;
@@ -9,6 +10,33 @@ interface AccountPageProps {
 }
 
 export default function AccountPage(props: AccountPageProps) {
+    const [accountInfo, setAccountInfo] = useState<{accountType:string,isActive:number,balance:number,username:string}|null>(null);
+        
+    useEffect(() => {
+        const fetchData = async () => {
+        const payload = {
+            token: localStorage.getItem('token'),
+        };
+        try {
+            const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo',
+            {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            });
+
+            const resultData = await response.json();
+            if (resultData.statusCode == 200) {
+                setAccountInfo(resultData.account);
+            }
+            if(resultData.statusCode == 400)
+                props.logout();
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            props.logout();
+        }
+        }
+        fetchData();
+    }, []);
 
     /**
      * Closes the user's account and logs them out.
@@ -41,8 +69,9 @@ export default function AccountPage(props: AccountPageProps) {
     }
 
     if (props.accountType === "Seller") {
+        
         return (
-            <SellerPage logout={props.logout} closeAccount={closeAccount} />
+            (accountInfo !== null && <SellerPage userData={accountInfo} logout={props.logout} closeAccount={closeAccount} />)
         );
     } else if (props.accountType === "Buyer") {
         return (
@@ -55,7 +84,7 @@ export default function AccountPage(props: AccountPageProps) {
     } else {
         return (
             <div>
-                Account page
+                account page
             </div>
         );
     }

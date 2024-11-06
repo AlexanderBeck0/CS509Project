@@ -1,11 +1,12 @@
 'use client';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import { HashRouter, Link, Navigate, redirect, Route, Routes } from 'react-router-dom';
+import { HashRouter, Link, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import AccountPage from "./components/AccountPage";
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
+import AddItemPage from "./components/AddItemPage";
 import SearchBar from "./components/SearchBar";
 import SortDropdown from "./components/SortDropdown";
 import { AccountType } from '@/utils/types';
@@ -54,13 +55,11 @@ function AppContent() {
     setToken(newToken);
     setAccountType(accountType);
     localStorage.setItem('token', newToken); //Store token in localStorage
-    redirect('/account');
   }
 
   function onRegister(newToken: string, accountType: AccountType): void {
     setToken(newToken);
     setAccountType(accountType);
-    redirect('/account');
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
@@ -76,17 +75,16 @@ function AppContent() {
     setToken(null);
     setIsLoggedIn(false);
     setAccountType(null);
-    redirect('/');
   }
 
   return (
     <main className="main-container">
       <div className="heading">
         <Link to="/"><button className="HomeButton">Auction House</button></Link>
-        <div className="search">{/* Need to disable if seller */}
+        {accountType !== "Seller" && <div className="search">{/* Need to disable if seller */}
           <SearchBar handleSearch={handleSearch} />
           <SortDropdown setSortBy={setSortBy} />
-        </div>
+        </div>}
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
             <Image src="/accountSymbol.png" height={40} width={40} style={{ height: "40px", width: "auto", objectFit: "contain" }} alt="Account" />
@@ -95,7 +93,10 @@ function AppContent() {
       </div>
       <div className="content">
         <Routes>
-          <Route path="/" element={<HomePage searchInput={searchInput} sortBy={sortBy} />} />
+          <Route path="/" element={
+            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"}/>)} />
+          <Route path="/addItem" element={
+            (isLoggedIn && token ? <AddItemPage/> : <Navigate to={"/account"}/>)} />
           <Route path="/login" element={
             (!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to={"/account"} />)
           } />

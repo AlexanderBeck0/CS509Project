@@ -86,13 +86,13 @@ export default function LoginPage(props: LoginPageProps) {
                         ref={passwordRef} id={passwordId}></input>
                 </div>
                 <div>
-                    <button className="btn btn-primary" type="submit" name="loginButton">
+                    <button className="accountButton btn btn-primary" type="submit" name="loginButton">
                         Login
                     </button>
                 </div>
             </form>
             <div>
-                <p>New user? <Link to={"/createAccount"}>Create Account</Link></p>
+                <p>New user? <Link className="hyperlink" to={"/createAccount"}>Create Account</Link></p>
             </div>
             <div className="text-xl">{message}</div>
             {props.children}
