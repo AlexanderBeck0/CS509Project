@@ -1,6 +1,7 @@
 import SellerPage from './SellerPage';
 import AdminPage from './AdminPage';
 import { AccountType } from '@/utils/types';
+import BuyerPage from './BuyerPage';
 
 interface AccountPageProps {
     accountType: AccountType | null;
@@ -45,9 +46,7 @@ export default function AccountPage(props: AccountPageProps) {
         );
     } else if (props.accountType === "Buyer") {
         return (
-            // Seller page until buyer page is complete
-            <SellerPage logout={props.logout} />
-            // TODO Return Buyer page
+            <BuyerPage logout={props.logout} closeAccount={closeAccount} />
         );
     } else if (props.accountType === "Admin") {
         return (
