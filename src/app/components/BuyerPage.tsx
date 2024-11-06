@@ -1,5 +1,6 @@
 // import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
+import { useRef, useState } from 'react';
 
 interface BuyerPageProps {
     logout: () => void;
@@ -7,6 +8,8 @@ interface BuyerPageProps {
 }
 
 export default function BuyerPage(props: BuyerPageProps) {
+    const fundsRef = useRef<HTMLInputElement | null>(null);
+    const [funds, setFunds] = useState<number>(0);
 
     /*get JSON of buyer id from database*/
 
@@ -34,22 +37,78 @@ export default function BuyerPage(props: BuyerPageProps) {
         props.closeAccount();
     }
 
+    /**
+     * Adds funds to the buyer.
+     */
+    async function addFunds(): Promise<void> {
+        const fundsInput = fundsRef.current?.valueAsNumber;
+
+        if (fundsInput === undefined) {
+            // TODO: Handle error here
+        }
+
+        // Validate input before sending
+        // Funds is not a whole number
+        if (Math.floor(fundsInput!) !== fundsInput) {
+            // TODO: Handle not whole number here
+        }
+
+        // Negative number
+        if (fundsInput! < 1) {
+            // TODO: Handle negative number here
+        }
+
+        try {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/edit-balance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    token: localStorage.getItem("token"),
+                    deltaBalance: fundsInput
+                })
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                throw new Error(errorMessage);
+            }
+
+            const data: { statusCode: 200, newBalance: number } | { statusCode: 400 | 500, error: string } = await response.json();
+            if (data['statusCode'] !== 200) {
+                throw new Error(data['error']);
+            }
+
+            // TODO: Display success message of funds being added here
+            setFunds(data.newBalance);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return (
         <div className='content'>
             <div> {/* heading of buyer */}
                 <Image src="/accountSymbol.png" alt="Buyer Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
                 <p><b>Buyer:</b> {"BUYERNAME"}</p>
             </div>
-            <div className="buyerContent"> {/* item content */}
-                <div className='buyerContentColumn w-1/3'>
-                    <p><b>Profit:</b></p>
-                    {"PROFIT NUMBER"}
+            <div className="flex flex-row gap-4 p-4 justify-center w-full max-w-6xl m-0 justify-items-center"> {/* item content */}
+                <div className='flex flex-col m-12 w-1/3'>
+                    <p><b>Funds:</b> ${funds}</p>
                     <div className='buttons'>
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
+                        <div className="max-w-full mt-2 flex flex-row flex-nowrap basis-full items-center">
+                            <input type="number" min={1} step={1} ref={fundsRef} placeholder="Funds #"
+                                className="flex basis-2/3 flex-grow-0 border rounded-lg border-solid border-black"
+                            // The below line would make it not allow decimals, but it causes the cursor to move to the start
+                            // onInput={(e) => (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, "")}
+                            ></input>
+                            <button className="flex basis-1/2 text-nowrap mt-0 border rounded-lg border-solid border-black"
+                                type="button" onClick={addFunds}>Add Funds</button>
+                        </div>
                     </div>
                 </div>
-                <div className='buyerContentColumn w-2/3'>
+                <div className='flex flex-col m-12 w-2/3'>
                     <div className='flex row'>
                         <p><b>Items:</b></p>
                         <div>{"DROPDOWN"}</div>
