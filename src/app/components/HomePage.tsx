@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { Item } from '@/utils/types';
+import { useEffect, useState } from 'react';
 
 export default function HomePage(props: { searchInput: string, sortBy: string }) {
-  const [result, setResult] = useState<any[]>([]);
+  const [result, setResult] = useState<Item[]>([]);
 
   useEffect(() => {
     console.log("Search: " + props.searchInput);
@@ -18,7 +19,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
             body: JSON.stringify(payload),
           });
 
-        const resultData = await response.json();
+        const resultData: { statusCode: 200 | 400, items: Item[] } = await response.json();
         console.log(resultData);
         if (resultData.statusCode == 200) {
           setResult(resultData.items);
@@ -39,8 +40,8 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
             <img src={item.image} alt={item.name} style={{ width: '200px', height: 'auto' }} />
             <h3>{item.name}</h3>
             <p> Description: {item.description} </p>
-            <p> Start Date: {item.startDate} </p>
-            <p> End Date: {item.endDate} </p>
+            <p> Start Date: {item.startDate.toString()} </p>
+            <p> End Date: {item.endDate?.toString()} </p>
             <p> ${item.price} </p>
           </div>
         ))

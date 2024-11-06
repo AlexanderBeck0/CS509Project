@@ -1,5 +1,5 @@
 'use client';
-import { AccountType } from "@/utils/types";
+import { Account, AccountType } from "@/utils/types";
 import { useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -60,13 +60,13 @@ export default function RegisterPage(props: RegisterPageProps) {
             }
 
             // TODO: Add items type definition and bids type definition here
-            const data: { token: string, accountType: AccountType, username: string, isActive: boolean, balance: number, items: unknown[] } | { token: string, username: string, accountType: AccountType, isActive: boolean, balance: number, bids: unknown[] } = json.body
+            const data: { token: string } & Account = json.body
             onRegister(data.token, data.accountType);
             setMessage("Registered!");
         } catch (error) {
             // Handle error thrown
             if (error instanceof Error) {
-                console.error("Error while creating an account: " + error.message);
+                console.warn("Error while creating an account: " + error.message);
                 setMessage("Error while creating an account: " + error.message);
             } else {
                 // A non-Error error was thrown.
