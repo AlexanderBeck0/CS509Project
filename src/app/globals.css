@@ -149,6 +149,7 @@ input:focus {
   display: flex;
   flex-direction: column;
   margin: 2rem;
+  width: 100%;
 }
 
 .container {
@@ -156,6 +157,7 @@ input:focus {
   flex-wrap: nowrap;
   overflow-x: auto;
   padding: 1rem;
+  gap: 1rem;
 }
 
 .scrollItem {
@@ -198,4 +200,22 @@ input:focus {
 
 .hyperlink:hover {
   text-decoration: underline;
+}
+
+.dateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dateLabel {
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.item {
+  min-width: 100px;
+  max-width: 150px;
 }

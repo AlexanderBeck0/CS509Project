@@ -2,6 +2,7 @@ import React, { useState, useEffect} from 'react';
 import Image from 'next/image';
 import { Link } from 'react-router-dom';
 import { ItemStatus } from '../../utils/ItemStatus'
+import ItemDisplay from './ItemDisplay';
     
 interface SellerPageProps {
     userData: {username:string,accountType:string,isActive:number,balance:number}
@@ -13,8 +14,7 @@ export default function SellerPage(props: SellerPageProps) {
     /*get JSON of seller id from database*/
     const [selectedOption, setSelectedOption] = useState("All");
     const [filteredItemresult, setFilteredItemresult] = useState<any[]>([]);
-    const [sellerResult, setSellerResult] = useState<any[]>([]);
-
+    
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
     };
@@ -98,14 +98,7 @@ export default function SellerPage(props: SellerPageProps) {
                         <div className="container" onWheel={handleScroll}>
                         {filteredItemresult.length > 0 ? (
                             filteredItemresult.map((item, index) => (
-                            <div key={index} className="item">
-                                <h3>{item.image} </h3>
-                                <h3>{item.name}</h3>
-                                <p> Description: {item.description} </p>
-                                <p> Start Date: {item.startDate} </p>
-                                <p> End Date: {item.endDate} </p>
-                                <p> ${item.price} </p>
-                            </div>
+                                <ItemDisplay index={index} item={item}/>
                             ))
                         ) : (
                             <p>No items found.</p>

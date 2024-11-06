@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import { HashRouter, Link, Navigate, redirect, Route, Routes } from 'react-router-dom';
+import { HashRouter, Link, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import AccountPage from "./components/AccountPage";
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
@@ -17,14 +17,7 @@ function AppContent() {
   const [sortBy, setSortBy] = useState("startDate_ASC");
 
   const [userData, setUserData] = useState<{accountType: string, username: string } | null>(null);
-  useEffect(() => {
-    if(userData == null) {
-      console.log("Data is null");
-      return;
-    }
-    console.log(userData);
-  }, [userData])
-
+  
   // Called whenever token changes
   useEffect(() => {
     const verifyToken = async () => {
@@ -56,7 +49,6 @@ function AppContent() {
       }
     }
     verifyToken();
-    console.log("Logged In: "+isLoggedIn);
   }, [token]);
 
   const handleSearch = (input: string) => {
@@ -85,17 +77,16 @@ function AppContent() {
     setToken(null);
     setIsLoggedIn(false);
     setUserData(null);
-    redirect('/');
   }
 
   return (
     <main className="main-container">
       <div className="heading">
         <Link to="/"><button className="HomeButton">Auction House</button></Link>
-        <div className="search">{/* Need to disable if seller */}
+        {userData?.accountType !== "Seller" && <div className="search">{/* Need to disable if seller */}
           <SearchBar handleSearch={handleSearch} />
           <SortDropdown setSortBy={setSortBy} />
-        </div>
+        </div>}
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
             <Image src="/accountSymbol.png" height={40} width={40} style={{ height: "40px", width: "auto", objectFit: "contain" }} alt="Account" />
@@ -104,8 +95,10 @@ function AppContent() {
       </div>
       <div className="content">
         <Routes>
-          <Route path="/" element={<HomePage searchInput={searchInput} sortBy={sortBy} />} />
-          <Route path="/addItem" element={<AddItemPage/>} />
+          <Route path="/" element={
+            (userData?.accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"}/>)} />
+          <Route path="/addItem" element={
+            (isLoggedIn && token ? <AddItemPage/> : <Navigate to={"/account"}/>)} />
           <Route path="/login" element={
             (!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to={"/account"} />)
           } />
@@ -113,7 +106,7 @@ function AppContent() {
             (!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to={"/account"} />)
           } />
           <Route path="/account" element={
-            (isLoggedIn && userData != null ? <AccountPage userData={userData} logout={logout} /> : <Navigate to={"/login"} />)
+            (isLoggedIn && token && userData != null ? <AccountPage userData={userData} logout={logout} /> : <Navigate to={"/login"} />)
           } />
         </Routes>
       </div>

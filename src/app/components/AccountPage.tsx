@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SellerPage from './SellerPage';
 
 interface AccountPageProps {
-    userData: {accountType: string, username: string}; // can never be null
+    userData: {accountType: string, username: string}; 
     logout: () => void;
 }
 
@@ -12,7 +12,7 @@ export default function AccountPage(props: AccountPageProps) {
     useEffect(() => {
         const fetchData = async () => {
         const payload = {
-            username: props.userData.username,
+            token: localStorage.getItem('token'),
         };
         try {
             const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo',
@@ -22,7 +22,6 @@ export default function AccountPage(props: AccountPageProps) {
             });
 
             const resultData = await response.json();
-            console.log(resultData);
             if (resultData.statusCode == 200) {
                 setAccountInfo(resultData.account);
             }
@@ -36,7 +35,6 @@ export default function AccountPage(props: AccountPageProps) {
         fetchData();
     }, []);
 
-    console.log(accountInfo);
     if (props.userData.accountType === "Seller") {
         if(accountInfo==null) return null;
         return (

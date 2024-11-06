@@ -32,7 +32,6 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
 
   return (
     <div className="ItemDisplay">
-      {/*do something with result here*/}
       {result.length > 0 ? (
         result.map((item, index) => (
           <div key={index} className="item">

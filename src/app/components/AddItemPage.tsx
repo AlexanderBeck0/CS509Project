@@ -1,55 +1,103 @@
-import React, { useState, useEffect, ChangeEvent} from 'react';
-import SellerPage from './SellerPage';
-import { Link } from 'react-router-dom';
+import React, { useState, ChangeEvent, useRef} from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface AddItemPageProps {
-    
 }
 
-export default function AddItemPage( {}:AddItemPageProps) { 
-    const [userImage,setUserImage] = useState<string | number | readonly string[] | undefined>(undefined);
+export default function AddItemPage( props :AddItemPageProps) { 
+
+    const navigate = useNavigate();
+    const [userImage,setUserImage] = useState<string>("");
+    const nameRef = useRef<HTMLInputElement | null>(null);
+    const descriptionRef = useRef<HTMLInputElement | null>(null);
+    const priceRef = useRef<HTMLInputElement | null>(null);
+    const startDateRef = useRef<HTMLInputElement | null>(null);
+    const endDateRef = useRef<HTMLInputElement | null>(null);
 
     const handleURLChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if(e.target.value === "") setUserImage(undefined);
-        else setUserImage(e.target.value);
+        //if(e.target.value === "") setUserImage(undefined);
+        setUserImage(e.target.value);
+    } 
+
+    const addItem = () => {
+        const fetchData = async () => {
+            const payload = {
+              token: localStorage.getItem('token'),
+              item: {
+                name: nameRef.current!.value,
+                description: descriptionRef.current!.value,
+                image: userImage,
+                initialPrice: Math.max(1, parseFloat(priceRef.current!.value) || 1),
+                startDate: startDateRef.current!.value,
+                endDate: endDateRef.current!.value == "" ? null : endDateRef.current!.value
+              }
+            };
+            console.log(JSON.stringify(payload));
+            try {
+              const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/saveItem',
+                {
+                  method: 'POST',
+                  body: JSON.stringify(payload),
+                });
+      
+              const resultData = await response.json();
+              if (resultData.statusCode === 200) {
+                navigate('/account');
+              }
+              if(resultData.statusCode === 400) {
+                alert("Add item failed");
+              }
+            } catch (error) {
+              console.error('Error fetching data:', error);
+            }
+          }
+          fetchData();
     }
 
+    const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        addItem();
+    };
+
     return (
-        <div className='sellerContent'>
+        <div >
+            <form onSubmit={handleSave}className='sellerContent'>
             <div className='sellerContentColumn' style={{ width: "60%", }}>
-                <input className="itemPageInput" style={{fontSize: "30px"}} type="text" name="ItemName" data-length="20" required
+                <input className="itemPageInput" ref={nameRef} style={{fontSize: "30px"}} type="text" name="ItemName" data-length="20" required
                     placeholder="Item Name"/>
                 <div style={{border: "1px solid black", borderRadius: "8px", height: "200px", maxHeight: "200px", maxWidth: "200px", margin: "1rem",}}>
-                    <img src={"https://en.wikipedia.org/wiki/Red_panda#/media/File:Red_Panda_(24986761703).jpg"}/>
+                    <img src={userImage || "https://www.thesaurus.com/e/wp-content/uploads/2022/01/20211220_personFirst_question_1000x700-790x310.png"} alt={userImage}/>
                 </div>
-                <input className="itemPageInput" style={{fontSize: "16px"}} type="text" name="ItemURL" data-length="20" required
+                <input className="itemPageInput" style={{fontSize: "16px"}} type="text" name="ItemURL" data-length="20"
                     placeholder="Image URL" value={userImage} onChange={handleURLChange}/>
-                <input className="itemPageInput" style={{fontSize: "16px"}} type="text" name="ItemURL" data-length="20" required
-                    placeholder="Item Description" value={userImage} onChange={handleURLChange}/>
+                <input className="itemPageInput" ref={descriptionRef} style={{fontSize: "16px"}} type="text" name="ItemURL" data-length="20"
+                    placeholder="Item Description"/>
+                <input className="itemPageInput" ref={priceRef} style={{fontSize: "16px"}} type="number" name="ItemPrice" data-length="20"
+                    placeholder="Item Price"/>
                 <div className='flex row'> {/* dates */}
                     <p style={{fontSize: "50px"}}>🕒</p>
-                    <div className='flex column center'>
-                        <div className='flex row' style={{width: "100%"}}>
-                            <p style={{fontSize: "12px", }}>Start Date:</p>{/* do calendar pop up */}
-                            <input className="itemPageInput" style={{fontSize: "12px"}} type="text" name="StartDate" data-length="10" required
+                    <div className='dateContainer'>
+                        <div className='dateLabel' style={{width: "100%"}}>
+                            <b>Start Date:</b>
+                            <input className="itemPageInput" ref={startDateRef} style={{fontSize: "12px"}} type="date" name="StartDate" data-length="10" required
                                 placeholder="MM/DD/YYYY"/>
                         </div>
-                        <div className='flex row' style={{width: "100%"}}>
-                            <p style={{fontSize: "12px"}}>End Date:</p>{/* do calendar pop up */}
-                            <input className="itemPageInput" style={{fontSize: "12px"}} type="text" name="EndDate" data-length="10" required
+                        <div className='dateLabel' style={{width: "100%"}}>
+                            <b>End Date:</b>
+                            <input className="itemPageInput" ref={endDateRef} style={{fontSize: "12px"}} type="date" name="EndDate" data-length="10"
                                 placeholder="MM/DD/YYYY"/>
                         </div>
                     </div>
                 </div>
             </div>
             <div className='sellerContentColumn'> {/* buttons */}
-                <button className='save accountButton'>💾 Save</button>
+                <button className='save accountButton' type="submit">💾 Save</button>
                 <Link to="/account">
                     <button className='cancel accountButton' style={{color: "red", border: "1px solid red",}}>
                         ❌Cancel
                         </button>
                 </Link>
-            </div>
+            </div></form>
         </div>
     );
 }
