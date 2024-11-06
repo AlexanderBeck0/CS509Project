@@ -1,4 +1,4 @@
-// import React, { useState, useEffect} from 'react';
+import { Buyer } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
@@ -9,7 +9,7 @@ interface BuyerPageProps {
 
 export default function BuyerPage(props: BuyerPageProps) {
     const fundsRef = useRef<HTMLInputElement | null>(null);
-    const [account, setAccount] = useState<any>(null);
+    const [account, setAccount] = useState<Buyer | null>(null);
     const [funds, setFunds] = useState<number>(0);
 
     useEffect(() => {
@@ -23,7 +23,7 @@ export default function BuyerPage(props: BuyerPageProps) {
                     })
                 });
 
-                const data = await response.json();
+                const data: { statusCode: 400 | 500, error: string } | { statusCode: 200, account: Buyer } = await response.json();
 
                 if (data.statusCode !== 200) throw new Error(data.error);
                 return data.account;
@@ -108,7 +108,7 @@ export default function BuyerPage(props: BuyerPageProps) {
                 throw new Error(data['error']);
             }
 
-            account.balance = data.newBalance;
+            account!.balance = data.newBalance;
             setFunds(data.newBalance);
         } catch (error) {
             console.error(error instanceof Error ? error.message : error);

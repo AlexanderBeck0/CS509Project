@@ -1,11 +1,11 @@
-import React, { useState, useEffect} from 'react';
+import { Account, Item } from '@/utils/types';
 import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ItemStatus } from '../../utils/ItemStatus'
 import ItemDisplay from './ItemDisplay';
-    
+
 interface SellerPageProps {
-    userData: {username:string,accountType:string,isActive:number,balance:number}
+    userData: Account
     logout: () => void;
     closeAccount: () => void;
 }
@@ -14,35 +14,35 @@ export default function SellerPage(props: SellerPageProps) {
 
     /*get JSON of seller id from database*/
     const [selectedOption, setSelectedOption] = useState("All");
-    const [filteredItemresult, setFilteredItemresult] = useState<any[]>([]);
-    
+    const [filteredItemresult, setFilteredItemresult] = useState<Item[]>([]);
+
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
     };
 
     useEffect(() => {
         const fetchData = async () => {
-          const payload = {
-            username: props.userData.username,
-            status: selectedOption,
-          };
-          try {
-            const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getSellerItems',
-              {
-                method: 'POST',
-                body: JSON.stringify(payload),
-              });
-    
-            const resultData = await response.json();
-            if (resultData.statusCode == 200) {
-                setFilteredItemresult(resultData.items);
+            const payload = {
+                username: props.userData.username,
+                status: selectedOption,
+            };
+            try {
+                const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getSellerItems',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                    });
+
+                const resultData = await response.json();
+                if (resultData.statusCode == 200) {
+                    setFilteredItemresult(resultData.items);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
             }
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
         }
         fetchData();
-      }, [selectedOption]);
+    }, [props.userData.username, selectedOption]); // Changed to include props.userData.username because ESLint wasn't happy about it
 
     const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
         const container = event.target as HTMLDivElement;
@@ -70,16 +70,16 @@ export default function SellerPage(props: SellerPageProps) {
 
     return (
         <div className='content'>
-             {/* need to handle account active/closed */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center"}}> {/* heading of seller */}
-                <Image src="/accountSymbol.png" alt="Seller Account Symbol" width={100} height={100} style={{ objectFit: "contain", margin: "1rem"}} />
+            {/* need to handle account active/closed */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}> {/* heading of seller */}
+                <Image src="/accountSymbol.png" alt="Seller Account Symbol" width={100} height={100} style={{ objectFit: "contain", margin: "1rem" }} />
                 <b>{props.userData!.username}</b>
             </div>
             <div className="sellerContent"> {/* item content */}
                 <div className='sellerContentColumn' style={{ width: "25%", }}>
                     <p><b>Profit:</b></p>
                     ${props.userData!.balance}
-                    <div className='buttons' style={{marginTop: "auto"}}>
+                    <div className='buttons' style={{ marginTop: "auto" }}>
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
                     </div>
@@ -102,13 +102,13 @@ export default function SellerPage(props: SellerPageProps) {
                     <div className='flex row'>
                         {/* Get items based on filter, not sold prob?? */}
                         <div className="container" onWheel={handleScroll}>
-                        {filteredItemresult.length > 0 ? (
-                            filteredItemresult.map((item, index) => (
-                                <ItemDisplay key={index} item={item}/>
-                            ))
-                        ) : (
-                            <p>No items found.</p>
-                        )}
+                            {filteredItemresult.length > 0 ? (
+                                filteredItemresult.map((item, index) => (
+                                    <ItemDisplay key={index} item={item} />
+                                ))
+                            ) : (
+                                <p>No items found.</p>
+                            )}
                         </div>
                     </div>
                     {/*
@@ -122,7 +122,7 @@ export default function SellerPage(props: SellerPageProps) {
                     </div>
                     */}
                 </div>
-                <div className='sellerContentColumn' style={{ width: "6%", justifyContent: "center", alignItems: "center"}}>
+                <div className='sellerContentColumn' style={{ width: "6%", justifyContent: "center", alignItems: "center" }}>
                     <Link to="/addItem"><button style={{ fontSize: "5vw", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
                         <b>+</b>
                     </button></Link>

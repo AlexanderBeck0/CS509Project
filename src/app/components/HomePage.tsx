@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { Item } from '@/utils/types';
+import { useEffect, useState } from 'react';
 import ItemDisplay from './ItemDisplay';
 
 export default function HomePage(props: { searchInput: string, sortBy: string }) {
-  const [result, setResult] = useState<any[]>([]);
+  const [result, setResult] = useState<Item[]>([]);
 
   useEffect(() => {
     console.log("Search: " + props.searchInput);
@@ -19,7 +20,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
             body: JSON.stringify(payload),
           });
 
-        const resultData = await response.json();
+        const resultData: { statusCode: 200 | 400, items: Item[] } = await response.json();
         console.log(resultData);
         if (resultData.statusCode == 200) {
           setResult(resultData.items);

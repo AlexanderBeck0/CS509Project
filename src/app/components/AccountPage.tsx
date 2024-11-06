@@ -1,8 +1,8 @@
-import SellerPage from './SellerPage';
-import AdminPage from './AdminPage';
-import { AccountType } from '@/utils/types';
-import BuyerPage from './BuyerPage';
+import { Account, AccountType } from '@/utils/types';
 import { useEffect, useState } from 'react';
+import AdminPage from './AdminPage';
+import BuyerPage from './BuyerPage';
+import SellerPage from './SellerPage';
 
 interface AccountPageProps {
     accountType: AccountType | null;
@@ -10,30 +10,30 @@ interface AccountPageProps {
 }
 
 export default function AccountPage(props: AccountPageProps) {
-    const [accountInfo, setAccountInfo] = useState<{accountType:string,isActive:number,balance:number,username:string}|null>(null);
-        
+    const [accountInfo, setAccountInfo] = useState<Account | null>(null);
+
     useEffect(() => {
         const fetchData = async () => {
-        const payload = {
-            token: localStorage.getItem('token'),
-        };
-        try {
-            const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo',
-            {
-                method: 'POST',
-                body: JSON.stringify(payload),
-            });
+            const payload = {
+                token: localStorage.getItem('token'),
+            };
+            try {
+                const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                    });
 
-            const resultData = await response.json();
-            if (resultData.statusCode == 200) {
-                setAccountInfo(resultData.account);
-            }
-            if(resultData.statusCode == 400)
+                const resultData = await response.json();
+                if (resultData.statusCode == 200) {
+                    setAccountInfo(resultData.account);
+                }
+                if (resultData.statusCode == 400)
+                    props.logout();
+            } catch (error) {
+                console.error('Error fetching data:', error);
                 props.logout();
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            props.logout();
-        }
+            }
         }
         fetchData();
     }, []);
@@ -69,12 +69,13 @@ export default function AccountPage(props: AccountPageProps) {
     }
 
     if (props.accountType === "Seller") {
-        
+
         return (
             (accountInfo !== null && <SellerPage userData={accountInfo} logout={props.logout} closeAccount={closeAccount} />)
         );
     } else if (props.accountType === "Buyer") {
         return (
+            // TODO: Pass data instead of fetching in function
             <BuyerPage logout={props.logout} closeAccount={closeAccount} />
         );
     } else if (props.accountType === "Admin") {

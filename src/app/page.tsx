@@ -1,15 +1,15 @@
 'use client';
+import { AccountType } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import { HashRouter, Link, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import AccountPage from "./components/AccountPage";
+import AddItemPage from "./components/AddItemPage";
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
-import AddItemPage from "./components/AddItemPage";
 import SearchBar from "./components/SearchBar";
 import SortDropdown from "./components/SortDropdown";
-import { AccountType } from '@/utils/types';
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -94,9 +94,9 @@ function AppContent() {
       <div className="content">
         <Routes>
           <Route path="/" element={
-            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"}/>)} />
+            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"} />)} />
           <Route path="/addItem" element={
-            (isLoggedIn && token ? <AddItemPage/> : <Navigate to={"/account"}/>)} />
+            (isLoggedIn && token ? <AddItemPage /> : <Navigate to={"/account"} />)} />
           <Route path="/login" element={
             (!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to={"/account"} />)
           } />
