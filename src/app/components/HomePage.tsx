@@ -36,7 +36,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
       {result.length > 0 ? (
         result.map((item, index) => (
           <div key={index} className="item">
-            <h3>{item.image} </h3>
+            <img src={item.image} alt={item.name} style={{ width: '200px', height: 'auto' }} />
             <h3>{item.name}</h3>
             <p> Description: {item.description} </p>
             <p> Start Date: {item.startDate} </p>
