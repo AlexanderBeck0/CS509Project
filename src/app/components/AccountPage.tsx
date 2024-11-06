@@ -5,7 +5,6 @@ import BuyerPage from './BuyerPage';
 import { useEffect, useState } from 'react';
 
 interface AccountPageProps {
-    userData: {accountType: string, username: string}; 
     accountType: AccountType | null;
     logout: () => void;
 }

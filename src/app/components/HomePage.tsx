@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ItemDisplay from './ItemDisplay';
 
 export default function HomePage(props: { searchInput: string, sortBy: string }) {
   const [result, setResult] = useState<any[]>([]);
@@ -34,14 +35,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
     <div className="ItemDisplay">
       {result.length > 0 ? (
         result.map((item, index) => (
-          <div key={index} className="item">
-            <img src={item.image} alt={item.name} style={{ width: '200px', height: 'auto' }} />
-            <h3>{item.name}</h3>
-            <p> Description: {item.description} </p>
-            <p> Start Date: {item.startDate} </p>
-            <p> End Date: {item.endDate} </p>
-            <p> ${item.price} </p>
-          </div>
+          <ItemDisplay key={index} item={item}/>
         ))
       ) : (
         <p>No items found.</p>

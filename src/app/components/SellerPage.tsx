@@ -104,7 +104,7 @@ export default function SellerPage(props: SellerPageProps) {
                         <div className="container" onWheel={handleScroll}>
                         {filteredItemresult.length > 0 ? (
                             filteredItemresult.map((item, index) => (
-                                <ItemDisplay index={index} item={item}/>
+                                <ItemDisplay key={index} item={item}/>
                             ))
                         ) : (
                             <p>No items found.</p>

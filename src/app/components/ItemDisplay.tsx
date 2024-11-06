@@ -1,14 +1,14 @@
-import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 
 interface ItemProps {
-    index: number,
     item : {name:string, description:string, image:string, startDate:string, endDate:string, price:number}
 }
 
-export function Item( {index, item}: ItemProps) {
+export function Item( {item}: ItemProps) {   
   return (
-    <div key={index} className="item">
-        <img src={item.image} alt={item.image}/>
+    <div className="item">
+        <img src={item.image || '/BlankImage.jpg'} // Use the validated or fallback image
+                alt={item.name} style={{borderRadius: "8px"}}/>
         <b style={{fontSize: "20px"}}>{item.name} - ${item.price}</b>
         <p>{item.description} </p>
         <div className='flex row'> {/* dates */}

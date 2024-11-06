@@ -18,8 +18,6 @@ function AppContent() {
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("startDate_ASC");
 
-  const [userData, setUserData] = useState<{accountType: string, username: string } | null>(null);
-  
   // Called whenever token changes
   useEffect(() => {
     const verifyToken = async () => {
@@ -44,7 +42,6 @@ function AppContent() {
       } catch (error) {
         console.error("Failure to verify token: " + error);
         setIsLoggedIn(false);
-        setUserData(null);
       }
     }
     verifyToken();
@@ -58,13 +55,11 @@ function AppContent() {
     setToken(newToken);
     setAccountType(accountType);
     localStorage.setItem('token', newToken); //Store token in localStorage
-    redirect('/account');
   }
 
   function onRegister(newToken: string, accountType: AccountType): void {
     setToken(newToken);
     setAccountType(accountType);
-    redirect('/account');
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
@@ -86,7 +81,7 @@ function AppContent() {
     <main className="main-container">
       <div className="heading">
         <Link to="/"><button className="HomeButton">Auction House</button></Link>
-        {userData?.accountType !== "Seller" && <div className="search">{/* Need to disable if seller */}
+        {accountType !== "Seller" && <div className="search">{/* Need to disable if seller */}
           <SearchBar handleSearch={handleSearch} />
           <SortDropdown setSortBy={setSortBy} />
         </div>}
@@ -99,7 +94,7 @@ function AppContent() {
       <div className="content">
         <Routes>
           <Route path="/" element={
-            (userData?.accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"}/>)} />
+            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"}/>)} />
           <Route path="/addItem" element={
             (isLoggedIn && token ? <AddItemPage/> : <Navigate to={"/account"}/>)} />
           <Route path="/login" element={
