@@ -66,7 +66,7 @@ export type Item = {
     */
     price?: number;
 
-    startDate: Date;
+    startDate: Date | string;
     endDate?: Date;
 
     /**

@@ -1,4 +1,3 @@
-// import React, { useState, useEffect} from 'react';
 import { Buyer } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
@@ -24,7 +23,7 @@ export default function BuyerPage(props: BuyerPageProps) {
                     })
                 });
 
-                const data: {statusCode: 400 | 500, error: string} | {statusCode: 200, account: Buyer} = await response.json();
+                const data: { statusCode: 400 | 500, error: string } | { statusCode: 200, account: Buyer } = await response.json();
 
                 if (data.statusCode !== 200) throw new Error(data.error);
                 return data.account;

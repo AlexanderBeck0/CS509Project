@@ -89,6 +89,10 @@ body {
   transition: transform 0.3s ease; 
 }
 
+.icon:hover {
+  color: #ccc;
+}
+
 .icon.open {
   transform: rotate(0deg); 
 }
@@ -103,10 +107,19 @@ body {
   align-content: left;
 }
 
-.search-input {
-  color: black;
+input {
   padding: 1rem;
-  background-color: transparent;
+  width: 100%;
+  max-width: 20rem;
+  max-height: 2.25rem;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  color: black;
+}
+
+input:focus {
+  border: 1px solid black
 }
 
 .dropdown {
@@ -116,6 +129,7 @@ body {
   padding: 0; margin: 0;
   background-color: white;
   border: 1px solid #ccc;
+  border-radius: 8px;
   z-index: 1;
 }
 
@@ -134,18 +148,21 @@ body {
 .sellerContentColumn {
   display: flex;
   flex-direction: column;
-  margin: 3rem;
+  margin: 2rem;
+  width: 100%;
 }
 
 .container {
   display: flex;
   flex-wrap: nowrap;
-  overflow-x: scroll;
+  overflow-x: auto;
   padding: 1rem;
+  gap: 1rem;
 }
 
 .scrollItem {
   width: 100vw;
+  margin: 1rem;
 }
 
 .buttons {
@@ -156,5 +173,51 @@ body {
 .accountButton {
   border-radius: 8px;
   border: 1px solid black;
-  margin-top: 1rem;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  padding: .25rem;
+}
+
+.accountButton:hover {
+  background-color: #ccc;
+}
+
+.searchButton:hover {
+  background-color:#ccc;
+}
+.searchButton {
+  border-radius: 8px;
+}
+
+.itemPageInput {
+  background-color: transparent;
+  width: auto;
+}
+
+.hyperlink {
+  color: blue;
+}
+
+.hyperlink:hover {
+  text-decoration: underline;
+}
+
+.dateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dateLabel {
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.item {
+  min-width: 150px;
+  align-content: center;
+  border: solid 1px black;
+  border-radius: 8px;
 }
