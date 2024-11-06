@@ -17,26 +17,39 @@ export const handler = async (event) => {
     }
     const { token, deltaBalance } = event
     const { username, accountType } = await verifyToken(token)
+    const isValid = username && accountType;
+    if (!isValid) {
+        return { statusCode: 500, error: "Invalid token" };
+    }
     // get account information
-    const account = await getAccountByUsername(username, pool, false);
+    const account = await getAccountByUsername(username, pool, true);
     // get balance
     const curBalance = account.balance
     // define new balance
     const newBalance = deltaBalance + curBalance
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         // make sure newBalance is not negative
         if (newBalance <= 0) {
-            return reject(new Error("New balance cannot be less than zero"));
+            return resolve({
+                statusCode: 400,
+                error: "New balance can not be less than 0"
+            });
         }
         // make sure balance is a whole number
         if (!Number.isInteger(newBalance)) {
-            return reject(new Error("New balance must be a whole number"))
+            return resolve({
+                statusCode: 400,
+                error: "Balance must be a whole number"
+            });
         }
 
         // make sure account is active
         if (account.isActive !== 1) {
-            return reject(new Error("Account must be active to edit balance"))
+            return resolve({
+                statusCode: 400,
+                error: "Account must be active to edit balance"
+            });
         }
 
 
@@ -50,13 +63,15 @@ export const handler = async (event) => {
 
                 if (fundsError) {
                     console.error('funds query error:', fundsError);
-                    return reject(fundsError);
+                    return resolve({
+                        statusCode: 400,
+                        error: "funds query error"
+                    });
                 } else {
                     // successful
                     return resolve({
                         statusCode: 200,
                         body: {
-                            token,
                             newBalance
                         }
                     });
@@ -66,7 +81,10 @@ export const handler = async (event) => {
             if (accountType === 'Seller') {
                 // make sure deltaBalance is positive
                 if (deltaBalance < 0) {
-                    return reject(new Error("Delta balance must be positive for sellers"));
+                    return resolve({
+                        statusCode: 400,
+                        error: "Delta balance must be positive for sellers"
+                    });
                 }
 
                 const addProfitQuery = updateBalanceQuery
@@ -75,7 +93,10 @@ export const handler = async (event) => {
 
                     if (profitError) {
                         console.error('profit query error:', profitError);
-                        return reject(profitError);
+                        return resolve({
+                            statusCode: 400,
+                            error: "profit query error"
+                        });
                     } else {
                         // successful
                         return resolve({
