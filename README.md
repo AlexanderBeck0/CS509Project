@@ -2,7 +2,7 @@
 
 This is an Auction House application created using Typescript, NextJS, and AWS. It is for the graduate course CS 509: Design of Software Systems at WPI.
 
-Link to active site: [Link to active site goes here](#)
+Link to active site: [Auction House](http://auctionhouse2024.s3-website-us-east-1.amazonaws.com/)
 
 ## Authors
 
@@ -15,7 +15,17 @@ Link to active site: [Link to active site goes here](#)
 
 Here are the Use Cases we have completed for Iteration One:
 
-* List use cases here
+* [Seller: Create Account](#create-account)
+* [Seller: Close Account](#close-account)
+* [Seller: Login Account](#login-account)
+* [Seller: Add Item](#login-account)
+* [Buyer: Open Account](#open-account)
+* [Buyer: Close an Account](#close-an-account)
+* [Buyer: Login](#login)
+* [Buyer: Add Funds](#add-funds)
+* [Customer: Search Items](#search-items)
+* [Customer: Sort Items](#sort-items)
+* [Customer: View Items](#view-items)
 
 ## Project Details
 
@@ -98,11 +108,19 @@ A Buyer is the only actor able to place bids on an item. A Buyer can...
 
 #### Open Account
 
+A customer is able to create a buyer account by going to create account. Alternatively, there is a link provided within the login page that redirects the customer to the register page. A customer cannot create an account with the username of an already existing account or an already closed account. They will select buyer from a dropdown to create a buyer account.
+
 #### Close an Account
+
+A buyer is able to close an account that does not have any active bids. The buyer cannot reopen the account. The username will be reserved, and an account cannot be created with the buyer's username again.
 
 #### Login
 
+A buyer can login to their account through the login page. The buyer cannot log into an account that has already been closed.
+
 #### Add Funds
+
+A buyer can add funds to their account on their account page. They can add a positive integer to the add funds entry box, click add funds, and the funds will be added to their account. Funds must be positive integers.
 
 #### Search Recently Sold
 
@@ -139,6 +157,8 @@ A Customer can view an active item (with only the highest bid shown, or initial 
 ### Admin
 
 There only exists one Admin within the Auction House. Admin has the ability to [Freeze](#freeze-item) and [Unfreeze](#unfreeze-item) items. Additionally, Admin can [Generate Auction Report](#generate-auction-report) and [Generate Forensics Report](#generate-forensics-report).
+
+As of iteration 1: Admin can also view the database data on their account page.
 
 #### Freeze Item
 
