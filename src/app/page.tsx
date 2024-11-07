@@ -37,8 +37,8 @@ function AppContent() {
 
         const data = await response.json();
 
-        setIsLoggedIn(data.body.username && data.body.accountType);
-        setAccountType(data.body.accountType ?? null);
+        setIsLoggedIn(data.body?.username && data.body?.accountType);
+        setAccountType(data.body?.accountType ?? null);
       } catch (error) {
         console.error("Failure to verify token: " + error);
         setIsLoggedIn(false);
