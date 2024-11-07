@@ -29,7 +29,7 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                     image: userImage,
                     initialPrice: Math.max(1, parseFloat(priceRef.current!.value) || 1),
                     startDate: startDateRef.current!.value,
-                    endDate: endDateRef.current!.value == "" ? null : endDateRef.current!.value
+                    endDate: endDateRef.current!.value === "" ? null : endDateRef.current!.value
                 }
             };
             console.log(JSON.stringify(payload));
@@ -84,19 +84,21 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                     <input className="itemPageInput" ref={descriptionRef} style={{ fontSize: "16px" }} type="text" name="ItemURL" data-length="20"
                         placeholder="Item Description" maxLength={100} />
                     <input className="itemPageInput" ref={priceRef} style={{ fontSize: "16px" }} type="number" name="ItemPrice" data-length="20"
-                        placeholder="Item Price" />
+                        step={1} min={0} maxLength={10} placeholder="Item Price" />
                     <div className='flex row'> {/* dates */}
                         <p style={{ fontSize: "50px" }}>🕒</p>
                         <div className='dateContainer'>
                             <div className='dateLabel' style={{ width: "100%" }}>
                                 <b>Start Date:</b>
                                 <input className="itemPageInput" ref={startDateRef} style={{ fontSize: "12px" }} type="date" name="StartDate" data-length="10" required
-                                    placeholder="MM/DD/YYYY" />
+                                    placeholder="MM/DD/YYYY" min={new Date().toISOString().split("T")[0]}
+                                    defaultValue={new Date().toISOString().split("T")[0]} />
                             </div>
                             <div className='dateLabel' style={{ width: "100%" }}>
                                 <b>End Date:</b>
                                 <input className="itemPageInput" ref={endDateRef} style={{ fontSize: "12px" }} type="date" name="EndDate" data-length="10"
-                                    placeholder="MM/DD/YYYY" />
+                                    placeholder="MM/DD/YYYY" min={new Date().toISOString().split("T")[0]}
+                                    defaultValue={new Date().toISOString().split("T")[0]} />
                             </div>
                         </div>
                     </div>

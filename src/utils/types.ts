@@ -47,7 +47,6 @@ export type Item = {
      */
     description?: string;
 
-
     /**
      * The image's url. Max length of 200 characters.
      */
@@ -89,6 +88,20 @@ export type Item = {
      * Whether the item has been archived. Defaults to `false`.
      */
     archived: boolean;
+
+    /**
+     * The item's status. Possible values are:
+     * 
+     *  * `Active`
+     *  * `Inactive` 
+     *  * `Frozen` 
+     *  * `Requested`
+     *  * `Failed` 
+     *  * `Completed` 
+     *  * `Fulfilled`
+     * 
+     * @see {@link ItemStatus} for more details on the status.
+     */
     status: ItemStatus;
 
     /**
@@ -114,7 +127,7 @@ export type Bid = {
     timeOfBid: Date;
 
     /**
-     * The username of the {@link Buyer} who created the bid.
+     * The {@link Buyer.username username} of the {@link Buyer} who created the bid.
      */
     buyerUsername: string;
 
@@ -133,8 +146,23 @@ export type Bid = {
 
 // #endregion
 // #region Accounts
+
+/**
+ * There are 3 main types of accounts: `Seller`, `Buyer`, and `Admin`. 
+ * 
+ * A {@link Seller} is able to sell {@link Item Items}.
+ * 
+ * A {@link Buyer} is able to place {@link Bid Bids}.
+ * 
+ * A {@link Admin} is able to freeze/unfreeze {@link Item Items}.
+ */
 export type AccountType = "Seller" | "Buyer" | "Admin";
 
+/**
+ * # Account
+ * 
+ * @see {@link Seller}, {@link Buyer}, {@link Admin}
+ */
 export interface Account {
     /**
      * The Account's username. Max length of 45

@@ -24,19 +24,18 @@ export default function AccountPage(props: AccountPageProps) {
                         body: JSON.stringify(payload),
                     });
 
-                const resultData = await response.json();
+                const resultData: { statusCode: 200, account: Account } | { statusCode: 400, error: string } = await response.json();
+                if (resultData.statusCode !== 200) throw new Error(resultData.error);
                 if (resultData.statusCode == 200) {
                     setAccountInfo(resultData.account);
                 }
-                if (resultData.statusCode == 400)
-                    props.logout();
             } catch (error) {
                 console.error('Error fetching data:', error);
                 props.logout();
             }
         }
         fetchData();
-    }, []);
+    }, [props]);
 
     /**
      * Closes the user's account and logs them out.
@@ -71,12 +70,12 @@ export default function AccountPage(props: AccountPageProps) {
     if (props.accountType === "Seller") {
 
         return (
-            (accountInfo !== null && <SellerPage userData={accountInfo} logout={props.logout} closeAccount={closeAccount} />)
+            (accountInfo && <SellerPage userData={accountInfo} logout={props.logout} closeAccount={closeAccount} />)
         );
     } else if (props.accountType === "Buyer") {
         return (
             // TODO: Pass data instead of fetching in function
-            <BuyerPage logout={props.logout} closeAccount={closeAccount} />
+            (accountInfo && <BuyerPage userData={accountInfo} logout={props.logout} closeAccount={closeAccount} />)
         );
     } else if (props.accountType === "Admin") {
         return (
