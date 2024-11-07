@@ -129,7 +129,7 @@ export default function BuyerPage(props: BuyerPageProps) {
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
                         <div className="max-w-full mt-2 flex flex-row flex-nowrap basis-full items-center">
-                            <input type="number" min={1} step={1} ref={fundsRef} placeholder="Funds #"
+                            <input type="number" min={1} step={1} maxLength={10} ref={fundsRef} placeholder="Funds #"
                                 className="flex basis-2/3 flex-grow-0 border rounded-lg border-solid border-black"
                             // The below line would make it not allow decimals, but it causes the cursor to move to the start
                             // onInput={(e) => (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, "")}

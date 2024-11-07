@@ -73,7 +73,7 @@ export default function LoginPage(props: LoginPageProps) {
                         <label className="text-lg" htmlFor={usernameId}>Username</label>
                     </div>
                     <input className="input input-bordered w-full max-w-xs max-h-9 input-primary focus:outline-accent"
-                        type="text" name="username" autoComplete="username" data-length="20" required
+                        type="text" name="username" autoComplete="username" data-length="20" maxLength={45} required
                         ref={usernameRef} id={usernameId}></input>
                 </div>
                 <div className="mb-2">
@@ -81,7 +81,7 @@ export default function LoginPage(props: LoginPageProps) {
                         <label className="text-lg" htmlFor={passwordId}>Password</label>
                     </div>
                     <input className="input input-bordered w-full max-w-xs max-h-9 input-primary focus:outline-accent"
-                        type="password" name="password" autoComplete="current-password" required
+                        type="password" name="password" autoComplete="current-password" maxLength={45} required
                         ref={passwordRef} id={passwordId}></input>
                 </div>
                 <div>
