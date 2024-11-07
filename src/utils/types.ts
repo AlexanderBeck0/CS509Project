@@ -1,5 +1,4 @@
-export type AccountType = "Seller" | "Buyer" | "Admin";
-
+// #region Items
 /**
  * # ItemStatus
  * A seller can review their items to see which ones are `inactive` (not yet published), 
@@ -51,27 +50,44 @@ export type Item = {
 
     /**
      * The image's url. Max length of 200 characters.
-    */
+     */
     image: string;
 
     /**
      * The item's initial price. Must be a positive whole number.
-    */
+     */
     initialPrice: number;
 
     /**
      * The item's current price. Must be a positive whole number.
      * 
      * Defaults to {@linkcode Item.initialPrice}
-    */
+     */
     price?: number;
 
+    /**
+     * The item's start date. Is required for publishing. Defaults to when the Seller publishes.
+     * 
+     * @example
+     * ```JS
+     * typeof item.startDate === "string" ? new Date(item.startDate).toLocaleDateString() : item.startDate.toLocaleDateString()
+     * ```
+     */
     startDate: Date | string;
-    endDate?: Date;
+
+    /**
+     * The item's end date. Is required for publishing.
+     * 
+     * @example
+     * ```JS
+     * (typeof item.startDate === "string" ? new Date(item.startDate).toLocaleDateString() : item.startDate.toLocaleDateString()) || "No end date"
+     * ```
+     */
+    endDate?: Date | string;
 
     /**
      * Whether the item has been archived. Defaults to `false`.
-    */
+     */
     archived: boolean;
     status: ItemStatus;
 
@@ -106,7 +122,7 @@ export type Bid = {
      * The {@link Item.id id} of the {@link Item} that this bid was placed on.
      */
     itemId: number;
-    
+
     /**
      * The {@link Bid.id id} of the previous {@link Bid}.
      * 
@@ -114,6 +130,10 @@ export type Bid = {
      */
     previousBidId?: number;
 };
+
+// #endregion
+// #region Accounts
+export type AccountType = "Seller" | "Buyer" | "Admin";
 
 export interface Account {
     /**
@@ -155,3 +175,4 @@ export interface Seller extends Account {
 
 // An empty Account. Note that to add any features to Admin, turn it into an interface and extend Account.
 export type Admin = Account;
+// #endregion

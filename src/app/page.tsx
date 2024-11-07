@@ -42,11 +42,13 @@ function AppContent() {
       } catch (error) {
         console.error("Failure to verify token: " + error);
         setIsLoggedIn(false);
+        setAccountType(null);
       }
     }
     verifyToken();
   }, [token]);
 
+  // #region Handlers
   const handleSearch = (input: string) => {
     setSearchInput(input);
   };
@@ -63,6 +65,8 @@ function AppContent() {
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
+  // #endregion
+
   /**
    * Logs the user out by deleting their token from local storage and changing the React states.
    * 
@@ -77,6 +81,7 @@ function AppContent() {
     setAccountType(null);
   }
 
+  // #region TSX
   return (
     <main className="main-container">
       <div className="heading">
@@ -110,6 +115,7 @@ function AppContent() {
       </div>
     </main>
   );
+  // #endregion
 }
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
