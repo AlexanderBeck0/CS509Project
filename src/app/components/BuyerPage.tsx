@@ -48,6 +48,7 @@ export default function BuyerPage(props: BuyerPageProps) {
         props.closeAccount();
     }
 
+    // #region edit-balance
     /**
      * Adds funds to the buyer.
      */
@@ -97,6 +98,7 @@ export default function BuyerPage(props: BuyerPageProps) {
             throw error
         }
     }
+    // #endregion
 
     return (
         <div className='content'>

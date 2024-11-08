@@ -105,6 +105,14 @@ export type Item = {
     status: ItemStatus;
 
     /**
+     * Flag that represents if the item is for sale. Defaults to `false`.
+     * 
+     * An item that is for sale is one that is not up for bid, but rather allows a buyer to instantly buy an item. 
+     * It still must be fulfilled afterwards.
+     */
+    forSale: boolean;
+
+    /**
      * The {@link Seller.username Seller's username}.
      */
     sellerUsername: string;

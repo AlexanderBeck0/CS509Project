@@ -30,7 +30,7 @@ export default function RegisterPage(props: RegisterPageProps) {
         event.preventDefault();
         setMessage("Registering...");
 
-        // Do post request to login here
+        // #region createAccount
         try {
             const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/createAccount", {
                 method: "POST",
@@ -75,6 +75,7 @@ export default function RegisterPage(props: RegisterPageProps) {
             }
         }
     }
+    // #endregion
 
     return (
         <div {...divProps}>

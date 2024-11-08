@@ -19,6 +19,7 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
         setUserImage(e.target.value);
     }
 
+    // #region saveItem
     const addItem = () => {
         const fetchData = async () => {
             const payload = {
@@ -53,6 +54,7 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
         }
         fetchData();
     }
+    // #endregion
 
     useEffect(() => {
         const today = new Date().toISOString().split('T')[0];

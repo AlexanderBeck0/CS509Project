@@ -20,6 +20,7 @@ export default function LoginPage(props: LoginPageProps) {
     const usernameId = useId();
     const passwordId = useId();
 
+    // #region login
     /**
      * The callback for when the user tries to login.
      * @param event The submit event.
@@ -64,6 +65,8 @@ export default function LoginPage(props: LoginPageProps) {
             }
         }
     }
+
+    // #endregion
 
     return (
         <div {...divProps}>

@@ -20,6 +20,7 @@ export default function SellerPage(props: SellerPageProps) {
         setSelectedOption(event.target.value);
     };
 
+    // #region getSellerItems
     useEffect(() => {
         const fetchData = async () => {
             const payload = {
@@ -43,6 +44,7 @@ export default function SellerPage(props: SellerPageProps) {
         }
         fetchData();
     }, [props.userData.username, selectedOption]); // Changed to include props.userData.username because ESLint wasn't happy about it
+    // #endregion
 
     const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
         const container = event.target as HTMLDivElement;

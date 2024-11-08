@@ -12,6 +12,7 @@ interface AccountPageProps {
 export default function AccountPage(props: AccountPageProps) {
     const [accountInfo, setAccountInfo] = useState<Account | null>(null);
 
+    // #region getAccountInfo
     useEffect(() => {
         const fetchData = async () => {
             const payload = {
@@ -37,6 +38,8 @@ export default function AccountPage(props: AccountPageProps) {
         fetchData();
     }, [props]);
 
+    // #endregion
+    // #region closeAccount
     /**
      * Closes the user's account and logs them out.
      */
@@ -66,6 +69,7 @@ export default function AccountPage(props: AccountPageProps) {
             console.error(error instanceof Error ? error.message : error);
         }
     }
+    // #endregion
 
     if (props.accountType === "Seller") {
 
