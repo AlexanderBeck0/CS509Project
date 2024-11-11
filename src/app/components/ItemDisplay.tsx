@@ -29,7 +29,7 @@ export default function ItemDisplay(props: ItemDisplayProps) {
                         </div>
                     </div>
                 </div>
-                <p className="text-lg basis-1/3">{item.status}</p>
+                {item?.status && <p className="text-lg basis-1/3">{item.status}</p>}
             </div>
             {props.children}
         </div>
