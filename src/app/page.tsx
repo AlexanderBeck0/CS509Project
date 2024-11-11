@@ -111,6 +111,9 @@ function AppContent() {
           <Route path="/account" element={
             (isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to={"/"} />)
           } />
+          {/* TODO: Add edit item here WITH authentication (Sellers only) */}
+          {/* TODO: Add view item here for Sellers */}
+          {/* TODO: Add view item here for Buyers */}
         </Routes>
       </div>
     </main>
