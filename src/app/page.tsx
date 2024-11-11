@@ -2,7 +2,7 @@
 import { AccountType } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Link, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import AccountPage from "./components/AccountPage";
 import AddItemPage from "./components/AddItemPage";
 import HomePage from "./components/HomePage";
@@ -10,6 +10,7 @@ import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import SearchBar from "./components/SearchBar";
 import SortDropdown from "./components/SortDropdown";
+import RecentlySold from "./components/RecentlySold";
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -17,6 +18,7 @@ function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("startDate_ASC");
+  const [recentlySold, setRecentlySold] = useState(false);
 
   // Called whenever token changes
   useEffect(() => {
@@ -47,10 +49,6 @@ function AppContent() {
     verifyToken();
   }, [token]);
 
-  const handleSearch = (input: string) => {
-    setSearchInput(input);
-  };
-
   function onLogin(newToken: string, accountType: AccountType): void {
     setToken(newToken);
     setAccountType(accountType);
@@ -80,10 +78,15 @@ function AppContent() {
   return (
     <main className="main-container">
       <div className="heading">
-        <Link to="/"><button className="HomeButton">Auction House</button></Link>
-        {accountType !== "Seller" && <div className="search">{/* Need to disable if seller */}
-          <SearchBar handleSearch={handleSearch} />
-          <SortDropdown setSortBy={setSortBy} />
+        <Link to="/"><button className="HomeButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>Auction House</button></Link>
+        {accountType !== "Seller" && <div className="search">
+          <SearchBar setSearchInput={setSearchInput} />
+          <div style={{ display: "flex", flexDirection: "column"}}>
+            {accountType === "Buyer" && (
+              <RecentlySold setRecentlySold={setRecentlySold} recentlySold={recentlySold}/>
+            )}
+            <SortDropdown setSortBy={setSortBy} />
+          </div>
         </div>}
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>

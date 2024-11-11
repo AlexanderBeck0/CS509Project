@@ -75,8 +75,8 @@ export default function SellerPage(props: SellerPageProps) {
                 <Image src="/accountSymbol.png" alt="Seller Account Symbol" width={100} height={100} style={{ objectFit: "contain", margin: "1rem" }} />
                 <b>{props.userData!.username}</b>
             </div>
-            <div className="sellerContent"> {/* item content */}
-                <div className='sellerContentColumn' style={{ width: "25%", }}>
+            <div className="pageContent"> {/* item content */}
+                <div className='pageContentColumn' style={{ width: "25%", }}>
                     <p><b>Profit:</b></p>
                     ${props.userData!.balance}
                     <div className='buttons' style={{ marginTop: "auto" }}>
@@ -84,7 +84,7 @@ export default function SellerPage(props: SellerPageProps) {
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
                     </div>
                 </div>
-                <div className='sellerContentColumn' style={{ width: "60%", }}>
+                <div className='pageContentColumn' style={{ width: "60%", }}>
                     <div className='flex row' style={{ justifyContent: "space-between", alignItems: "center" }}>
                         <p><b>Items:</b></p>
                         <select value={selectedOption} onChange={handleSelectChange}>

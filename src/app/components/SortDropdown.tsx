@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface DropdownMenuProps {
   setSortBy: (sort: string) => void;
@@ -10,6 +11,8 @@ export function SortDropdown({ setSortBy }: DropdownMenuProps) {
   const [dropdownButtonWidth, setDropdownButtonWidth] = useState(0);
   const [selectedOption, setSelectedOption] = useState("Start");
   const [isAscending, setIsAscending] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (dropdownButtonRef.current) {
@@ -25,6 +28,8 @@ export function SortDropdown({ setSortBy }: DropdownMenuProps) {
       setIsAscending(true);
     }
     setIsOpen(false);
+    
+    navigate('/');
   };
 
   useEffect(() => {
@@ -40,12 +45,14 @@ export function SortDropdown({ setSortBy }: DropdownMenuProps) {
   }, [selectedOption, isAscending, setSortBy]);
 
   return (
-    <div style={{ position: "relative", marginLeft: "8px" }}>
-      <button ref={dropdownButtonRef} onClick={() => setIsOpen(!isOpen)}>
+    <div className="searchBox">
+      <span style={{ fontSize: "12px",marginRight: "0.5rem" }}>{(isAscending ? "▼ " : "▲ ") + selectedOption+":"}</span>  
+    <div style={{ position: "relative" }}>
+      <button ref={dropdownButtonRef} onClick={() => setIsOpen(!isOpen)} style={{ display: "flex", alignItems: "center" }}>
         <span className={`icon ${isOpen ? "open" : "closed"}`}>▼</span>
       </button>
       {isOpen && (
-        <ul className="dropdown" style={{ right: `${dropdownButtonWidth / 2}px`, top: "120%" }}>
+        <ul className="dropdown" style={{ right: `${dropdownButtonWidth/2}px`, top: "120%" }}>
           {["Name", "Price", "Start", "End"].map((option) => (
             <li
               key={option}
@@ -66,6 +73,7 @@ export function SortDropdown({ setSortBy }: DropdownMenuProps) {
           ))}
         </ul>
       )}
+    </div>
     </div>
   );
 }

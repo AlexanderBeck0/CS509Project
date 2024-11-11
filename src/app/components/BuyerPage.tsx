@@ -1,44 +1,21 @@
-import { Buyer } from '@/utils/types';
+import { Account } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 interface BuyerPageProps {
+    userData: Account
     logout: () => void;
     closeAccount: () => void;
 }
 
 export default function BuyerPage(props: BuyerPageProps) {
     const fundsRef = useRef<HTMLInputElement | null>(null);
-    const [account, setAccount] = useState<Buyer | null>(null);
-    const [funds, setFunds] = useState<number>(0);
+    
+    const [selectedOption, setSelectedOption] = useState("All");
 
-    useEffect(() => {
-        const fetchAccountData = async () => {
-            try {
-                const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        token: localStorage.getItem('token')
-                    })
-                });
-
-                const data: { statusCode: 400 | 500, error: string } | { statusCode: 200, account: Buyer } = await response.json();
-
-                if (data.statusCode !== 200) throw new Error(data.error);
-                return data.account;
-            } catch (error) {
-                console.error(error instanceof Error ? error.message : error);
-                throw error
-            }
-        };
-        fetchAccountData().then((accountInfo) => setAccount(accountInfo)).catch((error) => console.error(error.message));
-    }, []);
-
-    useEffect(() => {
-        if (account === null || account === undefined) return;
-        setFunds(account.balance);
-    }, [account]);
+    const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedOption(event.target.value);
+    };
 
     /*get JSON of buyer id from database*/
 
@@ -52,23 +29,14 @@ export default function BuyerPage(props: BuyerPageProps) {
         });
     };
 
-    /**
-     * Used to call `props.logout()`
-     */
     const handleLogout = () => {
         props.logout();
     };
 
-    /**
-     * Used to call `props.clorseAccount()`
-     */
     const handleCloseAccount = () => {
         props.closeAccount();
     }
 
-    /**
-     * Adds funds to the buyer.
-     */
     async function addFunds(): Promise<void> {
         const fundsInput = fundsRef.current?.valueAsNumber;
 
@@ -108,8 +76,7 @@ export default function BuyerPage(props: BuyerPageProps) {
                 throw new Error(data['error']);
             }
 
-            account!.balance = data.newBalance;
-            setFunds(data.newBalance);
+            props.userData.balance = data.newBalance;
         } catch (error) {
             console.error(error instanceof Error ? error.message : error);
             throw error
@@ -120,29 +87,37 @@ export default function BuyerPage(props: BuyerPageProps) {
         <div className='content'>
             <div> {/* heading of buyer */}
                 <Image src="/accountSymbol.png" alt="Buyer Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
-                <p><b>Buyer:</b> {account?.username || "Unknown"}</p>
+                <p><b>Buyer:</b> {props.userData.username}</p>
             </div>
-            <div className="flex flex-row gap-4 p-4 justify-center w-full max-w-6xl m-0 justify-items-center"> {/* item content */}
-                <div className='flex flex-col m-12 w-1/3'>
-                    <p><b>Funds:</b> ${funds}</p>
+            <div className="pageContent"> {/* item content */}
+                <div className='pageContentColumn' style={{ width: "25%", }}>
+                    <p><b>Funds:</b> ${props.userData.balance}</p>
                     <div className='buttons'>
+                        <input type="number" min={1} step={1} ref={fundsRef} placeholder="Funds #"
+                            className="input"
+                        // The below line would make it not allow decimals, but it causes the cursor to move to the start
+                        onInput={(e) => (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, "")}
+                        ></input>
+                        <button className="accountButton"
+                            type="button" onClick={addFunds}>Add Funds</button>
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
-                        <div className="max-w-full mt-2 flex flex-row flex-nowrap basis-full items-center">
-                            <input type="number" min={1} step={1} ref={fundsRef} placeholder="Funds #"
-                                className="flex basis-2/3 flex-grow-0 border rounded-lg border-solid border-black"
-                            // The below line would make it not allow decimals, but it causes the cursor to move to the start
-                            // onInput={(e) => (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, "")}
-                            ></input>
-                            <button className="flex basis-1/2 text-nowrap mt-0 border rounded-lg border-solid border-black"
-                                type="button" onClick={addFunds}>Add Funds</button>
-                        </div>
                     </div>
                 </div>
-                <div className='flex flex-col m-12 w-2/3'>
+                <div className='pageContentColumn' style={{ width: "60%", }}>
                     <div className='flex row'>
                         <p><b>Items:</b></p>
-                        <div>{"DROPDOWN"}</div>
+                        <select value={selectedOption} onChange={handleSelectChange}>
+                            <option value={"All"}>All</option> {/* what are the status options for buyer? */}
+                            <option value={"Active"}>Active</option>
+                            <option value={"Inactive"}>Inactive</option>
+                            <option value={"Frozen"}>Frozen</option>
+                            <option value={"Requested"}>Requested</option>
+                            <option value={"Failed"}>Failed</option>
+                            <option value={"Archived"}>Archived</option>
+                            <option value={"Completed"}>Completed</option>
+                            <option value={"Fulfilled"}>Fulfilled</option>
+                        </select>
                     </div>
                     <div className='flex row'>
                         <div className="container" onWheel={handleScroll}>
@@ -155,18 +130,6 @@ export default function BuyerPage(props: BuyerPageProps) {
                             <div className="scrollItem">
                                 3
                             </div>
-                        </div>
-                        <button className='text-6xl'><b>+</b></button>
-                    </div>
-                    <div className="container" onWheel={handleScroll}>
-                        <div className="scrollItem">
-                            1
-                        </div>
-                        <div className="scrollItem">
-                            2
-                        </div>
-                        <div className="scrollItem">
-                            3
                         </div>
                     </div>
                 </div>

@@ -1,14 +1,22 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchBarProps {
-  handleSearch: (input: string) => void;
+  setSearchInput: (input: string) => void;
 }
 
-export function SearchBar({ handleSearch }: SearchBarProps) {
+export function SearchBar({ setSearchInput }: SearchBarProps) {
   const [tempSearchInput, setTempSearchInput] = useState("");
 
+  const navigate = useNavigate();
+  
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTempSearchInput(e.target.value);
+  };
+
+  const handleSearch = (input: string) => {
+    setSearchInput(input);
+    navigate('/');
   };
 
   return (

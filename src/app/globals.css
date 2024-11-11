@@ -86,7 +86,8 @@ body {
 
 .icon {
   display: inline-block;
-  transition: transform 0.3s ease; 
+  transition: transform 0.3s ease;
+  font-size: 18px;
 }
 
 .icon:hover {
@@ -133,7 +134,7 @@ input:focus {
   z-index: 1;
 }
 
-.sellerContent {
+.pageContent {
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -145,7 +146,7 @@ input:focus {
   justify-items: center;
 }
 
-.sellerContentColumn {
+.pageContentColumn {
   display: flex;
   flex-direction: column;
   margin: 2rem;
@@ -220,4 +221,25 @@ input:focus {
   align-content: center;
   border: solid 1px black;
   border-radius: 8px;
+}
+
+.recently-sold-check {
+  padding: 0rem;
+  width: 16px; height: 16px;
+  background-color: white;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem;
+  border: 1px solid #ccc;
+  background-color: darkgrey;
+  padding: 0.15rem;
+  border-radius: 8px;
+  justify-content: center;
+  height: 25px;
 }
