@@ -62,7 +62,7 @@ export default function SellerPage(props: SellerPageProps) {
     };
 
     /**
-     * Used to call `props.clorseAccount()`
+     * Used to call `props.closeAccount()`
      */
     const handleCloseAccount = () => {
         props.closeAccount();

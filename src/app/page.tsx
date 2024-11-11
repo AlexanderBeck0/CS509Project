@@ -10,6 +10,7 @@ import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import SearchBar from "./components/SearchBar";
 import SortDropdown from "./components/SortDropdown";
+import ItemPage from './components/ItemPage';
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -81,31 +82,26 @@ function AppContent() {
     <main className="main-container">
       <div className="heading">
         <Link to="/"><button className="HomeButton">Auction House</button></Link>
-        {accountType !== "Seller" && <div className="search">{/* Need to disable if seller */}
-          <SearchBar handleSearch={handleSearch} />
-          <SortDropdown setSortBy={setSortBy} />
-        </div>}
+        {accountType !== "Seller" && (
+          <div className="search">
+            <SearchBar handleSearch={handleSearch} />
+            <SortDropdown setSortBy={setSortBy} />
+          </div>
+        )}
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
-            <Image src="/accountSymbol.png" height={40} width={40} style={{ height: "40px", width: "auto", objectFit: "contain" }} alt="Account" />
+            <Image src="/accountSymbol.png" height={40} width={40} alt="Account" />
           </button>
         </Link>
       </div>
       <div className="content">
         <Routes>
-          <Route path="/" element={
-            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"} />)} />
-          <Route path="/addItem" element={
-            (isLoggedIn && token ? <AddItemPage /> : <Navigate to={"/account"} />)} />
-          <Route path="/login" element={
-            (!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to={"/account"} />)
-          } />
-          <Route path="/createAccount" element={
-            (!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to={"/account"} />)
-          } />
-          <Route path="/account" element={
-            (isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to={"/"} />)
-          } />
+          <Route path="/" element={accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to="/account" />} />
+          <Route path="/addItem" element={isLoggedIn && token ? <AddItemPage /> : <Navigate to="/account" />} />
+          <Route path="/login" element={!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to="/account" />} />
+          <Route path="/createAccount" element={!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to="/account" />} />
+          <Route path="/account" element={isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to="/" />} />
+          <Route path="/item/:id" element={<ItemPage />} />  {/* New route for item details */}
         </Routes>
       </div>
     </main>
