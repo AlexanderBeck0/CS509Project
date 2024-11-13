@@ -1,5 +1,4 @@
-export type AccountType = "Seller" | "Buyer" | "Admin";
-
+// #region Items
 /**
  * # ItemStatus
  * A seller can review their items to see which ones are `inactive` (not yet published), 
@@ -48,32 +47,70 @@ export type Item = {
      */
     description?: string;
 
-
     /**
      * The image's url. Max length of 200 characters.
-    */
+     */
     image: string;
 
     /**
      * The item's initial price. Must be a positive whole number.
-    */
+     */
     initialPrice: number;
 
     /**
      * The item's current price. Must be a positive whole number.
      * 
      * Defaults to {@linkcode Item.initialPrice}
-    */
+     */
     price?: number;
 
+    /**
+     * The item's start date. Is required for publishing. Defaults to when the Seller publishes.
+     * 
+     * @example
+     * ```JS
+     * typeof item.startDate === "string" ? new Date(item.startDate).toLocaleDateString() : item.startDate.toLocaleDateString()
+     * ```
+     */
     startDate: Date | string;
-    endDate?: Date;
+
+    /**
+     * The item's end date. Is required for publishing.
+     * 
+     * @example
+     * ```JS
+     * (typeof item.startDate === "string" ? new Date(item.startDate).toLocaleDateString() : item.startDate.toLocaleDateString()) || "No end date"
+     * ```
+     */
+    endDate?: Date | string;
 
     /**
      * Whether the item has been archived. Defaults to `false`.
-    */
+     */
     archived: boolean;
+
+    /**
+     * The item's status. Possible values are:
+     * 
+     *  * `Active`
+     *  * `Inactive` 
+     *  * `Frozen` 
+     *  * `Requested`
+     *  * `Failed` 
+     *  * `Completed` 
+     *  * `Fulfilled`
+     * 
+     * @see {@link ItemStatus} for more details on the status.
+     */
     status: ItemStatus;
+
+    /**
+     * Flag that represents if the item is for sale. Defaults to `false`.
+     * 
+     * An item that is for sale is one that is not up for bid, but rather allows a buyer to instantly buy an item. 
+     * It still must be fulfilled afterwards.
+     */
+    forSale: boolean;
 
     /**
      * The {@link Seller.username Seller's username}.
@@ -98,7 +135,7 @@ export type Bid = {
     timeOfBid: Date;
 
     /**
-     * The username of the {@link Buyer} who created the bid.
+     * The {@link Buyer.username username} of the {@link Buyer} who created the bid.
      */
     buyerUsername: string;
 
@@ -106,7 +143,7 @@ export type Bid = {
      * The {@link Item.id id} of the {@link Item} that this bid was placed on.
      */
     itemId: number;
-    
+
     /**
      * The {@link Bid.id id} of the previous {@link Bid}.
      * 
@@ -115,6 +152,25 @@ export type Bid = {
     previousBidId?: number;
 };
 
+// #endregion
+// #region Accounts
+
+/**
+ * There are 3 main types of accounts: `Seller`, `Buyer`, and `Admin`. 
+ * 
+ * A {@link Seller} is able to sell {@link Item Items}.
+ * 
+ * A {@link Buyer} is able to place {@link Bid Bids}.
+ * 
+ * A {@link Admin} is able to freeze/unfreeze {@link Item Items}.
+ */
+export type AccountType = "Seller" | "Buyer" | "Admin";
+
+/**
+ * # Account
+ * 
+ * @see {@link Seller}, {@link Buyer}, {@link Admin}
+ */
 export interface Account {
     /**
      * The Account's username. Max length of 45
@@ -155,3 +211,4 @@ export interface Seller extends Account {
 
 // An empty Account. Note that to add any features to Admin, turn it into an interface and extend Account.
 export type Admin = Account;
+// #endregion
