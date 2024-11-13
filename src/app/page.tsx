@@ -3,14 +3,8 @@ import { AccountType } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
 import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
-import AccountPage from "./components/AccountPage";
-import AddItemPage from "./components/AddItemPage";
-import HomePage from "./components/HomePage";
-import LoginPage from "./components/LoginPage";
-import RegisterPage from "./components/RegisterPage";
-import SearchBar from "./components/SearchBar";
-import SortDropdown from "./components/SortDropdown";
-import ItemPage from './components/ItemPage';
+import { AccountPage, AddItemPage, HomePage, LoginPage, RegisterPage, SearchBar, SortDropdown } from './components/';
+import { ItemPage } from './components/ItemPage';
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -101,7 +95,8 @@ function AppContent() {
           <Route path="/login" element={!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to="/account" />} />
           <Route path="/createAccount" element={!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to="/account" />} />
           <Route path="/account" element={isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to="/" />} />
-          <Route path="/item/:id" element={<ItemPage accountType={accountType} token={token} />} />  {/* New route for item details */}
+          <Route path="/item/:id" element={
+            <ItemPage accountType={accountType} token={token} />} />  {/* New route for item details */}
         </Routes>
       </div>
     </main>

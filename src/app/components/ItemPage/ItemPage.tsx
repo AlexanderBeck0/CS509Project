@@ -1,6 +1,8 @@
 import { Item, Bid, AccountType } from '@/utils/types';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import BuyerItemPage from './BuyerItemPage';
+import SellerItemPage from './SellerItemPage';
 
 interface ItemPageProps {
     accountType: AccountType | null;
@@ -11,8 +13,6 @@ export default function ItemPage(props: ItemPageProps) {
     const { id } = useParams<{ id: string }>();
     const [item, setItem] = useState<Item | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
-    const [newBid, setNewBid] = useState<number>(0);
-    //const [availableFunds, setAvailableFunds] = useState<number>(1000); // Example amount; fetch real funds as needed
 
     useEffect(() => {
         const fetchItem = async () => {
@@ -42,15 +42,6 @@ export default function ItemPage(props: ItemPageProps) {
         fetchItem();
     }, [id, props]);
 
-    const handlePlaceBid = () => {
-        // if (newBid > availableFunds) {
-        //     alert("You do not have enough funds to place this bid.");
-        //     return;
-        // }
-        // Further implementation for bid submission to backend can be added here
-        alert(`Placed bid of $${newBid}`);
-    };
-
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
             {item ? (
@@ -69,34 +60,26 @@ export default function ItemPage(props: ItemPageProps) {
                     {/* Middle Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <p><strong>Current Price:</strong> ${item.price}</p>
+                        {props.accountType !== null && <>
+                            <h3>Bids:</h3>
+                            {bids.length > 0 ? (
+                                <ul>
+                                    {bids.map((bid, index) => (
+                                        <li key={index}>${bid.bid} by {bid.buyerUsername}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>No bids placed yet.</p>
+                            )}
+                        </>
+                        }
+                        {
+                            props.accountType === "Seller" && <SellerItemPage />
+                        }
+                        {
+                            props.accountType === "Buyer" && <BuyerItemPage />
+                        }
 
-                        <h3>Bids:</h3>
-                        {bids.length > 0 ? (
-                            <ul>
-                                {bids.map((bid, index) => (
-                                    <li key={index}>${bid.bid} by {bid.buyerUsername}</li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>No bids placed yet.</p>
-                        )}
-
-                        <div>
-                            <label>
-                                Place bid of: $
-                                <input
-                                    type="number"
-                                    value={newBid}
-                                    onChange={(e) => setNewBid(Number(e.target.value))}
-                                    style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
-                                />
-                            </label>
-                            <button onClick={handlePlaceBid} style={{ marginLeft: '0.5rem' }}>
-                                Place Bid
-                            </button>
-                        </div>
-
-                        {/* <p><strong>Available Funds:</strong> ${availableFunds}</p> */}
                     </div>
                 </>
             ) : (

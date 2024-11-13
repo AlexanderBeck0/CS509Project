@@ -36,7 +36,7 @@ export default function AccountPage(props: AccountPageProps) {
             }
         }
         fetchData();
-    }, []);
+    }, [props]);
 
     /**
      * Closes the user's account and logs them out.
