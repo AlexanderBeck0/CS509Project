@@ -5,6 +5,7 @@ import ItemDisplay from './ItemDisplay';
 export default function HomePage(props: { searchInput: string, sortBy: string }) {
   const [result, setResult] = useState<Item[]>([]);
 
+  // #region searchItems
   useEffect(() => {
     console.log("Search: " + props.searchInput);
     console.log("Sort: " + props.sortBy);
@@ -31,6 +32,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
     }
     fetchData();
   }, [props.searchInput, props.sortBy]);
+  // #endregion
 
   return (
     <div className="ItemDisplay">

@@ -5,7 +5,7 @@ interface AccountPageProps {
 }
 
 export default function AdminPage(props: AccountPageProps) {
-
+    // #region view-db
     async function handleClick(tableName: string) {
         const payload = {
             "tableName": tableName,
@@ -20,6 +20,7 @@ export default function AdminPage(props: AccountPageProps) {
         const result = await response.json();
         displayResult(result.body);
     }
+    // #endregion
 
     /**
      * Used to call `logout()`

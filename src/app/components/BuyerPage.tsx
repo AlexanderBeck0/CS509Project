@@ -1,8 +1,9 @@
-import { Buyer } from '@/utils/types';
+import { Account, Buyer } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 interface BuyerPageProps {
+    userData: Account;
     logout: () => void;
     closeAccount: () => void;
 }
@@ -13,27 +14,8 @@ export default function BuyerPage(props: BuyerPageProps) {
     const [funds, setFunds] = useState<number>(0);
 
     useEffect(() => {
-        const fetchAccountData = async () => {
-            try {
-                const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        token: localStorage.getItem('token')
-                    })
-                });
-
-                const data: { statusCode: 400 | 500, error: string } | { statusCode: 200, account: Buyer } = await response.json();
-
-                if (data.statusCode !== 200) throw new Error(data.error);
-                return data.account;
-            } catch (error) {
-                console.error(error instanceof Error ? error.message : error);
-                throw error
-            }
-        };
-        fetchAccountData().then((accountInfo) => setAccount(accountInfo)).catch((error) => console.error(error.message));
-    }, []);
+        setAccount(props.userData);
+    }, [props]);
 
     useEffect(() => {
         if (account === null || account === undefined) return;
@@ -66,6 +48,7 @@ export default function BuyerPage(props: BuyerPageProps) {
         props.closeAccount();
     }
 
+    // #region edit-balance
     /**
      * Adds funds to the buyer.
      */
@@ -115,6 +98,7 @@ export default function BuyerPage(props: BuyerPageProps) {
             throw error
         }
     }
+    // #endregion
 
     return (
         <div className='content'>
@@ -129,7 +113,7 @@ export default function BuyerPage(props: BuyerPageProps) {
                         <button className='accountButton' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton' onClick={handleLogout}>Log out</button>
                         <div className="max-w-full mt-2 flex flex-row flex-nowrap basis-full items-center">
-                            <input type="number" min={1} step={1} ref={fundsRef} placeholder="Funds #"
+                            <input type="number" min={1} step={1} maxLength={10} ref={fundsRef} placeholder="Funds #"
                                 className="flex basis-2/3 flex-grow-0 border rounded-lg border-solid border-black"
                             // The below line would make it not allow decimals, but it causes the cursor to move to the start
                             // onInput={(e) => (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, "")}
