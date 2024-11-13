@@ -9,7 +9,7 @@ interface ItemDisplayProps {
 export default function ItemDisplay(props: ItemDisplayProps) {
   const { item } = props;
   return (
-    <div className="item min-w-60">
+    <div className="item min-w-60 ">
       <picture>
         <img src={item.image || '/BlankImage.jpg'} // Use the validated or fallback image
           alt={item.name}
