@@ -1,6 +1,7 @@
 import { Item } from '@/utils/types';
 import { useEffect, useState } from 'react';
 import ItemDisplay from './ItemDisplay';
+import { Link } from 'react-router-dom';
 
 export default function HomePage(props: { searchInput: string, sortBy: string }) {
   const [result, setResult] = useState<Item[]>([]);
@@ -38,7 +39,9 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
     <div className="ItemDisplay">
       {result.length > 0 ? (
         result.map((item, index) => (
-          <ItemDisplay key={index} item={item}/>
+          <Link key={index} to={`/item/${item.id}`}>
+            <ItemDisplay key={index} item={item} />
+          </Link>
         ))
       ) : (
         <p>No items found.</p>
