@@ -21,7 +21,7 @@ export const handler = async (event) => {
     return new Promise((resolve, reject) => {
         // Type check all args
         if (typeof tableName !== 'string') {
-            const error = new TypeError('Invalid username parameter. Expected a string.');
+            const error = new TypeError('Invalid tableName parameter. Expected a string.');
             console.error(error);
             return reject(error);
         }

@@ -21,6 +21,31 @@ export default function AdminPage(props: AccountPageProps) {
         displayResult(result.body);
     }
     // #endregion
+    // #region modify-db
+    async function handleModify(sqlCommand: string) {
+        const payload = {
+            "sqlCommand": sqlCommand,
+        };
+        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/modify-db", {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const result = await response.json();
+        if (response.ok) {
+            console.log(result.body);
+            alert("Operation successful");
+            const resultDiv = document.getElementById("result");
+            if (resultDiv) {
+                resultDiv.innerHTML = result.body;
+            }
+        } else {
+            alert(`Error: ${result.message}`);
+        }
+    }
+    // #endregion
 
     /**
      * Used to call `logout()`
@@ -76,8 +101,19 @@ export default function AdminPage(props: AccountPageProps) {
                 <Image src="/accountSymbol.png" alt="Admin Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
                 <p><b>ADMIN PAGE</b></p>
             </div>
+            <div className='SQL Commands'>
+                <h1>Execute SQL Command:</h1>
+                <textarea id="sqlCommand" rows={4} cols={50} placeholder="Enter your SQL command here"></textarea>
+                <button onClick={() => {
+                    const sqlCommand = (document.getElementById('sqlCommand') as HTMLTextAreaElement).value;
+                    handleModify(sqlCommand);
+                }}
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Execute
+                </button>
+            </div>
             <div className="viewDB"> {/* view DB content */}
-                <h1>Select * FROM ______ </h1>
+                <h1>View Database Tables: </h1>
                 <button onClick={() => handleClick('Account')}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Account
