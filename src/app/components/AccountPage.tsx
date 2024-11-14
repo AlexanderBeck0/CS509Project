@@ -55,8 +55,8 @@ export default function AccountPage(props: AccountPageProps) {
 
             const data = await response.json();
             if (data.error) {
-                // TODO: Show the user this error with a message somehow
                 console.error(data.error);
+                alert(`Error closing account: ${data.error}`);
                 return;
             }
 
