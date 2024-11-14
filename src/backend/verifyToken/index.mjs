@@ -12,9 +12,7 @@ export const handler = async (event) => {
             if (token === undefined || token === null) {
                 return resolve({
                     statusCode: 200,
-                    body: {
-                        valid: false
-                    }
+                    valid: false
                 });
             }
 
