@@ -25,7 +25,7 @@ export default function ItemDisplay(props: ItemDisplayProps) {
               {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleDateString() : item.startDate.toLocaleDateString()}
             </div>
             <div className='dateLabel' style={{ width: "100%" }}>
-              {(typeof item.startDate === "string" ? new Date(item.startDate).toLocaleDateString() : item.startDate.toLocaleDateString()) || "No end date"}
+              {(typeof item.endDate === "string" ? new Date(item.endDate).toLocaleDateString() : item.endDate?.toLocaleDateString()) || "No end date"}
             </div>
           </div>
         </div>
