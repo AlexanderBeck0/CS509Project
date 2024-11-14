@@ -105,6 +105,8 @@ export default function AdminPage(props: AccountPageProps) {
         // keyName[0] is one of the PRIMARY_KEYS that relates to row
         const key = row[keyName[0]];
 
+        if (row["accountType"] && row["accountType"] === "Admin") throw new Error("NOOO PLEASE DON'T DELETE ADMIN");
+
         await handleModify(`DELETE FROM ${selectedRef.current} WHERE ${keyName[0]} = '${key}'`);
     }
 
