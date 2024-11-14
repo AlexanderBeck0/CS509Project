@@ -39,6 +39,7 @@ export const handler = async (event) => {
                 return reject(displayError);
             } else {
                 console.log('display query results:', displayResults);
+                pool.end();
                 return resolve({
                     statusCode: 200,
                     body: JSON.stringify(displayResults),

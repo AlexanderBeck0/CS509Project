@@ -30,6 +30,7 @@ export const handler = async (event) => {
         const localQuery = `${sqlCommand}`;
         console.log('Executing modifcation query:', localQuery);
 
+        // Capital callback parameters are cursed
         pool.query(localQuery, (Error, Results) => {
 
             if (Error) {
@@ -37,6 +38,7 @@ export const handler = async (event) => {
                 return reject(Error);
             } else {
                 console.log('query results:', Results);
+                pool.end();
                 return resolve({
                     statusCode: 200,
                     body: JSON.stringify(Results),

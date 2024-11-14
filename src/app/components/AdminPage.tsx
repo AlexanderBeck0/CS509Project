@@ -1,10 +1,14 @@
 import Image from 'next/image';
+import { ReactNode, useRef, useState } from 'react';
 
 interface AccountPageProps {
     logout: () => void;
 }
 
 export default function AdminPage(props: AccountPageProps) {
+    const outputRef = useRef<HTMLDivElement | null>(null);
+    const [outputContent, setOutputContent] = useState<ReactNode>(null);
+    const [copyOnClick, setCopyOnClick] = useState<boolean>(false);
     // #region view-db
     async function handleClick(tableName: string) {
         const payload = {
@@ -18,11 +22,12 @@ export default function AdminPage(props: AccountPageProps) {
             }
         });
         const result = await response.json();
-        displayResult(result.body);
+        setOutputContent(displayResult(result.body));
     }
     // #endregion
     // #region modify-db
     async function handleModify(sqlCommand: string) {
+        // TODO: PLEASE add verification to this
         const payload = {
             "sqlCommand": sqlCommand,
         };
@@ -37,15 +42,27 @@ export default function AdminPage(props: AccountPageProps) {
         if (response.ok) {
             console.log(result.body);
             alert("Operation successful");
-            const resultDiv = document.getElementById("result");
-            if (resultDiv) {
-                resultDiv.innerHTML = result.body;
-            }
+            setOutputContent(<code>{result.body}</code>)
         } else {
             alert(`Error: ${result.message}`);
         }
     }
     // #endregion
+
+    // #region handleCopy
+    function handleCopyOnClick() {
+        setCopyOnClick(!copyOnClick);
+    }
+
+    /**
+     * 
+     * @param value The value to copy.
+     */
+    function copy(value: string): void {
+        if (!copyOnClick) return;
+        navigator.clipboard.writeText(value);
+    }
+    // #endreigion
 
     /**
      * Used to call `logout()`
@@ -55,48 +72,43 @@ export default function AdminPage(props: AccountPageProps) {
         props.logout();
     };
 
-    function displayResult(data: string) {
-        const resultDiv = document.getElementById("result");
+    function displayResult(data: string): ReactNode {
         const jsonData = JSON.parse(data);
         if (jsonData.length === 0) {
-            if (resultDiv) {
-                resultDiv.innerHTML = "No data found";
-            }
-            return;
+            return <p>No data found</p>
         }
-
-        let table = `
-            <table border='1' style='border-collapse: collapse; width: 100%;'>
-            <thead style='background-color: #f2f2f2;'>
-                <tr>`;
-        // Create table headers
-        Object.keys(jsonData[0]).forEach(key => {
-            table += `<th style='padding: 8px; text-align: left; border-bottom: 1px solid #ddd;'>${key}</th>`;
-        });
-        table += `
-                </tr>
-            </thead>
-            <tbody>`;
-
-        // Create table rows
-        jsonData.forEach((row: Record<string, string | number | boolean>) => {
-            table += "<tr>";
-            Object.values(row).forEach((value: string | number | boolean) => {
-                table += `<td style='padding: 8px; border-bottom: 1px solid #ddd;'>${value}</td>`;
-            });
-            table += "</tr>";
-        });
-        table += `
-            </tbody>
-            </table>`;
-
-        if (resultDiv) {
-            resultDiv.innerHTML = table;
-        }
+        return (
+            <table className={`border border-black border-collapse max-w-2xl w-full mx-auto`}>
+                <thead className="bg-zinc-100">
+                    <tr>
+                        {
+                            Object.keys(jsonData[0]).map((key, index) => {
+                                return <th key={index} className="p-1 text-left border-b border-b-zinc-300 whitespace-nowrap">{key}</th>
+                            })
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        jsonData.map((row: Record<string, string | number | boolean>, rowIndex: number) => {
+                            return (<tr key={rowIndex}>
+                                {
+                                    Object.values(row).map((value: string | number | boolean, index) => {
+                                        return <td key={index} className={`p-1 text-left border-b border-b-zinc-300 truncate text-wrap max-w-[150px] ${copyOnClick ? "hover:cursor-copy" : "hover:cursor-text" }`} 
+                                        title={String(value)} onClick={() => copyOnClick && copy(String(value))}>{value}</td>
+                                    })
+                                }
+                            </tr>
+                            )
+                        })
+                    }
+                </tbody>
+            </table>
+        )
     }
 
     return (
-        <div className='content'>
+        <div className='content center'>
             <div> {/* heading of admin */}
                 <Image src="/accountSymbol.png" alt="Admin Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
                 <p><b>ADMIN PAGE</b></p>
@@ -114,17 +126,22 @@ export default function AdminPage(props: AccountPageProps) {
             </div>
             <div className="viewDB"> {/* view DB content */}
                 <h1>View Database Tables: </h1>
-                <button onClick={() => handleClick('Account')}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Account
-                </button>
-                <button onClick={() => handleClick('Item')}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Item</button>
-                <button onClick={() => handleClick('Bid')}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Bid</button>
-                <div id="result"></div>
+                <div>
+                    <button onClick={() => handleClick('Account')}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Account
+                    </button>
+                    <button onClick={() => handleClick('Item')}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Item</button>
+                    <button onClick={() => handleClick('Bid')}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Bid</button>
+                    <button onClick={handleCopyOnClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        {copyOnClick ? "Disable" : "Enable"} Copy on Click
+                    </button>
+                </div>
+                <div id="result" ref={outputRef}>{outputContent}</div>
             </div>
             <button className='accountButton' onClick={handleLogout}>Log out</button>
         </div>
