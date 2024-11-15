@@ -101,7 +101,7 @@ function AppContent() {
           <Route path="/createAccount" element={!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to="/account" />} />
           <Route path="/account" element={isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to="/" />} />
           <Route path="/item/:id" element={<ItemPage accountType={accountType} token={token} />} /> 
-          <Route path="/edit/:id" element={isLoggedIn && accountType === "Seller" && <EditItemPage />} />
+          <Route path="/edit/:id" element={isLoggedIn && accountType === "Seller" && <EditItemPage accountType={accountType} token={token} />} />
         </Routes>
       </div>
     </main>
