@@ -27,12 +27,17 @@ export default function ItemPage(props: ItemPageProps) {
                 });
 
                 const data = await response.json();
+                console.log(data)
                 if (data.statusCode === 200) {
-                    setItem(data.items[0]);
-                    setBids(data.items.bids || []);
+                    setItem(data.item);
+                    setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
                 }
                 if (data.statusCode !== 200) {
-                    alert(data.error)
+                    // alert(data.error)
+                    console.error(data.error)
+                    if (data.error === "jwt expired") {
+                        alert("Your token has expired. Please log in again.");
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching item:', error);
