@@ -1,4 +1,4 @@
-import { createPool } from "../opt/nodejs/index.mjs";
+import { createPool, getUsernameFromToken } from "../opt/nodejs/index.mjs";
 
 /**
  * @param {number} id the id of item to get status of
@@ -37,7 +37,7 @@ async function getEndDateFromID(id, pool) {
 
 /**
  * 
- * @param {{item_id: number, forSale: boolean}} event id of item to publish, and if it should be forSale
+ * @param {{token: string, item_id: number, forSale: boolean}} event id of item to publish, and if it should be forSale
  * @returns 
  */
 export const handler = async (event) => {
@@ -50,7 +50,23 @@ export const handler = async (event) => {
         return { statusCode: 500, error: "Could not make database connection" };
     }
 
-    const { item_id, forSale } = event;
+    const { token, item_id, forSale } = event;
+
+    // make sure user is seller of this item
+    const username = await getUsernameFromToken(token)
+    const checkSellerQuery = 'SELECT seller_username FROM Item WHERE id = ?';
+
+    const sellerQueryResults = await new Promise((resolve, reject) => {
+        pool.query(checkSellerQuery, [item_id], (error, results) => {
+            if (error) return reject(error);
+            return resolve(results);
+        });
+    });
+    console.log('Seller Query Results:', sellerQueryResults[0]);
+
+    if (sellerQueryResults[0]['seller_username'] !== username) {
+        return { statusCode: 400, error: "You do not own this item" };
+    }
 
     // get the status of the item
     const status = await getStatusFromID(item_id, pool)
