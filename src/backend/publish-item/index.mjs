@@ -78,6 +78,8 @@ export const handler = async (event) => {
     // get endDate of item
     const endDate = await getEndDateFromID(item_id, pool)
     // if endDate is after now then can not be published
+    console.log("endDate", endDate)
+    console.log("endDate:", new Date(endDate), "Current Date: ", new Date())
     if (!endDate || endDate === '0000-00-00 00:00:00' || new Date(endDate) <= new Date()) {
         return { statusCode: 400, error: "Cannot publish an item if the end date has passed or is invalid" };
     }
