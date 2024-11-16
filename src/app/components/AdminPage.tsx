@@ -24,8 +24,27 @@ export default function AdminPage(props: AccountPageProps) {
     const selectedRef = useRef<null | typeof TABLES[number]>(null);
 
     const outputRef = useRef<HTMLDivElement | null>(null);
+    const executeQueryRef = useRef<HTMLTextAreaElement | null>(null);
     const [outputContent, setOutputContent] = useState<ReactNode>(null);
     const [copyOnClick, setCopyOnClick] = useState<boolean>(false);
+
+    // #region Template Queries
+    const TEMPLATE_QUERIES: { name: string, query: string }[] = [
+        { name: "Find Account", query: "SELECT * FROM Account WHERE username = '___'" },
+        { name: "Delete Account", query: "DELETE FROM Account WHERE username = '___'" },
+        { name: "Close Account", query: "UPDATE Account SET isActive = 0 WHERE username = '___'" },
+        { name: "Activate Account", query: "UPDATE Account SET isActive = 1 WHERE username = '___'" },
+        { name: "Find Item", query: "SELECT * FROM Item WHERE id = ___" },
+        { name: "Delete Item", query: "DELETE FROM Item WHERE id = ___" },
+        { name: "Publish Item", query: "UPDATE Item SET status = 'Active' WHERE id = ___" },
+        { name: "Unpublish Item", query: "UPDATE Item SET status = 'Inactive' WHERE id = ___" },
+        { name: "Find Bid (Bid id)", query: "SELECT * FROM Bid WHERE id = ___" },
+        { name: "Find Bids (Item id)", query: "SELECT Bid.* FROM Bid LEFT JOIN Item ON Bid.item_id = Item.id WHERE Bid.item_id = ___" },
+        { name: "Find Bids (Seller username)", query: "SELECT Bid.* FROM Bid LEFT JOIN Item ON Bid.item_id = Item.id WHERE Item.seller_username = '___'" },
+        { name: "Find Bids (Buyer username)", query: "SELECT * FROM Bid WHERE buyer_username = '___'" },
+        { name: "Delete Bid", query: "DELETE FROM Bid WHERE id = ___" },
+    ]
+    // #endregion
 
     // #region view-db
     async function handleClick(tableName: typeof TABLES[number]) {
@@ -128,8 +147,27 @@ export default function AdminPage(props: AccountPageProps) {
         if (jsonData.length === 0) {
             return <p>No data found</p>
         }
+
+        // Print non-array JSON into a table
+        if (!Array.isArray(jsonData)) {
+            return (
+                <table className={`border border-black border-collapse max-w-2xl w-full mx-auto`}>
+                    {
+                        Object.entries(jsonData).map(([key, value], index) => {
+                            return (
+                                <tr key={index}>
+                                    <th className="p-1 text-left border-b border-b-zinc-300 whitespace-nowrap">{key}</th>
+                                    <td className="text-left border-b border-b-zinc-300 whitespace-nowrap">{String(value)}</td>
+                                </tr>
+                            )
+                        })
+                    }
+                </table>
+            )
+        }
+        // #region Output Table
         return (
-            <table className={`border border-black border-collapse max-w-2xl w-full mx-auto`}>
+            <table className={`border border-black border-collapse w-full flex-grow-0 mx-auto`}>
                 <thead className="bg-zinc-100">
                     <tr>
                         {
@@ -147,11 +185,11 @@ export default function AdminPage(props: AccountPageProps) {
                                 <tr key={rowIndex}>
                                     {
                                         Object.values(row).map((value: string | number | boolean, index) => {
-                                            return <td key={index} className={`p-1 text-left border-b border-b-zinc-300 truncate text-wrap max-w-[${Math.floor(1800 / Object.values(row).length)}px] ${copyOnClick ? "hover:cursor-copy" : "hover:cursor-text"}`}
+                                            return <td key={index} className={`p-1 text-left border-b border-b-zinc-300 truncate max-w-36 ${copyOnClick ? "hover:cursor-copy" : "hover:cursor-text"}`}
                                                 title={String(value)} onClick={() => copyOnClick && copy(String(value))}>{value}</td>
                                         })
                                     }
-                                    <td className={`p-1 text-left border-b border-b-zinc-300 truncate text-wrap max-w-[${Math.floor(1800 / Object.values(row).length)}px]`}>
+                                    <td className={`p-1 text-left border-b border-b-zinc-300 line-clamp-1 max-w-[${Math.floor(1800 / Object.values(row).length)}px]`}>
                                         <button onClick={() => deleteRow(row)}
                                             className={`p-2 bg-red-400 hover:bg-red-500 active:bg-red-600`}>Delete</button>
                                     </td>
@@ -162,6 +200,7 @@ export default function AdminPage(props: AccountPageProps) {
                 </tbody>
             </table>
         )
+        // #endregion
     }
 
     return (
@@ -170,20 +209,30 @@ export default function AdminPage(props: AccountPageProps) {
                 <Image src="/accountSymbol.png" alt="Admin Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
                 <p><b>ADMIN PAGE</b></p>
             </div>
-            <div className='SQL Commands'>
-                <h1>Execute SQL Command:</h1>
-                <textarea id="sqlCommand" rows={4} cols={50} placeholder="Enter your SQL command here"></textarea>
-                <button onClick={() => {
-                    const sqlCommand = (document.getElementById('sqlCommand') as HTMLTextAreaElement).value;
-                    handleModify(sqlCommand);
-                }}
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            <div className='SQL Commands flex flex-row items-end'>
+                <div className="flex flex-col">
+                    <label htmlFor='sqlCommand' className='label'>Execute SQL Command:</label>
+                    <textarea id="sqlCommand" ref={executeQueryRef} rows={4} cols={50} placeholder="Enter your SQL command here"
+                        className="flex-1 justify-self-center resize-none"></textarea>
+                </div>
+                <button onClick={() => handleModify(executeQueryRef.current!.value)}
+                    className="h-fit justify-end bg-green-500 hover:bg-green-700 active:bg-green-800 text-white font-bold py-2 px-4 rounded">
                     Execute
                 </button>
             </div>
+            <div className="predefinedButtons grid grid-cols-4 auto-rows-min justify-items-stretch gap-0.5 min-w-fit">
+                {
+                    TEMPLATE_QUERIES.map((query, index) => {
+                        return <button key={index}
+                            onClick={() => executeQueryRef.current!.value = query.query}
+                            className='p-1 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 rounded basis-1/4'>{query.name}</button>
+                    })
+                }
+            </div>
+
             <div className="viewDB"> {/* view DB content */}
                 <h1>View Database Tables: </h1>
-                <div>
+                <div className="flex flex-row gap-0.5 center">
                     {
                         // Add all the tables in TABLES
                         Object.values(TABLES).map((table, index) => {
