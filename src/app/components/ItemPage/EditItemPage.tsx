@@ -14,9 +14,10 @@ async function unpublish(id: number) {
         });
 
         const data = await response.json();
+        // console.log(data)
         if (data.error) {
             console.error(data.error);
-            alert(`Error publishing item: ${data.error}`);
+            alert(`Error unpublishing item: ${data.error}`);
             return;
         }
 
@@ -45,7 +46,6 @@ async function publish(id: number, forSale: boolean) {
             alert(`Error publishing item: ${data.error}`);
             return;
         }
-
         return data;
 
     } catch (error) {
@@ -98,6 +98,8 @@ export default function ItemPage(props: ItemPageProps) {
                     setItem(data.item);
                     setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
                     setPublish(data.item.status === 'Active')
+                    console.log(data.item.forSale)
+                    setForSale(data.item.forSale === 1)
                 }
                 if (data.statusCode !== 200) {
                     alert(data.error)
@@ -108,7 +110,7 @@ export default function ItemPage(props: ItemPageProps) {
         };
 
         fetchItem();
-    }, [id, props]);
+    }, [id, props, published]);
 
     useEffect(() => {
         setPublish(item?.status === 'Active')
@@ -144,6 +146,11 @@ export default function ItemPage(props: ItemPageProps) {
                         ) : (
                             <p>No bids placed yet.</p>
                         )}
+                        {published ? (
+                            <p>{forSale === true ? "This item is able to be bought NOW!" : "This item is up for normal auction"}</p>
+                        ) : (
+                            <></>
+                        )}
                     </div>
                     {/* Controls */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -164,7 +171,7 @@ export default function ItemPage(props: ItemPageProps) {
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                             onClick={handlePublishClick}
                         >
-                            {published ? "Unpublish" : "Published"}
+                            {published ? "Unpublish" : "Publish"}
                         </button>
                     </div>
                 </>

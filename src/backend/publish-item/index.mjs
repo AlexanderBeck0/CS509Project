@@ -92,9 +92,9 @@ export const handler = async (event) => {
             WHERE id = ?;
             `;
 
-        pool.query(localQuery, [forSale, item_id], (err, results) => {
+        pool.query(localQuery, [forSale, item_id], (err) => {
             if (err) return reject(err);
-            return resolve({ statusCode: 200, item_id, changedRows: results.changedRows });
+            return resolve({ statusCode: 200, item_id });
         });
     });
 }
