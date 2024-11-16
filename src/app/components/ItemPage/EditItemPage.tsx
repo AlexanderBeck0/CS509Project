@@ -95,10 +95,9 @@ export default function ItemPage(props: ItemPageProps) {
 
                 const data = await response.json();
                 if (data.statusCode === 200) {
-                    setItem(data.items[0]);
-                    setPublish(data.items[0].status === 'Active')
-                    console.log(data.items[0].status)
-                    setBids(data.items.bids || []);
+                    setItem(data.item);
+                    setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
+                    setPublish(data.item.status === 'Active')
                 }
                 if (data.statusCode !== 200) {
                     alert(data.error)
