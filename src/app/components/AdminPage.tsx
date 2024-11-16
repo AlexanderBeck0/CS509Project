@@ -33,6 +33,7 @@ export default function AdminPage(props: AccountPageProps) {
 
         const payload = {
             "tableName": tableName,
+            "token": localStorage.getItem('token')
         };
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/view-db", {
             method: "POST",
@@ -41,15 +42,20 @@ export default function AdminPage(props: AccountPageProps) {
                 'Content-Type': 'application/json'
             }
         });
-        const result = await response.json();
+        const result: { statusCode: 400 | 401 | 403 | 500, error: string } | { statusCode: 200, body: string } = await response.json();
+        if (result.statusCode !== 200) {
+            setOutputContent(<p>Error: {result.error}</p>)
+            return;
+        }
+
         setOutputContent(displayResult(result.body));
     }
     // #endregion
     // #region modify-db
     async function handleModify(sqlCommand: string) {
-        // TODO: PLEASE add verification to this
         const payload = {
             "sqlCommand": sqlCommand,
+            "token": localStorage.getItem('token')
         };
         console.log("Running SQL Command: " + sqlCommand);
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/modify-db", {
@@ -59,14 +65,15 @@ export default function AdminPage(props: AccountPageProps) {
                 'Content-Type': 'application/json'
             }
         });
-        const result = await response.json();
-        if (response.ok) {
-            console.log(result);
-            alert("Operation successful");
-            setOutputContent(<code>{result.body}</code>)
-        } else {
-            alert(`Error: ${result.message}`);
+        const result: { statusCode: 200, body: string } | { statusCode: 400 | 401 | 403 | 500, error: string } = await response.json();
+        console.log(result);
+        if (result.statusCode !== 200) {
+            setOutputContent(<p>Error executing query: {result.error}</p>);
+            return;
         }
+
+        setOutputContent(displayResult(result.body));
+
     }
     // #endregion
 
@@ -116,6 +123,7 @@ export default function AdminPage(props: AccountPageProps) {
      * @returns The ReactNode of the table from the data.
      */
     function displayResult(data: string): ReactNode {
+        if (!data || data.length === 0) return <p>No data found</p>
         const jsonData = JSON.parse(data);
         if (jsonData.length === 0) {
             return <p>No data found</p>

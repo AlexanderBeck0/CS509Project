@@ -1,7 +1,7 @@
-import { createPool } from "../opt/nodejs/index.mjs";
+import { createPool, verifyToken } from "../opt/nodejs/index.mjs";
 
 /**
- * @param {{sqlCommand: string}} event
+ * @param {{sqlCommand: string, token: string}} event
  */
 export const handler = async (event) => {
     /**
@@ -16,34 +16,45 @@ export const handler = async (event) => {
         return { statusCode: 500, error: "Could not make database connection" };
     }
 
-    const { sqlCommand } = event;
+    const { sqlCommand, token } = event;
 
-    return new Promise((resolve, reject) => {
-        // Type check all args
-        if (typeof sqlCommand !== 'string') {
-            const error = new TypeError('Invalid parameter. Expected a string.');
-            console.error(error);
-            return reject(error);
+    // Type check all args
+    if (typeof sqlCommand !== 'string') {
+        const error = new TypeError('Invalid sql command parameter. Expected a string.');
+        console.error(error);
+        return { statusCode: 500, error: error.message };
+    }
+
+    // Verify the token
+    try {
+        const { username, accountType } = await verifyToken(token);
+        if (!username || !accountType) {
+            return { statusCode: 401, error: "Invalid token" }
         }
 
+        if (accountType !== "Admin") {
+            return { statusCode: 403, error: "It is forbidden to perform this operation." }
+        }
+    } catch (error) {
+        return { statusCode: 400, error: typeof error === 'string' ? error : JSON.stringify(error) }
+    }
+
+    return new Promise((resolve) => {
         // Proceed with query
-        const localQuery = `${sqlCommand}`;
-        console.log('Executing modifcation query:', localQuery);
+        console.log('Executing modifcation query:', sqlCommand);
 
         // Capital callback parameters are cursed
-        pool.query(localQuery, (Error, Results) => {
-
-            if (Error) {
-                console.error('query error:', Error);
-                return reject(Error);
-            } else {
-                console.log('query results:', Results);
-                pool.end();
-                return resolve({
-                    statusCode: 200,
-                    body: JSON.stringify(Results),
-                });
+        pool.query(sqlCommand, (error, results) => {
+            pool.end();
+            if (error) {
+                console.error('query error:', error);
+                return resolve({ statusCode: 500, error: error instanceof Error ? error.message : JSON.stringify(error)});
             }
+            console.log('query results:', results);
+            return resolve({
+                statusCode: 200,
+                body: JSON.stringify(results),
+            });
         });
     });
 };
