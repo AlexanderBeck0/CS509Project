@@ -10,7 +10,7 @@ export const handler = async (event) => {
         pool = await createPool();
     } catch (error) {
         console.error("Failed to create MySQL Pool. Error: ", error);
-        return { statusCode: 500, error: "Could not make database connection"  };
+        return { statusCode: 500, error: "Could not make database connection" };
     }
 
     try {
@@ -29,11 +29,11 @@ export const handler = async (event) => {
         console.log(account);
 
         if (!account) {
-            return { statusCode: 400, error: "Account doesn't exist"  };
+            return { statusCode: 400, error: "Account doesn't exist" };
         }
 
         if (account.accountType === 'Admin') {
-            return { statusCode: 400,  error: "Cannot close an Admin account" };
+            return { statusCode: 400, error: "Cannot close an Admin account" };
         }
 
         const closedQuery = `SELECT isActive FROM Account WHERE username = ?`;
@@ -50,7 +50,7 @@ export const handler = async (event) => {
         if (isActive === 0) {
             const error = new Error('This user is already a closed account');
             console.error(error);
-            return { statusCode: 400,  error: error.message  };
+            return { statusCode: 400, error: error.message };
         }
 
         const bidQuery = `
@@ -73,7 +73,7 @@ export const handler = async (event) => {
         if (bidCount > 0) {
             const error = new Error('You cannot close an account with Active bids');
             console.error(error);
-            return { statusCode: 400, error: error.message  };
+            return { statusCode: 400, error: error.message };
         }
 
         const itemQuery = `
@@ -116,7 +116,7 @@ export const handler = async (event) => {
 
         return {
             statusCode: 200,
-             valid: true 
+            valid: true
         };
     } catch (error) {
         console.error('Unexpected error:', error);
