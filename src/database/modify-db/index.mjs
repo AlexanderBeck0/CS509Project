@@ -33,14 +33,14 @@ export const handler = async (event) => {
         }
 
         if (accountType !== "Admin") {
-            return { statusCode: 403, error: "It is forbidden to perform this operation." }
+            return { statusCode: 403, error: `It is forbidden to perform this operation as a ${accountType}.`  }
         }
     } catch (error) {
         return { statusCode: 400, error: typeof error === 'string' ? error : JSON.stringify(error) }
     }
     
-    if (sqlCommand.toUpperCase().includes('DROP')) {
-        return { statusCode: 403, error: "It is forbidden to perform this operation." }
+    if (sqlCommand.toUpperCase().includes('DROP TABLE')) {
+        return { statusCode: 403, error: "You are not allowed to perform the drop command." }
     }
 
     return new Promise((resolve) => {
