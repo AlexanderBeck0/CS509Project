@@ -39,16 +39,19 @@ export const handler = async (event) => {
         if (typeof username !== 'string') {
             const error = new TypeError('Invalid username parameter. Expected a string.');
             console.error(error);
+            pool.end();
             return reject(error);
         }
         if (typeof password !== 'string') {
             const error = new TypeError('Invalid password parameter. Expected a string.');
             console.error(error);
+            pool.end();
             return reject(error);
         }
         if (typeof accountType !== 'string') {
             const error = new TypeError('Invalid accountType parameter. Expected a string.');
             console.error(error);
+            pool.end();
             return reject(error);
         }
 
@@ -57,20 +60,23 @@ export const handler = async (event) => {
         console.log('Executing check query:', checkQuery);
         pool.query(checkQuery, [username], async (checkError, checkResults) => {
             if (checkError) {
+                pool.end();
                 console.error('Check query error:', checkError);
                 return reject(checkError);
             }
 
+            // If the length > 0, there already exists an account with that username
             if (checkResults.length > 0) {
+                pool.end();
                 const isActive = checkResults[0].isActive;
-                if (isActive === 'closed') {
+                if (!isActive) {
                     const error = new Error('This user has permanently closed an account with that username.');
                     console.error(error);
-                    return reject(error);
+                    return resolve({ statusCode: 400, error: error.message });
                 } else {
                     const error = new Error('Username already exists. Please choose a different username.');
                     console.error(error);
-                    return reject(error);
+                    return resolve({ statusCode: 400, error: error.message });
                 }
             }
 
@@ -83,21 +89,20 @@ export const handler = async (event) => {
 
             const hashedPassword = await hashPassword(password);
             pool.query(insertQuery, [username, hashedPassword, accountType], async (insertError) => {
-
+                pool.end();
                 if (insertError) {
                     console.error('Insert query error:', insertError);
                     return reject(insertError);
-                } else {
-                    const account = await getAccountByUsername(username, pool);
-                    const token = await generateToken(account);
-                    return resolve({
-                        statusCode: 200,
-                        body: {
-                            token,
-                            ...account
-                        }
-                    });
                 }
+                const account = await getAccountByUsername(username, pool);
+                const token = await generateToken(account);
+                return resolve({
+                    statusCode: 200,
+                    body: {
+                        token,
+                        ...account
+                    }
+                });
             });
         });
     });
