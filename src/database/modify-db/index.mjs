@@ -38,6 +38,10 @@ export const handler = async (event) => {
     } catch (error) {
         return { statusCode: 400, error: typeof error === 'string' ? error : JSON.stringify(error) }
     }
+    
+    if (sqlCommand.toUpperCase().includes('DROP')) {
+        return { statusCode: 403, error: "It is forbidden to perform this operation." }
+    }
 
     return new Promise((resolve) => {
         // Proceed with query
