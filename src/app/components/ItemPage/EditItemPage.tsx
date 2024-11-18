@@ -1,6 +1,7 @@
-import { Item, Bid, AccountType } from '@/utils/types';
-import React, { useEffect, useState } from 'react';
+import type { AccountType, Bid, Item } from '@/utils/types';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import EditItemForm from './EditItemForm';
 
 async function unpublish(id: number) {
     try {
@@ -134,23 +135,26 @@ export default function ItemPage(props: ItemPageProps) {
                     </div>
 
                     {/* Middle Container */}
-                    <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <p><strong>Current Price:</strong> ${item.price}</p>
-                        <h3>Bids:</h3>
-                        {bids.length > 0 ? (
-                            <ul>
-                                {bids.map((bid, index) => (
-                                    <li key={index}>${bid.bid} by {bid.buyerUsername}</li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>No bids placed yet.</p>
-                        )}
-                        {published ? (
-                            <p>{forSale === true ? "This item is able to be bought NOW!" : "This item is up for normal auction"}</p>
-                        ) : (
-                            <></>
-                        )}
+                    <div className="w-1/3 flex flex-col gap-4">
+                        {/* Bids */}
+                        <div>
+                            <p><strong>Current Price:</strong> ${item.price}</p>
+                            <h3>Bids:</h3>
+                            {bids.length > 0 ? (
+                                <ul>
+                                    {bids.map((bid, index) => (
+                                        <li key={index}>${bid.bid} by {bid.buyer_username}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>No bids placed yet.</p>
+                            )}
+                            {published && <p>{forSale ? "This item is able to be bought NOW!" : "This item is up for normal auction"}</p>}
+                        </div>
+                        {/* Edit Controls */}
+                        {item.status === "Inactive" && bids.length === 0 &&
+                            <EditItemForm item={item} />
+                        }
                     </div>
                     {/* Controls */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -168,8 +172,9 @@ export default function ItemPage(props: ItemPageProps) {
                         }
                         {/* Publish or unpublish button: */}
                         <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
                             onClick={handlePublishClick}
+                            disabled={bids.length > 0}
                         >
                             {published ? "Unpublish" : "Publish"}
                         </button>
