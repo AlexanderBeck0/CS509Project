@@ -274,16 +274,21 @@ function _getItemFromIDNoChecks(id, pool) {
     }
     // https://stackoverflow.com/questions/37470949/how-do-i-generate-nested-json-objects-using-mysql-native-json-functions
     const itemQuery = `
-    SELECT Item.*, COALESCE(JSON_ARRAYAGG(JSON_OBJECT(
-        'id', Bid.id,
-        'bid', Bid.bid,
-        'timeOfBid', Bid.timeOfBid,
-        'buyer_username', Bid.buyer_username
-    )), '[]') AS bids
+    SELECT Item.*, IF (COUNT(Bid.id) = 0, 
+        JSON_ARRAY(), 
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', Bid.id,
+                'bid', Bid.bid,
+                'timeOfBid', Bid.timeOfBid,
+                'buyer_username', Bid.buyer_username
+            )
+        )
+    ) AS bids
     FROM Item
     LEFT JOIN Bid ON Item.id = Bid.item_id
     WHERE Item.id = ?
-    `;
+    `
     return new Promise((resolve, reject) => {
         pool.query(itemQuery, [id], (error, results) => {
             if (error) {
@@ -291,7 +296,7 @@ function _getItemFromIDNoChecks(id, pool) {
                 return reject(error);
             }
 
-            if (!results || results.length === 0) {
+            if (!results || results.length === 0 || results['id'] === null) {
                 console.log("Item doesn't exist");
                 return resolve(undefined);
             }

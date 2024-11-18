@@ -97,12 +97,12 @@ export default function ItemPage(props: ItemPageProps) {
                 if (data.statusCode === 200) {
                     setItem(data.item);
                     setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
-                    setPublish(data.item.status === 'Active')
-                    console.log(data.item.forSale)
-                    setForSale(data.item.forSale === 1)
+                    setPublish(data.item.status === 'Active');
+                    setForSale(data.item.forSale === 1);
                 }
                 if (data.statusCode !== 200) {
-                    alert(data.error)
+                    console.log(data);
+                    alert(data.error);
                 }
             } catch (error) {
                 console.error('Error fetching item:', error);
