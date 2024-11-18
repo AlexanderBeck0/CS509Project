@@ -178,6 +178,9 @@ export default function ItemPage(props: ItemPageProps) {
                         >
                             {published ? "Unpublish" : "Publish"}
                         </button>
+                        {!published && 
+                        <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
+                        onClick={() => alert("Not yet implemented")}>Remove Item</button>}
                     </div>
                 </>
             ) : (
