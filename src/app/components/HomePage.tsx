@@ -8,8 +8,6 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
 
   // #region searchItems
   useEffect(() => {
-    console.log("Search: " + props.searchInput);
-    console.log("Sort: " + props.sortBy);
     const fetchData = async () => {
       const payload = {
         query: props.searchInput, // need to get all items sorted by some default
@@ -23,7 +21,6 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
           });
 
         const resultData: { statusCode: 200 | 400, items: Item[] } = await response.json();
-        console.log(resultData);
         if (resultData.statusCode == 200) {
           setResult(resultData.items);
         }

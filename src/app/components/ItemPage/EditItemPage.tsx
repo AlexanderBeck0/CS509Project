@@ -102,7 +102,7 @@ export default function ItemPage(props: ItemPageProps) {
                 }
                 if (data.statusCode !== 200) {
                     console.log(data);
-                    alert(data.error);
+                    if (data?.error !== undefined) alert(data.error);
                 }
             } catch (error) {
                 console.error('Error fetching item:', error);

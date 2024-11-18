@@ -33,7 +33,6 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                     endDate: endDateRef.current!.value === "" ? null : endDateRef.current!.value
                 }
             };
-            console.log(JSON.stringify(payload));
             try {
                 const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/saveItem',
                     {

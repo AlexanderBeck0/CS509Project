@@ -27,7 +27,6 @@ export default function ItemPage(props: ItemPageProps) {
                 });
 
                 const data = await response.json();
-                console.log(data)
                 if (data.statusCode === 200) {
                     setItem(data.item);
                     setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
