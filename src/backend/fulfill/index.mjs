@@ -45,7 +45,7 @@ export const handler = async (event) => {
         // get the buyer account of the bid with the most recent timeOfBid on the item
         const getBuyerAccountQuery = `
         SELECT buyer_username
-        FROM Bids
+        FROM Bid
         WHERE item_id = ?
         ORDER BY timeOfBid DESC
         LIMIT 1;
