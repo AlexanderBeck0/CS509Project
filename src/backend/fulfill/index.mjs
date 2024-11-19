@@ -111,7 +111,7 @@ export const handler = async (event) => {
 
             const localQuery = `
             UPDATE Item
-            SET status = 'Fulfilled'
+            SET status = 'Fulfilled', archived = true
             WHERE id = ?;
             `;
 
