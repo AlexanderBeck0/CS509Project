@@ -64,19 +64,20 @@ export default function ItemPage(props: ItemPageProps) {
     const [item, setItem] = useState<Item | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
     const [forSale, setForSale] = useState(false);
-    const [published, setPublish] = useState<boolean | null>(null)
+    const [published, setPublished] = useState<boolean | null>(null)
 
 
     async function handlePublishClick() {
+        if (item?.status === "Frozen") alert("NOT YET IMPLEMENTED; FROZEN ITEMS CANNOT BE UNPUBLISHED");
         if (item?.status === 'Active') {
             const unpublishResults = await unpublish(item.id)
             if (unpublishResults['statusCode'] === 200) {
-                setPublish(false)
+                setPublished(false)
             }
         } else if (item?.status === 'Inactive') {
             const publishResults = await publish(item.id, forSale)
             if (publishResults['statusCode'] === 200) {
-                setPublish(true)
+                setPublished(true)
             }
         }
 
@@ -98,7 +99,7 @@ export default function ItemPage(props: ItemPageProps) {
                 if (data.statusCode === 200) {
                     setItem(data.item);
                     setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
-                    setPublish(data.item.status === 'Active');
+                    setPublished(data.item.status === 'Active');
                     setForSale(data.item.forSale === 1);
                 }
                 if (data.statusCode !== 200) {
@@ -114,7 +115,7 @@ export default function ItemPage(props: ItemPageProps) {
     }, [id, props, published]);
 
     useEffect(() => {
-        setPublish(item?.status === 'Active')
+        setPublished(item?.status === 'Active')
     }, [item])
 
 
@@ -128,10 +129,10 @@ export default function ItemPage(props: ItemPageProps) {
                         <picture>
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
                         </picture>
-                        <p><strong> Description: </strong> {item.description}</p>
-                        <p><strong> Start Date: </strong> {new Date(item.startDate).toLocaleDateString()}</p>
-                        <p><strong>End Date:</strong> {item?.endDate ? new Date(item.endDate).toLocaleDateString() : 'No end date available'}</p>
-                        <p><strong>Status:</strong> {item.status}</p>
+                        <p><strong>Description: </strong> {item.description}</p>
+                        <p><strong>Start Date: </strong> {new Date(item.startDate).toLocaleDateString()}</p>
+                        <p><strong>End Date: </strong> {item?.endDate ? new Date(item.endDate).toLocaleDateString() : 'No end date available'}</p>
+                        <p><strong>Status: </strong> {item.status}</p>
                     </div>
 
                     {/* Middle Container */}
@@ -158,6 +159,7 @@ export default function ItemPage(props: ItemPageProps) {
                     </div>
                     {/* Controls */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {/* TODO: Add a request unfreeze here and hide publish/unpublish if it is frozen/requested */}
                         {/* for sale button: */}
                         {!published &&
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', }}>
@@ -178,9 +180,10 @@ export default function ItemPage(props: ItemPageProps) {
                         >
                             {published ? "Unpublish" : "Publish"}
                         </button>
-                        {!published && 
-                        <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
-                        onClick={() => alert("Not yet implemented")}>Remove Item</button>}
+                        {!published &&
+                            <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
+                                onClick={() => alert("Not yet implemented")}>Remove Item</button>}
+                        
                     </div>
                 </>
             ) : (

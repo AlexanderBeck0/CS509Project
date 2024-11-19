@@ -80,7 +80,7 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                     <div style={{ border: "1px solid black", borderRadius: "8px", height: "200px", maxHeight: "200px", maxWidth: "200px", margin: "1rem", }}>
                         <img src={userImage || "BlankImage.jpg"} alt={userImage} style={{ borderRadius: "8px" }} />
                     </div>
-                    <input className="itemPageInput" style={{ fontSize: "16px" }} type="text" name="ItemURL" data-length="20"
+                    <input className="itemPageInput" style={{ fontSize: "16px" }} type="url" name="ItemURL" data-length="20"
                         placeholder="Image URL" value={userImage} onChange={handleURLChange} maxLength={200} />
                     <input className="itemPageInput" ref={descriptionRef} style={{ fontSize: "16px" }} type="text" name="ItemURL" data-length="20"
                         placeholder="Item Description" maxLength={100} />
