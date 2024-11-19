@@ -79,6 +79,34 @@ export const handler = async (event) => {
             });
         });
 
+        // add 95% of the price to the seller balance
+        const addFundsToSellerQuery = `
+        UPDATE Account
+        SET balance = balance + ?
+        WHERE username = ?;
+        `;
+
+        await new Promise((resolve, reject) => {
+            pool.query(addFundsToSellerQuery, [itemPrice * 0.95, username], (err) => {
+                if (err) return reject(err);
+                return resolve();
+            });
+        });
+
+        // add 5% of the price to admin1 balance
+        const addFundsToAdminQuery = `
+        UPDATE Account
+        SET balance = balance + ?
+        WHERE username = 'admin1';
+        `;
+
+        await new Promise((resolve, reject) => {
+            pool.query(addFundsToAdminQuery, [itemPrice * 0.05], (err) => {
+                if (err) return reject(err);
+                return resolve();
+            });
+        });
+
         return await new Promise((resolve, reject) => {
 
             const localQuery = `
