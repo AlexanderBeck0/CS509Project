@@ -78,7 +78,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </>
                         }
                         {
-                            props.accountType === "Seller" && <SellerItemPage />
+                            props.accountType === "Seller" && <SellerItemPage status={item.status} item_id={item.id} />
                         }
                         {
                             props.accountType === "Buyer" && <BuyerItemPage />

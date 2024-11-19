@@ -29,6 +29,30 @@ async function unpublish(id: number) {
     }
 }
 
+async function archive(id: number) {
+    try {
+        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/archive", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                token: localStorage.getItem("token"),
+                item_id: id
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            console.error(data.error);
+            alert(`Error archiving item: ${data.error}`);
+            return;
+        }
+        return data;
+
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+    }
+}
+
 async function publish(id: number, forSale: boolean) {
     try {
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/publishItem", {
@@ -65,6 +89,14 @@ export default function ItemPage(props: ItemPageProps) {
     const [bids, setBids] = useState<Bid[]>([]);
     const [forSale, setForSale] = useState(false);
     const [published, setPublished] = useState<boolean | null>(null)
+    const [archived, setArchived] = useState<boolean | null>(null)
+
+    useEffect(() => {
+        if (archived) {
+            // TODO: Should go to view item since it is now archived and cannot be edited
+            console.log("TODO IMPLEMENT GO TO VIEW ITEM")
+        }
+    }, [archived]);
 
 
     async function handlePublishClick() {
@@ -81,6 +113,15 @@ export default function ItemPage(props: ItemPageProps) {
             }
         }
 
+    }
+
+    async function handleArchiveClick() {
+        if (item?.status === 'Inactive') {
+            const archiveResults = await archive(item.id)
+            if (archiveResults['statusCode'] === 200) {
+                setArchived(true)
+            }
+        }
     }
 
     /**
@@ -103,6 +144,7 @@ export default function ItemPage(props: ItemPageProps) {
                 setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
                 setPublished(data.item.status === 'Active');
                 setForSale(data.item.forSale === 1);
+                setArchived(data.item.archived === 1);
                 return;
             }
             console.log(data);
@@ -119,6 +161,7 @@ export default function ItemPage(props: ItemPageProps) {
 
     useEffect(() => {
         setPublished(item?.status === 'Active')
+        setArchived(item?.archived === true)
     }, [item]);
 
     async function handleEdit(changes: object): Promise<string> {
@@ -219,6 +262,16 @@ export default function ItemPage(props: ItemPageProps) {
                         {!published &&
                             <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
                                 onClick={() => alert("Not yet implemented")}>Remove Item</button>}
+
+                        {/* archive item */}
+                        {!archived && (
+                            <button
+                                className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={handleArchiveClick}
+                            >
+                                Archive
+                            </button>
+                        )}
 
                     </div>
                 </>
