@@ -24,23 +24,27 @@ let updateItem = (username, accountType, item, pool) => {
     // Check that they are a Seller
     if (accountType !== "Seller") return reject("Only Sellers can edit items!");
 
-    // Check if they are the owner of the item
-    await pool.query("SELECT * FROM Item WHERE seller_username = ? AND id = ?", [username, item.id], (error, results) => {
+    // Backend checks for the item
+    await pool.query("SELECT * FROM Item WHERE id = ?", [item.id], (error, results) => {
       if (error) return reject(error);
-      if (!results || results.length === 0) return reject("Not the owner of this item!");
+      if (!results || results.length === 0) return reject("Item was not found!");
+      if (results.seller_username !== username) return reject("Not the owner of this item!");
+      if (results.status !== "Inactive") return reject("Sellers can only edit inactive items.");
+      if (results.status !== item.status) return reject("You are not permitted change the item's status!");
+      if (results.seller_username !== item.seller_username) return reject("You are not permitted transfer ownership of the item!");
     });
 
     // If it gets to this point, the Seller is the owner of the item.
 
     const sqlQuery = `
         UPDATE Item
-        SET name = ?, description = ?, image = ?, initialPrice = ?, price = ?, startDate = ?, endDate = ?, archived = ?, status = ?, forSale = ?
+        SET name = ?, description = ?, image = ?, initialPrice = ?, price = ?, startDate = ?, endDate = ?, archived = ?, forSale = ?
         WHERE id = ?;
         `;
 
     // Note that we can set the price here to initialPrice because them being able to edit implies that it is not published
     // As such, there can be no bids
-    pool.query(sqlQuery, [item.name, item.description, item.image, +item.initialPrice, +item.initialPrice, item.startDate, item.endDate, item.archived, item.status, item.forSale, item.id], (error, rows) => {
+    pool.query(sqlQuery, [item.name, item.description, item.image, +item.initialPrice, +item.initialPrice, item.startDate, item.endDate, item.archived, item.forSale, item.id], (error, rows) => {
       if (error) { console.log("DB error"); return reject(error); }
       return resolve(rows);
     });
