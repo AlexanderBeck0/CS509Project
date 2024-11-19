@@ -83,40 +83,76 @@ export default function ItemPage(props: ItemPageProps) {
 
     }
 
-    useEffect(() => {
-        const fetchItem = async () => {
-            const payload = { id: id, token: props.token };
-            try {
-                const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                });
+    /**
+     * Function to call when fetching an item.
+     */
+    async function fetchItem(): Promise<void> {
+        const payload = { id: id, token: props.token };
+        try {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
 
-                const data = await response.json();
-                if (data.statusCode === 200) {
-                    setItem(data.item);
-                    setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
-                    setPublished(data.item.status === 'Active');
-                    setForSale(data.item.forSale === 1);
-                }
-                if (data.statusCode !== 200) {
-                    console.log(data);
-                    if (data?.error !== undefined) alert(data.error);
-                }
-            } catch (error) {
-                console.error('Error fetching item:', error);
+            const data = await response.json();
+            if (data.statusCode === 200) {
+                setItem(data.item);
+                setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
+                setPublished(data.item.status === 'Active');
+                setForSale(data.item.forSale === 1);
+                return;
             }
-        };
+            console.log(data);
+            if (data?.error !== undefined) alert(data.error);
 
+        } catch (error) {
+            console.error('Error fetching item:', error);
+        }
+    }
+
+    useEffect(() => {
         fetchItem();
     }, [id, props, published]);
 
     useEffect(() => {
         setPublished(item?.status === 'Active')
-    }, [item])
+    }, [item]);
+
+    async function handleEdit(changes: object): Promise<string> {
+        // Create a new item that contains all the new changes
+        const newItem: Partial<Item> = { ...item }!;
+        Object.entries(changes).forEach(([key, value]) => {
+            if (key in newItem) {
+                newItem[key as keyof Item] = value;
+            }
+        });
+
+        return new Promise((resolve, reject) => {
+            fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/saveItem", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    token: localStorage.getItem("token"),
+                    item: newItem
+                }),
+            }).then(response => response.json()).then(data => {
+                if (data.statusCode !== 200) {
+                    console.error(data.error);
+                    reject(data.error);
+                }
+                resolve("Successfully edited item!");
+                fetchItem();
+            }).catch(error => {
+                console.error(error);
+                reject(error instanceof Error ? error.message : typeof error === "string" ? error : error);
+            });
+        });
+    }
 
 
     return (
@@ -154,7 +190,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </div>
                         {/* Edit Controls */}
                         {item.status === "Inactive" && bids.length === 0 &&
-                            <EditItemForm item={item} />
+                            <EditItemForm item={item} handleEdit={handleEdit} />
                         }
                     </div>
                     {/* Controls */}
@@ -183,7 +219,7 @@ export default function ItemPage(props: ItemPageProps) {
                         {!published &&
                             <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
                                 onClick={() => alert("Not yet implemented")}>Remove Item</button>}
-                        
+
                     </div>
                 </>
             ) : (

@@ -4,9 +4,10 @@ import { useState, type HTMLInputTypeAttribute, type ReactNode } from "react";
 interface EditItemFormProps {
     item: Item;
     /**
-     * A message to show under the edit button. If `undefined`, nothing is shown.
+     * 
+     * @returns A promise of the result of trying to save.
      */
-    message?: string;
+    handleEdit: (changes: object, EDITABLE_ITEM_KEYS: readonly string[]) => Promise<string>;
     className?: string;
 }
 
@@ -17,7 +18,7 @@ const EDITABLE_ITEM_KEYS = ['name', 'description', 'startDate', 'endDate', 'imag
 
 export default function EditItemForm(props: EditItemFormProps): ReactNode {
     const [keysInUse, setKeysInUse] = useState<typeof EDITABLE_ITEM_KEYS[number][]>([]);
-    const [message, setMessage] = useState<string | null>(props?.message || null);
+    const [message, setMessage] = useState<string | null>(null);
 
     function onKeySelect(key: typeof EDITABLE_ITEM_KEYS[number]): void {
         if (!keysInUse.includes(key)) setKeysInUse([...keysInUse, key]);
@@ -31,10 +32,13 @@ export default function EditItemForm(props: EditItemFormProps): ReactNode {
      * The action handler for when the form is submitted. Will save the changes.
      * @param formData The form data. {@link https://react.dev/reference/react-dom/components/form}
      */
-    function saveChanges(formData: FormData): void {
+    async function saveChanges(formData: FormData): Promise<void> {
         const changes = Object.fromEntries(formData.entries());
-        alert("Backend of this component is not yet complete!");
-        setMessage("Request: " + JSON.stringify(changes));
+        await props.handleEdit(changes, EDITABLE_ITEM_KEYS).then(result => {
+            setMessage(result);
+        }).catch(error => {
+            setMessage("Error editting item: " + error);
+        });
     }
 
     return (

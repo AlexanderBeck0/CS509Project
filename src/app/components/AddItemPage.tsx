@@ -46,6 +46,7 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                 }
                 if (resultData.statusCode === 400) {
                     alert("Add item failed");
+                    console.error(resultData)
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -77,8 +78,8 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                 <div className='sellerContentColumn' style={{ width: "60%", }}>
                     <input className="itemPageInput" ref={nameRef} style={{ fontSize: "30px" }} type="text" name="ItemName" data-length="20" maxLength={45} required
                         placeholder="Item Name" />
-                    <div style={{ border: "1px solid black", borderRadius: "8px", height: "200px", maxHeight: "200px", maxWidth: "200px", margin: "1rem", }}>
-                        <img src={userImage || "BlankImage.jpg"} alt={userImage} style={{ borderRadius: "8px" }} />
+                    <div className="border border-black rounded-lg h-52 max-h-52 max-w-52 m-4 flex grow">
+                        <img src={userImage || "BlankImage.jpg"} alt={userImage} className="rounded-lg" />
                     </div>
                     <input className="itemPageInput" style={{ fontSize: "16px" }} type="url" name="ItemURL" data-length="20"
                         placeholder="Image URL" value={userImage} onChange={handleURLChange} maxLength={200} />

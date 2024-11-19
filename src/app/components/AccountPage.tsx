@@ -26,7 +26,10 @@ export default function AccountPage(props: AccountPageProps) {
                     });
 
                 const resultData: { statusCode: 200, account: Account } | { statusCode: 400, error: string } = await response.json();
-                if (resultData.statusCode !== 200) throw new Error(resultData.error);
+                if (resultData.statusCode !== 200) {
+                    console.log(resultData);
+                    throw new Error(resultData.error);
+                }
                 if (resultData.statusCode == 200) {
                     setAccountInfo(resultData.account);
                 }
