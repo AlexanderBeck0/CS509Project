@@ -122,10 +122,10 @@ export const handler = async (event) => {
         });
     } catch (error) {
         console.error(error);
-        return reject({
+        return {
             statusCode: 500,
             error: error.message
-        });
+        };
     } finally {
         // Close the pool's connection
         pool.end();
