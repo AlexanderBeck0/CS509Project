@@ -19,8 +19,7 @@ export default function AccountPage(props: AccountPageProps) {
                 token: localStorage.getItem('token'),
             };
             try {
-                const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo',
-                    {
+                const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo', {
                         method: 'POST',
                         body: JSON.stringify(payload),
                     });

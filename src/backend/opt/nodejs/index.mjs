@@ -229,6 +229,19 @@ export async function getAccountTypeFromToken(token) {
  *      });
  * });
  * ```
+ * @example
+ * ```JS
+ * // A usage example
+ * const { username } = await verifyToken(event.token).catch(error => {
+ *      if (error instanceof Error && error.name === "TokenExpiredError") {
+ *          return {
+ *              statusCode: 400,
+ *              error: "Your token has expired. Please log in again."
+ *          };
+ *      }
+ * });
+ * const account = await getAccountByUsername(username, pool);
+ * ```
  */
 export async function verifyToken(token) {
     return new Promise((resolve, reject) => {
@@ -263,7 +276,7 @@ export async function verifyToken(token) {
  */
 function _getItemFromIDNoChecks(id, pool) {
     // DO NOT EXPORT THIS FUNCTION  
-    if ((typeof id !== 'number' || id === NaN) && Number.parseInt(id) === NaN) throw new TypeError(`ID must be a number. Instead recieved " ${+id} of type ${typeof +id} (${id} of type ${typeof id})`);
+    if ((typeof id !== 'number' || isNaN(id)) && isNaN(Number.parseInt(id))) throw new TypeError(`ID must be a number. Instead recieved "${+id}" of type ${typeof +id} (${id} of type ${typeof id})`);
     if (+id < 0) throw new TypeError("ID must be greater than 0! Instead recieved " + id);
 
     // Validate pool
@@ -352,7 +365,7 @@ function _getItemFromIDNoChecks(id, pool) {
  * ```
  */
 export async function getItemFromID(id, pool, username = undefined) {
-    if ((typeof id !== 'number' || id === NaN) && Number.parseInt(id) === NaN) throw new TypeError(`ID must be a number. Instead recieved " ${+id} of type ${typeof +id} (${id} of type ${typeof id})`);
+    if ((typeof id !== 'number' || isNaN(id)) && isNaN(Number.parseInt(id))) throw new TypeError(`ID must be a number. Instead recieved "${+id}" of type ${typeof +id} (${id} of type ${typeof id})`);
     if (+id < 0) throw new TypeError("ID must be greater than 0! Instead recieved " + id);
 
     if (username !== undefined && typeof username !== 'string') {
