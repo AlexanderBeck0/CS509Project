@@ -8,3 +8,4 @@ export { default as RegisterPage } from './RegisterPage';
 export { default as SearchBar } from './SearchBar';
 export { default as SortDropdown } from './SortDropdown';
 export { default as ItemPage } from './ItemPage/ItemPage';
+export { default as RecentlySold } from './RecentlySold'

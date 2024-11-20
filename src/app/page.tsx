@@ -3,9 +3,8 @@ import { AccountType } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
 import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
-import { AccountPage, AddItemPage, HomePage, LoginPage, RegisterPage, SearchBar, SortDropdown } from './components/';
+import { AccountPage, AddItemPage, HomePage, LoginPage, RegisterPage, SearchBar, SortDropdown, RecentlySold } from './components/';
 import { ItemPage } from './components/ItemPage';
-import RecentlySold from './components/RecentlySold';
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));

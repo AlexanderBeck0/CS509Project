@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface RecentlySoldProps {
@@ -6,7 +6,7 @@ interface RecentlySoldProps {
   recentlySold: boolean;
 }
 
-export default function RecentlySold({ setRecentlySold, recentlySold }: RecentlySoldProps) {
+export function RecentlySold({ setRecentlySold, recentlySold }: RecentlySoldProps) {
 
     const navigate = useNavigate();
 
@@ -22,3 +22,4 @@ export default function RecentlySold({ setRecentlySold, recentlySold }: Recently
         </div>
     );
 }
+export default RecentlySold;
