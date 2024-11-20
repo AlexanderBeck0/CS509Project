@@ -2,7 +2,7 @@ import { createPool, getUsernameFromToken, getItemFromID } from "../opt/nodejs/i
 
 /**
  * 
- * @param {{token: string, item_id: number, forSale: boolean}} event id of item to publish, and if it should be forSale
+ * @param {{token: string, item_id: number}} event token of user and id of item to archive
  * @returns 
  */
 export const handler = async (event) => {
@@ -15,7 +15,7 @@ export const handler = async (event) => {
         return { statusCode: 500, error: "Could not make database connection" };
     }
 
-    const { token, item_id, forSale } = event;
+    const { token, item_id } = event;
     try {
         // make sure user is seller of this item
         const username = await getUsernameFromToken(token)
@@ -27,7 +27,6 @@ export const handler = async (event) => {
                 return resolve(results);
             });
         });
-        // console.log('Seller Query Results:', sellerQueryResults[0]);
 
         if (sellerQueryResults[0]['seller_username'] !== username) {
             return { statusCode: 400, error: "You do not own this item" };
@@ -38,27 +37,20 @@ export const handler = async (event) => {
             return { statusCode: 403, error: "Insufficient Permission to view this item", error };
         });
 
-        // if item status is active, can not publish
-        if (item.status != 'Inactive') {
-            return { statusCode: 400, error: "Cannot publish an item if it is not inactive" };
+        // if item status is not inactive
+        if (item.status !== 'Inactive') {
+            return { statusCode: 400, error: "Cannot archive an item that is not inactive" };
         }
 
-        // if endDate is after now then can not be published
-        // console.log("endDate", item.endDate)
-        // console.log("endDate:", new Date(item.endDate), "Current Date: ", new Date())
-        if (!item.endDate || item.endDate === '0000-00-00 00:00:00' || new Date(item.endDate) <= new Date()) {
-            return { statusCode: 400, error: "Cannot publish an item if the end date has passed or is invalid" };
-        }
-
+        // proceed to archive
         return await new Promise((resolve, reject) => {
-
             const localQuery = `
             UPDATE Item
-            SET status = 'Active', forSale = ?, startDate = NOW()
+            SET archived = true
             WHERE id = ?;
             `;
 
-            pool.query(localQuery, [forSale, item_id], (err) => {
+            pool.query(localQuery, [item_id], (err) => {
                 if (err) return reject(err);
                 return resolve({ statusCode: 200, item_id });
             });

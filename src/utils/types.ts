@@ -137,12 +137,12 @@ export type Bid = {
     /**
      * The {@link Buyer.username username} of the {@link Buyer} who created the bid.
      */
-    buyerUsername: string;
+    buyer_username: string;
 
     /**
      * The {@link Item.id id} of the {@link Item} that this bid was placed on.
      */
-    itemId: number;
+    item_id: number;
 
     /**
      * The {@link Bid.id id} of the previous {@link Bid}.

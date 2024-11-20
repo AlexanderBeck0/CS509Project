@@ -1,5 +1,5 @@
-import { Item, Bid, AccountType } from '@/utils/types';
-import React, { useEffect, useState } from 'react';
+import type { AccountType, Bid, Item } from '@/utils/types';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BuyerItemPage from './BuyerItemPage';
 import SellerItemPage from './SellerItemPage';
@@ -13,30 +13,32 @@ export default function ItemPage(props: ItemPageProps) {
     const { id } = useParams<{ id: string }>();
     const [item, setItem] = useState<Item | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchItem = async () => {
             const payload = { id: id, token: props.token };
-            try {
-                const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                });
 
-                const data = await response.json();
+            await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            }).then(response => response.json()).then(data => {
+                if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
-                    setItem(data.items[0]);
-                    setBids(data.items.bids || []);
+                    setItem(data.item);
+                    setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
                 }
-                if (data.statusCode !== 200) {
-                    alert(data.error)
+            }).catch(error => {
+                // Log actual errors and not just insufficient permission errors
+                if (error instanceof Error) console.error(error);
+                if (typeof error === 'string' && error.includes("jwt expired")) {
+                    setErrorMessage("Your token has expired. Please log in again.");
                 }
-            } catch (error) {
-                console.error('Error fetching item:', error);
-            }
+                setErrorMessage(error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error));
+            });
         };
 
         fetchItem();
@@ -44,7 +46,8 @@ export default function ItemPage(props: ItemPageProps) {
 
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
-            {item ? (
+            {!!errorMessage && <p>{errorMessage}</p>}
+            {!!!errorMessage && (item ? (
                 <>
                     {/* Left Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -65,7 +68,7 @@ export default function ItemPage(props: ItemPageProps) {
                             {bids.length > 0 ? (
                                 <ul>
                                     {bids.map((bid, index) => (
-                                        <li key={index}>${bid.bid} by {bid.buyerUsername}</li>
+                                        <li key={index}>${bid.bid} by {bid.buyer_username}</li>
                                     ))}
                                 </ul>
                             ) : (
@@ -74,7 +77,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </>
                         }
                         {
-                            props.accountType === "Seller" && <SellerItemPage />
+                            props.accountType === "Seller" && <SellerItemPage status={item.status} item_id={item.id} />
                         }
                         {
                             props.accountType === "Buyer" && <BuyerItemPage />
@@ -84,7 +87,7 @@ export default function ItemPage(props: ItemPageProps) {
                 </>
             ) : (
                 <p>Loading...</p>
-            )}
+            ))}
         </div>
     );
 }
