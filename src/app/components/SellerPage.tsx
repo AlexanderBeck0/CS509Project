@@ -27,7 +27,7 @@ export default function SellerPage(props: SellerPageProps) {
      * @param item The item to get the item action from.
      */
     const getItemAction = (item: Item): { text: string, url: string } => {
-        return item.status === "Active" || item.status === "Inactive" || item.status === "Frozen" || item.status === "Requested" ?
+        return (item.status === "Active" || item.status === "Inactive" || item.status === "Frozen" || item.status === "Requested") && !item.archived ?
             { text: "Edit Item", url: `/edit/${item.id}` } :
             { text: "View Item", url: `/item/${item.id}` }
     }

@@ -13,34 +13,32 @@ export default function ItemPage(props: ItemPageProps) {
     const { id } = useParams<{ id: string }>();
     const [item, setItem] = useState<Item | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchItem = async () => {
             const payload = { id: id, token: props.token };
-            try {
-                const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                });
 
-                const data = await response.json();
+            await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            }).then(response => response.json()).then(data => {
+                if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
                     setItem(data.item);
                     setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
                 }
-                if (data.statusCode !== 200) {
-                    // alert(data.error)
-                    console.error(data.error)
-                    if (typeof data.error === 'string' && data.error.includes("jwt expired")) {
-                        alert("Your token has expired. Please log in again.");
-                    }
+            }).catch(error => {
+                // Log actual errors and not just insufficient permission errors
+                if (error instanceof Error) console.error(error);
+                if (typeof error === 'string' && error.includes("jwt expired")) {
+                    setErrorMessage("Your token has expired. Please log in again.");
                 }
-            } catch (error) {
-                console.error('Error fetching item:', error);
-            }
+                setErrorMessage(error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error));
+            });
         };
 
         fetchItem();
@@ -48,7 +46,8 @@ export default function ItemPage(props: ItemPageProps) {
 
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
-            {item ? (
+            {!!errorMessage && <p>{errorMessage}</p>}
+            {!!!errorMessage && (item ? (
                 <>
                     {/* Left Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -88,7 +87,7 @@ export default function ItemPage(props: ItemPageProps) {
                 </>
             ) : (
                 <p>Loading...</p>
-            )}
+            ))}
         </div>
     );
 }

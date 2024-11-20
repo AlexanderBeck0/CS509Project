@@ -266,7 +266,7 @@ export default function ItemPage(props: ItemPageProps) {
                         {/* archive item */}
                         {!archived && !published && (
                             <button
-                                className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
                                 onClick={handleArchiveClick}
                             >
                                 Archive
