@@ -1,5 +1,5 @@
-import { Item, Bid, AccountType } from '@/utils/types';
-import React, { useEffect, useState } from 'react';
+import type { AccountType, Bid, Item } from '@/utils/types';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BuyerItemPage from './BuyerItemPage';
 import SellerItemPage from './SellerItemPage';
@@ -34,7 +34,7 @@ export default function ItemPage(props: ItemPageProps) {
                 if (data.statusCode !== 200) {
                     // alert(data.error)
                     console.error(data.error)
-                    if (data.error === "jwt expired") {
+                    if (typeof data.error === 'string' && data.error.includes("jwt expired")) {
                         alert("Your token has expired. Please log in again.");
                     }
                 }
