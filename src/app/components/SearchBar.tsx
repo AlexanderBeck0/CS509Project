@@ -29,7 +29,7 @@ export function SearchBar({ setSearchInput }: SearchBarProps) {
         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSearch(tempSearchInput)}
         onChange={handleInputChange}
         placeholder="Search here..."
-        role="searchbox" // I'm not quite sure what the difference between "search" and "searchbox" are...
+        role="searchbox" 
       />
       <button className='searchButton' onClick={() => handleSearch(tempSearchInput)}>&nbsp;🔎&nbsp;</button>
     </div>

@@ -2,16 +2,19 @@ import { Item } from '@/utils/types';
 import { useEffect, useState } from 'react';
 import ItemDisplay from './ItemDisplay';
 
-export default function HomePage(props: { searchInput: string, sortBy: string }) {
+export default function HomePage(props: { searchInput: string, sortBy: string, recentlySold: boolean }) {
   const [result, setResult] = useState<Item[]>([]);
 
   useEffect(() => {
     console.log("Search: " + props.searchInput);
     console.log("Sort: " + props.sortBy);
+    console.log("Recently Sold "+props.recentlySold);
+    
     const fetchData = async () => {
       const payload = {
-        query: props.searchInput, // need to get all items sorted by some default
+        query: props.searchInput,
         sortBy: props.sortBy,
+        recentlySold: props.recentlySold,
       };
       try {
         const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/searchItems',

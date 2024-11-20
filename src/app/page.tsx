@@ -97,7 +97,7 @@ function AppContent() {
       <div className="content">
         <Routes>
           <Route path="/" element={
-            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to={"/account"} />)} />
+            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} recentlySold={accountType === "Buyer" ? recentlySold : false}/> : <Navigate to={"/account"} />)} />
           <Route path="/addItem" element={
             (isLoggedIn && token ? <AddItemPage /> : <Navigate to={"/account"} />)} />
           <Route path="/login" element={
