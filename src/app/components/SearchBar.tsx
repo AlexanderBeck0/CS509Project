@@ -1,14 +1,22 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchBarProps {
-  handleSearch: (input: string) => void;
+  setSearchInput: (input: string) => void;
 }
 
-export function SearchBar({ handleSearch }: SearchBarProps) {
+export function SearchBar({ setSearchInput }: SearchBarProps) {
   const [tempSearchInput, setTempSearchInput] = useState("");
 
+  const navigate = useNavigate();
+  
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTempSearchInput(e.target.value);
+  };
+
+  const handleSearch = (input: string) => {
+    setSearchInput(input);
+    navigate('/');
   };
 
   return (
@@ -21,7 +29,7 @@ export function SearchBar({ handleSearch }: SearchBarProps) {
         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSearch(tempSearchInput)}
         onChange={handleInputChange}
         placeholder="Search here..."
-        role="searchbox" // I'm not quite sure what the difference between "search" and "searchbox" are...
+        role="searchbox" 
       />
       <button className='searchButton' onClick={() => handleSearch(tempSearchInput)}>&nbsp;🔎&nbsp;</button>
     </div>
