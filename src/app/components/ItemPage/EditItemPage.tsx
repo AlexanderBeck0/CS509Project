@@ -1,5 +1,5 @@
 import type { AccountType, Bid, Item } from '@/utils/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import EditItemForm from './EditItemForm';
 
@@ -127,7 +127,7 @@ export default function ItemPage(props: ItemPageProps) {
     /**
      * Function to call when fetching an item.
      */
-    async function fetchItem(): Promise<void> {
+    const fetchItem = useCallback(async (): Promise<void> => {
         const payload = { id: id, token: props.token };
         try {
             const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
@@ -153,11 +153,11 @@ export default function ItemPage(props: ItemPageProps) {
         } catch (error) {
             console.error('Error fetching item:', error);
         }
-    }
+    }, [id, props.token]);
 
     useEffect(() => {
         fetchItem();
-    }, [id, props, published]);
+    }, [fetchItem, id, props, published]);
 
     useEffect(() => {
         setPublished(item?.status === 'Active')

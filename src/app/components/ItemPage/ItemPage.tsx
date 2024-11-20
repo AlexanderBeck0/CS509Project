@@ -36,6 +36,7 @@ export default function ItemPage(props: ItemPageProps) {
                 if (error instanceof Error) console.error(error);
                 if (typeof error === 'string' && error.includes("jwt expired")) {
                     setErrorMessage("Your token has expired. Please log in again.");
+                    return;
                 }
                 setErrorMessage(error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error));
             });
