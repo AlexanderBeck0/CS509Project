@@ -78,6 +78,30 @@ async function publish(id: number, forSale: boolean) {
     }
 }
 
+async function remove(id: number) {
+    try {
+        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/remove-item", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                token: localStorage.getItem("token"),
+                item_id: id
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            console.error(data.error);
+            alert(`Error removing item: ${data.error}`);
+            return;
+        }
+        return data;
+
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+    }
+}
+
 interface ItemPageProps {
     accountType: AccountType | null;
     token: string | null;
@@ -120,6 +144,15 @@ export default function ItemPage(props: ItemPageProps) {
             const archiveResults = await archive(item.id)
             if (archiveResults['statusCode'] === 200) {
                 setArchived(true)
+            }
+        }
+    }
+
+    async function handleRemoveClick() {
+        if (item?.status === 'Inactive') {
+            const removeResults = await remove(item.id)
+            if (removeResults['statusCode'] === 200) {
+                navigate("/account")
             }
         }
     }
@@ -261,7 +294,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </button>
                         {!published &&
                             <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
-                                onClick={() => alert("Not yet implemented")}>Remove Item</button>}
+                                onClick={handleRemoveClick}>Remove Item</button>}
 
                         {/* archive item */}
                         {!archived && !published && (
