@@ -3,7 +3,7 @@ import { AccountType } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
 import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
-import { AccountPage, AddItemPage, HomePage, LoginPage, RegisterPage, SearchBar, SortDropdown } from './components/';
+import { AccountPage, AddItemPage, HomePage, LoginPage, RegisterPage, SearchBar, SortDropdown, RecentlySold } from './components/';
 import { EditItemPage, ItemPage } from './components/ItemPage';
 
 function AppContent() {
@@ -12,6 +12,7 @@ function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("startDate_ASC");
+  const [recentlySold, setRecentlySold] = useState(false);
 
   // Called whenever token changes
   useEffect(() => {
@@ -43,11 +44,6 @@ function AppContent() {
     verifyToken();
   }, [token]);
 
-  // #region Handlers
-  const handleSearch = (input: string) => {
-    setSearchInput(input);
-  };
-
   function onLogin(newToken: string, accountType: AccountType): void {
     setToken(newToken);
     setAccountType(accountType);
@@ -60,7 +56,6 @@ function AppContent() {
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
-  // #endregion
 
   /**
    * Logs the user out by deleting their token from local storage and changing the React states.
@@ -80,13 +75,16 @@ function AppContent() {
   return (
     <main className="main-container">
       <div className="heading">
-        <Link to="/"><button className="HomeButton">Auction House</button></Link>
-        {accountType !== "Seller" && (
-          <div className="search">
-            <SearchBar handleSearch={handleSearch} />
+        <Link to="/"><button className="HomeButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>Auction House</button></Link>
+        {accountType !== "Seller" && <div className="search">
+          <SearchBar setSearchInput={setSearchInput} />
+          <div style={{ display: "flex", flexDirection: "column"}}>
+            {accountType === "Buyer" && (
+              <RecentlySold setRecentlySold={setRecentlySold} recentlySold={recentlySold}/>
+            )}
             <SortDropdown setSortBy={setSortBy} />
           </div>
-        )}
+        </div>}
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
             <Image src="/accountSymbol.png" height={40} width={40} alt="Account" />
@@ -95,7 +93,7 @@ function AppContent() {
       </div>
       <div className="content">
         <Routes>
-          <Route path="/" element={accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} /> : <Navigate to="/account" />} />
+          <Route path="/" element={accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} recentlySold={accountType === "Buyer" ? recentlySold : false}/> : <Navigate to={"/account"} />} />
           <Route path="/addItem" element={isLoggedIn && token ? <AddItemPage /> : <Navigate to="/account" />} />
           <Route path="/login" element={!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to="/account" />} />
           <Route path="/createAccount" element={!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to="/account" />} />

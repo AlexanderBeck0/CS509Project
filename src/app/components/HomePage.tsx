@@ -3,15 +3,16 @@ import { useEffect, useState } from 'react';
 import ItemDisplay from './ItemDisplay';
 import { Link } from 'react-router-dom';
 
-export default function HomePage(props: { searchInput: string, sortBy: string }) {
+export default function HomePage(props: { searchInput: string, sortBy: string, recentlySold: boolean }) {
   const [result, setResult] = useState<Item[]>([]);
 
   // #region searchItems
   useEffect(() => {
     const fetchData = async () => {
       const payload = {
-        query: props.searchInput, // need to get all items sorted by some default
+        query: props.searchInput,
         sortBy: props.sortBy,
+        recentlySold: props.recentlySold,
       };
       try {
         const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/searchItems',
@@ -29,7 +30,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string })
       }
     }
     fetchData();
-  }, [props.searchInput, props.sortBy]);
+  }, [props.searchInput, props.sortBy, props.recentlySold]);
   // #endregion
 
   return (
