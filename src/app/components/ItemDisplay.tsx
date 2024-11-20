@@ -29,7 +29,10 @@ export default function ItemDisplay(props: ItemDisplayProps) {
             </div>
           </div>
         </div>
-        {item?.status && <p className="text-lg basis-1/3">{item.status}</p>}
+        <div className="flex flex-col">
+          {item?.status && <p className="text-lg basis-1/3">{item.status}</p>}
+          {!!item?.archived && <p className="text-lg basis-1/3">Archived</p>}
+        </div>
       </div>
       {props.children}
     </div>

@@ -32,6 +32,7 @@ let updateItem = (username, accountType, item, pool) => {
       if (results.status !== "Inactive") return reject("Sellers can only edit inactive items.");
       if (results.status !== item.status) return reject("You are not permitted change the item's status!");
       if (results.seller_username !== item.seller_username) return reject("You are not permitted transfer ownership of the item!");
+      if (results.archived) return reject("Unable to edit archived items!");
     });
 
     // If it gets to this point, the Seller is the owner of the item.
