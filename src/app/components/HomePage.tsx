@@ -35,7 +35,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string, r
       }
     }
     fetchData();
-  }, [props.searchInput, props.sortBy]);
+  }, [props.searchInput, props.sortBy, props.recentlySold]);
   // #endregion
 
   return (
