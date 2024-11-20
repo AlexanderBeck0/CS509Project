@@ -42,9 +42,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Zip files
 *.zip
 **/*.zip
 
+# Ignore vscode folder (it didn't ignore the first time so enjoy my 3 attempts)
 /.vscode/
 .vscode/
 /.vscode
+
+# git logs
+git.report.txt

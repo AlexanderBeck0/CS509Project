@@ -1,7 +1,7 @@
 import { createPool, verifyToken } from "../opt/nodejs/index.mjs";
 
 /**
- * @param {{tableName: string, token: string}} event The view-db event
+ * @param {{sqlCommand: string, token: string}} event
  */
 export const handler = async (event) => {
     /**
@@ -16,11 +16,11 @@ export const handler = async (event) => {
         return { statusCode: 500, error: "Could not make database connection" };
     }
 
-    const { tableName, token } = event;
+    const { sqlCommand, token } = event;
 
     // Type check all args
-    if (typeof tableName !== 'string') {
-        const error = new TypeError('Invalid tableName parameter. Expected a string.');
+    if (typeof sqlCommand !== 'string') {
+        const error = new TypeError('Invalid sql command parameter. Expected a string.');
         console.error(error);
         return { statusCode: 500, error: error.message };
     }
@@ -33,32 +33,32 @@ export const handler = async (event) => {
         }
 
         if (accountType !== "Admin") {
-            return { statusCode: 403, error: "It is forbidden to perform this operation." }
+            return { statusCode: 403, error: `It is forbidden to perform this operation as a ${accountType}.`  }
         }
     } catch (error) {
         return { statusCode: 400, error: typeof error === 'string' ? error : JSON.stringify(error) }
     }
+    
+    if (sqlCommand.toUpperCase().includes('DROP TABLE')) {
+        return { statusCode: 403, error: "You are not allowed to perform the drop command." }
+    }
 
     return new Promise((resolve) => {
-        // Proceed with displaying data
-        const displayQuery = `
-            SELECT * FROM ??
-            `;
-        console.log('Executing display query:', displayQuery);
+        // Proceed with query
+        console.log('Executing modifcation query:', sqlCommand);
 
-        pool.query(displayQuery, [tableName], (displayError, displayResults) => {
+        // Capital callback parameters are cursed
+        pool.query(sqlCommand, (error, results) => {
             pool.end();
-            if (displayError) {
-                console.error('display query error:', displayError);
+            if (error) {
+                console.error('query error:', error);
                 return resolve({ statusCode: 500, error: error instanceof Error ? error.message : JSON.stringify(error)});
             }
-
-            console.log('display query results:', displayResults);
+            console.log('query results:', results);
             return resolve({
                 statusCode: 200,
-                body: JSON.stringify(displayResults),
+                body: JSON.stringify(results),
             });
-
         });
     });
 };

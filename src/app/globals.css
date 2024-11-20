@@ -12,12 +12,14 @@ This forces dark mode on my machine which makes the UI impossible to use.
 
 @media (min-width: 640px) {
   .main-container {
-      padding: 5rem;
+    padding: 5rem;
   }
+
   .content {
-      align-items: flex-start;
+    align-items: flex-start;
   }
 }
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #ededed;
@@ -71,6 +73,10 @@ body {
   justify-items: left;
 }
 
+.ItemDisplay .item {
+  height: 100%;
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -95,15 +101,15 @@ body {
 }
 
 .icon.open {
-  transform: rotate(0deg); 
+  transform: rotate(0deg);
 }
 
 .icon.closed {
-  transform: rotate(90deg); 
+  transform: rotate(90deg);
 }
 
 .search {
-  display: flex; 
+  display: flex;
   align-items: center;
   align-content: left;
 }
@@ -124,10 +130,11 @@ input:focus {
 }
 
 .dropdown {
-  color:black;
+  color: black;
   font-size: 16px;
   position: absolute;
-  padding: 0; margin: 0;
+  padding: 0;
+  margin: 0;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -184,8 +191,9 @@ input:focus {
 }
 
 .searchButton:hover {
-  background-color:#ccc;
+  background-color: #ccc;
 }
+
 .searchButton {
   border-radius: 8px;
 }
@@ -217,7 +225,7 @@ input:focus {
 }
 
 .item {
-  min-width: 150px;
+  /* min-width: 150px; */
   align-content: center;
   border: solid 1px black;
   border-radius: 8px;

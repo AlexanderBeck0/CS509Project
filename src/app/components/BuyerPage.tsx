@@ -1,4 +1,4 @@
-import { Account } from '@/utils/types';
+import { Account, Buyer } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
@@ -16,6 +16,14 @@ export default function BuyerPage(props: BuyerPageProps) {
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
     };
+    // useEffect(() => {
+    //     setAccount(props.userData);
+    // }, [props]);
+
+    // useEffect(() => {
+    //     if (account === null || account === undefined) return;
+    //     setFunds(account.balance);
+    // }, [account]);
 
     /*get JSON of buyer id from database*/
 
@@ -82,6 +90,7 @@ export default function BuyerPage(props: BuyerPageProps) {
             throw error
         }
     }
+    // #endregion
 
     return (
         <div className='content'>

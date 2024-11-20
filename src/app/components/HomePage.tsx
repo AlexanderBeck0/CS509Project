@@ -1,10 +1,12 @@
 import { Item } from '@/utils/types';
 import { useEffect, useState } from 'react';
 import ItemDisplay from './ItemDisplay';
+import { Link } from 'react-router-dom';
 
 export default function HomePage(props: { searchInput: string, sortBy: string, recentlySold: boolean }) {
   const [result, setResult] = useState<Item[]>([]);
 
+  // #region searchItems
   useEffect(() => {
     console.log("Search: " + props.searchInput);
     console.log("Sort: " + props.sortBy);
@@ -34,12 +36,15 @@ export default function HomePage(props: { searchInput: string, sortBy: string, r
     }
     fetchData();
   }, [props.searchInput, props.sortBy]);
+  // #endregion
 
   return (
     <div className="ItemDisplay">
       {result.length > 0 ? (
         result.map((item, index) => (
-          <ItemDisplay key={index} item={item}/>
+          <Link key={index} to={`/item/${item.id}`}>
+            <ItemDisplay key={index} item={item} />
+          </Link>
         ))
       ) : (
         <p>No items found.</p>

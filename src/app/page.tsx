@@ -2,15 +2,10 @@
 import { AccountType } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
-import { HashRouter, Link, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import AccountPage from "./components/AccountPage";
-import AddItemPage from "./components/AddItemPage";
-import HomePage from "./components/HomePage";
-import LoginPage from "./components/LoginPage";
-import RegisterPage from "./components/RegisterPage";
-import SearchBar from "./components/SearchBar";
-import SortDropdown from "./components/SortDropdown";
-import RecentlySold from "./components/RecentlySold";
+import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
+import { AccountPage, AddItemPage, HomePage, LoginPage, RegisterPage, SearchBar, SortDropdown } from './components/';
+import { ItemPage } from './components/ItemPage';
+import RecentlySold from './components/RecentlySold';
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -39,11 +34,12 @@ function AppContent() {
 
         const data = await response.json();
 
-        setIsLoggedIn(data.body.username && data.body.accountType);
-        setAccountType(data.body.accountType ?? null);
+        setIsLoggedIn(data.body?.username && data.body?.accountType);
+        setAccountType(data.body?.accountType ?? null);
       } catch (error) {
         console.error("Failure to verify token: " + error);
         setIsLoggedIn(false);
+        setAccountType(null);
       }
     }
     verifyToken();
@@ -61,6 +57,8 @@ function AppContent() {
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
+  // #endregion
+
   /**
    * Logs the user out by deleting their token from local storage and changing the React states.
    * 
@@ -75,6 +73,7 @@ function AppContent() {
     setAccountType(null);
   }
 
+  // #region TSX
   return (
     <main className="main-container">
       <div className="heading">
@@ -90,29 +89,24 @@ function AppContent() {
         </div>}
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
-            <Image src="/accountSymbol.png" height={40} width={40} style={{ height: "40px", width: "auto", objectFit: "contain" }} alt="Account" />
+            <Image src="/accountSymbol.png" height={40} width={40} alt="Account" />
           </button>
         </Link>
       </div>
       <div className="content">
         <Routes>
-          <Route path="/" element={
-            (accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} recentlySold={accountType === "Buyer" ? recentlySold : false}/> : <Navigate to={"/account"} />)} />
-          <Route path="/addItem" element={
-            (isLoggedIn && token ? <AddItemPage /> : <Navigate to={"/account"} />)} />
-          <Route path="/login" element={
-            (!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to={"/account"} />)
-          } />
-          <Route path="/createAccount" element={
-            (!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to={"/account"} />)
-          } />
-          <Route path="/account" element={
-            (isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to={"/"} />)
-          } />
+          <Route path="/" element={accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} recentlySold={accountType === "Buyer" ? recentlySold : false}/> : <Navigate to={"/account"} />} />
+          <Route path="/addItem" element={isLoggedIn && token ? <AddItemPage /> : <Navigate to="/account" />} />
+          <Route path="/login" element={!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to="/account" />} />
+          <Route path="/createAccount" element={!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to="/account" />} />
+          <Route path="/account" element={isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to="/" />} />
+          <Route path="/item/:id" element={
+            <ItemPage accountType={accountType} token={token} />} />  {/* New route for item details */}
         </Routes>
       </div>
     </main>
   );
+  // #endregion
 }
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
