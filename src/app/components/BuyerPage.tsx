@@ -90,7 +90,6 @@ export default function BuyerPage(props: BuyerPageProps) {
             throw error
         }
     }
-    // #endregion
 
     return (
         <div className='content'>

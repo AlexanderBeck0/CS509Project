@@ -56,7 +56,6 @@ function AppContent() {
     localStorage.setItem('token', newToken); //Store token in localStorage
   }
 
-  // #endregion
 
   /**
    * Logs the user out by deleting their token from local storage and changing the React states.
