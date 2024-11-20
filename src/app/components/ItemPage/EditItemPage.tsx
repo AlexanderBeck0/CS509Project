@@ -1,6 +1,6 @@
 import type { AccountType, Bid, Item } from '@/utils/types';
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditItemForm from './EditItemForm';
 
 async function unpublish(id: number) {
@@ -90,13 +90,13 @@ export default function ItemPage(props: ItemPageProps) {
     const [forSale, setForSale] = useState(false);
     const [published, setPublished] = useState<boolean | null>(null)
     const [archived, setArchived] = useState<boolean | null>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (archived) {
-            // TODO: Should go to view item since it is now archived and cannot be edited
-            console.log("TODO IMPLEMENT GO TO VIEW ITEM")
+            navigate(`/item/${id}`)
         }
-    }, [archived]);
+    }, [archived, id, navigate]);
 
 
     async function handlePublishClick() {
