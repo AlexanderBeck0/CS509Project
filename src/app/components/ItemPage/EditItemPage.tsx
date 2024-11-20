@@ -1,6 +1,6 @@
 import type { AccountType, Bid, Item } from '@/utils/types';
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditItemForm from './EditItemForm';
 
 async function unpublish(id: number) {
@@ -78,6 +78,30 @@ async function publish(id: number, forSale: boolean) {
     }
 }
 
+async function remove(id: number) {
+    try {
+        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/remove-item", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                token: localStorage.getItem("token"),
+                item_id: id
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            console.error(data.error);
+            alert(`Error removing item: ${data.error}`);
+            return;
+        }
+        return data;
+
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+    }
+}
+
 interface ItemPageProps {
     accountType: AccountType | null;
     token: string | null;
@@ -90,13 +114,13 @@ export default function ItemPage(props: ItemPageProps) {
     const [forSale, setForSale] = useState(false);
     const [published, setPublished] = useState<boolean | null>(null)
     const [archived, setArchived] = useState<boolean | null>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (archived) {
-            // TODO: Should go to view item since it is now archived and cannot be edited
-            console.log("TODO IMPLEMENT GO TO VIEW ITEM")
+            navigate(`/item/${id}`)
         }
-    }, [archived]);
+    }, [archived, id, navigate]);
 
 
     async function handlePublishClick() {
@@ -120,6 +144,15 @@ export default function ItemPage(props: ItemPageProps) {
             const archiveResults = await archive(item.id)
             if (archiveResults['statusCode'] === 200) {
                 setArchived(true)
+            }
+        }
+    }
+
+    async function handleRemoveClick() {
+        if (item?.status === 'Inactive') {
+            const removeResults = await remove(item.id)
+            if (removeResults['statusCode'] === 200) {
+                navigate("/account")
             }
         }
     }
@@ -261,7 +294,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </button>
                         {!published &&
                             <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
-                                onClick={() => alert("Not yet implemented")}>Remove Item</button>}
+                                onClick={handleRemoveClick}>Remove Item</button>}
 
                         {/* archive item */}
                         {!archived && !published && (
