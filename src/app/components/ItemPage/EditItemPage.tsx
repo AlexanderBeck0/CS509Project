@@ -197,11 +197,29 @@ export default function ItemPage(props: ItemPageProps) {
         setArchived(item?.archived === true)
     }, [item]);
 
+    /**
+     * @param changes The changes to be made.
+     * @returns A string promise of the resulting message. Could be a success message, or an error message.
+     */
     async function handleEdit(changes: object): Promise<string> {
+
+        /**
+         * @param str The date string to check.
+         * @returns A boolean representing if str is a date string.
+         */
+        const isDate = (str: string): boolean => {
+            return !isNaN(new Date(str).getTime());
+        }
+
         // Create a new item that contains all the new changes
         const newItem: Partial<Item> = { ...item }!;
         Object.entries(changes).forEach(([key, value]) => {
+            // console.log(new Date(value))
             if (key in newItem) {
+                // Convert date to ISO format
+                if (isDate(value)) {
+                    value = new Date(value).toISOString().slice(0, -8)
+                }
                 newItem[key as keyof Item] = value;
             }
         });
@@ -230,7 +248,6 @@ export default function ItemPage(props: ItemPageProps) {
         });
     }
 
-
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
             {item ? (
@@ -242,8 +259,8 @@ export default function ItemPage(props: ItemPageProps) {
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
                         </picture>
                         <p><strong>Description: </strong> {item.description}</p>
-                        <p><strong>Start Date: </strong> {new Date(item.startDate).toLocaleDateString()}</p>
-                        <p><strong>End Date: </strong> {item?.endDate ? new Date(item.endDate).toLocaleDateString() : 'No end date available'}</p>
+                        <p><strong>Start Date: </strong> {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleString() : item.startDate.toLocaleString()}</p>
+                        <p><strong>End Date: </strong> {item?.endDate ?(typeof item.endDate === "string" ? new Date(item.endDate).toLocaleString() : item.endDate?.toLocaleString()) : 'No end date available'}</p>
                         <p><strong>Status: </strong> {item.status}</p>
                     </div>
 
