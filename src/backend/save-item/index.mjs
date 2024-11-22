@@ -28,6 +28,8 @@ let updateItem = (username, accountType, item, pool) => {
     await pool.query("SELECT * FROM Item WHERE id = ?", [item.id], (error, results) => {
       if (error) return reject(error);
       if (!results || results.length === 0) return reject("Item was not found!");
+      results = results[0];
+      
       if (results.seller_username !== username) return reject("Not the owner of this item!");
       if (results.status !== "Inactive") return reject("Sellers can only edit inactive items.");
       if (results.status !== item.status) return reject("You are not permitted change the item's status!");
@@ -88,7 +90,11 @@ export const handler = async (event) => {
     };
   }
   finally {
-    pool.end();
+    pool.end((err) => {
+      if (err) {
+        console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+      }
+    });
   }
   return response;
 };

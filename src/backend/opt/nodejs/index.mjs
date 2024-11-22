@@ -29,7 +29,11 @@ const JWT_KEY = `${process.env.WEB_TOKEN_KEY}`;
  *          // Your code here
  *      } finally {
  *          // Close the connection to the pool
- *          pool.end();
+ *          pool.end((err) => {
+ *              if (err) {
+ *                  console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+ *              }
+ *          });
  *      }
  * });
  * ```
@@ -69,7 +73,11 @@ export async function createPool() {
  *      console.error(error);
  *      // Handle error here
  * } finally {
- *      pool.end();
+ *      pool.end((err) => {
+ *          if (err) {
+ *              console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+ *          }
+ *      });
  * }
  * ```
  */
@@ -360,7 +368,11 @@ function _getItemFromIDNoChecks(id, pool) {
  *      // Handle error here
  * } finally {
  *      // Close the connection
- *      pool.end();
+ *      pool.end((err) => {
+ *          if (err) {
+ *              console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+ *          }
+ *      });
  * }
  * ```
  */
