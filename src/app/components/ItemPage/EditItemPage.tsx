@@ -112,11 +112,17 @@ export default function ItemPage(props: ItemPageProps) {
     const [item, setItem] = useState<Item | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
     const [forSale, setForSale] = useState(false);
-    const [published, setPublished] = useState<boolean | null>(null)
-    const [archived, setArchived] = useState<boolean | null>(null)
+    const [published, setPublished] = useState<boolean | null>(null);
+    const [archived, setArchived] = useState<boolean | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    /**
+     * Used when there is a fatal error that should prevent the page from being shown.
+     */
+    const [fatalErrorMessage, setFatalErrorMessage] = useState<string | null>(null);
     const navigate = useNavigate()
 
     useEffect(() => {
+        // Ensure that if the item is archived, the Seller is taken to view item instead of edit
         if (archived) {
             navigate(`/item/${id}`)
         }
@@ -180,11 +186,16 @@ export default function ItemPage(props: ItemPageProps) {
                 setArchived(data.item.archived === 1);
                 return;
             }
-            console.log(data);
-            if (data?.error !== undefined) alert(data.error);
+            if (data?.error !== undefined) {
+                if (data.error.includes("jwt expired")) {
+                    throw new Error("Your token has expired. Please log in again.");
+                }
+                setErrorMessage(data.error); // Non-fatal error handling
+            }
 
         } catch (error) {
-            console.error('Error fetching item:', error);
+            // Fatal error (not an expected error)
+            setFatalErrorMessage(typeof error === "string" ? error : error instanceof Error ? error.message : JSON.stringify(error));
         }
     }, [id, props.token]);
 
@@ -202,7 +213,6 @@ export default function ItemPage(props: ItemPageProps) {
      * @returns A string promise of the resulting message. Could be a success message, or an error message.
      */
     async function handleEdit(changes: object): Promise<string> {
-
         /**
          * @param str The date string to check.
          * @returns A boolean representing if str is a date string.
@@ -250,7 +260,9 @@ export default function ItemPage(props: ItemPageProps) {
 
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
-            {item ? (
+            {/* Would probably be better to use an ErrorBoundary but I do not have the time to look into it */}
+            {!!fatalErrorMessage && <p className="text-lg">{fatalErrorMessage}</p>}
+            {!!!fatalErrorMessage && (item ? (
                 <>
                     {/* Left Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -260,7 +272,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </picture>
                         <p><strong>Description: </strong> {item.description}</p>
                         <p><strong>Start Date: </strong> {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleString() : item.startDate.toLocaleString()}</p>
-                        <p><strong>End Date: </strong> {item?.endDate ?(typeof item.endDate === "string" ? new Date(item.endDate).toLocaleString() : item.endDate?.toLocaleString()) : 'No end date available'}</p>
+                        <p><strong>End Date: </strong> {item?.endDate ? (typeof item.endDate === "string" ? new Date(item.endDate).toLocaleString() : item.endDate?.toLocaleString()) : 'No end date available'}</p>
                         <p><strong>Status: </strong> {item.status}</p>
                     </div>
 
@@ -322,12 +334,12 @@ export default function ItemPage(props: ItemPageProps) {
                                 Archive
                             </button>
                         )}
-
+                        {!!errorMessage && <p className="text-sm">{errorMessage}</p>}
                     </div>
                 </>
             ) : (
                 <p>Loading...</p>
-            )}
+            ))}
         </div>
     );
 }
