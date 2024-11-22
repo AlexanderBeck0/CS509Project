@@ -103,7 +103,11 @@ export const handler = async (event) => {
             });
         } finally {
             // Close the pool's connection
-            pool.end();
+            pool.end((err) => {
+                if (err) {
+                    console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+                }
+            });
         }
     });
 };

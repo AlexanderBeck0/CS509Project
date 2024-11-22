@@ -29,12 +29,20 @@ let updateItem = (username, accountType, item, pool) => {
       if (error) return reject(error);
       if (!results || results.length === 0) return reject("Item was not found!");
       results = results[0];
-      
+
       if (results.seller_username !== username) return reject("Not the owner of this item!");
       if (results.status !== "Inactive") return reject("Sellers can only edit inactive items.");
       if (results.status !== item.status) return reject("You are not permitted change the item's status!");
+      if (item.id !== results.id) return reject("You are not permitted to change the item's id!");
       if (results.seller_username !== item.seller_username) return reject("You are not permitted transfer ownership of the item!");
       if (results.archived) return reject("Unable to edit archived items!");
+      if (item.startDate < new Date()) console.warn("Start date is before the current date. Allowing...");
+      if (item.endDate) {
+        // Since endDate is optional, only run these checks if it exists
+        if (item.endDate < new Date()) return reject("Cannot set end date in the past!");
+        if (item.endDate < item.startDate) return reject("Cannot set end date before start date!");
+        if (item.startDate > item.endDate) return reject("Cannot set start date after end date!"); // Not sure if this will run...
+      }
     });
 
     // If it gets to this point, the Seller is the owner of the item.

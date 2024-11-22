@@ -89,13 +89,20 @@ export const handler = async (event) => {
 
             const hashedPassword = await hashPassword(password);
             pool.query(insertQuery, [username, hashedPassword, accountType], async (insertError) => {
-                pool.end();
                 if (insertError) {
                     console.error('Insert query error:', insertError);
                     return reject(insertError);
                 }
                 const account = await getAccountByUsername(username, pool);
                 const token = await generateToken(account);
+
+                // Close the pool's connection
+                pool.end((err) => {
+                    if (err) {
+                        console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+                    }
+                });
+
                 return resolve({
                     statusCode: 200,
                     body: {

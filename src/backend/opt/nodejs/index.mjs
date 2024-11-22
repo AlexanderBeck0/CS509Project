@@ -163,6 +163,7 @@ export async function generateToken(account) {
 
 
 /**
+ * @deprecated Use {@link verifyToken} instead
  * @param {string} token The token to get the username from.
  * @returns {Promise<string | undefined>} The username from `token`, or `undefined` if the username is not proper.
  * @example
@@ -187,6 +188,7 @@ export async function getUsernameFromToken(token) {
 }
 
 /**
+ * @deprecated Use {@link verifyToken} instead
  * @param {string} token The token to get the accountType from.
  * @returns {Promise<string | undefined>} The accountType from `token`, or `undefined` if the token is invalid.
  * @example
@@ -214,6 +216,7 @@ export async function getAccountTypeFromToken(token) {
  * Verifies the authenticity of a given JWT (jsonwebtoken)
  * @param {string} token The token to verify.
  * @returns {Promise<{username: string | null, accountType: ("Seller" | "Buyer" | "Admin") | null}>} A Promise of the validitity of `Token`
+ * @throws {TokenExpiredError} A {@link jwt.TokenExpiredError TokenExpiredError} if the token is expired. See example for an example of how to handle this.
  * @example
  * ```JS
  * // Synchronous
@@ -253,6 +256,7 @@ export async function getAccountTypeFromToken(token) {
  */
 export async function verifyToken(token) {
     return new Promise((resolve, reject) => {
+        if (token === undefined || token === null) return reject(new jwt.TokenExpiredError());
         return jwt.verify(token, JWT_KEY, (err, decoded) => {
             if (err) {
                 // Ensure that TokenExpiredError does not reject but rather resolves false
@@ -403,7 +407,7 @@ export async function getItemFromID(id, pool, username = undefined) {
         // Return undefined if the item was not found
         if (foundItem === undefined) {
             console.log("No item found");
-            return resolve(undefined);
+            return reject("Item with this ID not found!");
         }
 
         // Check if item is active
@@ -411,21 +415,25 @@ export async function getItemFromID(id, pool, username = undefined) {
         console.log(foundItem)
 
         if (accountType === "Admin") {
+            console.log("Admin attempted to view item.");
             return reject("Admins cannot view items.");
         }
         // Check if user has permissions to get the bids
         if (username === undefined && !isActive) {
             // No permission to view item.
+            console.log("Customer attempted to view an inactive item.");
             return reject("Customers cannot view items that are not active.");
         }
 
         if (foundItem.archived && accountType === undefined) {
             // Item has been archived. Pretend it doesn't exist.
+            console.log("Customer attempted to view an archived item.");
             return reject("Customers cannot view archived items.");
         }
 
         if (accountType === "Seller" && foundItem['seller_username'] !== username) {
             // Sellers are only allowed to access their own items
+            console.log(`Seller '${username}' attempted to view ${foundItem['seller_username']}'s item.`);
             return reject("Permission denied. This is not your item.");
         }
 
@@ -476,6 +484,7 @@ export async function getItemFromID(id, pool, username = undefined) {
         const inBuffer = withinBuyerBuffer();
         if (accountType === "Buyer" && (!inBuffer || (inBuffer && !BUYER_VIEWABLE_ITEM_STATUSES.includes(foundItem.status)))) {
             // Not an item within the buyer buffer period
+            console.log("Buyer attemped to view an item that is more than " + BUYER_BUFFER_IN_HOURS + " hours completed.");
             return reject("Permission denied. It has been more than " + BUYER_BUFFER_IN_HOURS + " hours since this item has been completed.");
         }
 

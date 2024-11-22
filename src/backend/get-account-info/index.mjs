@@ -3,9 +3,11 @@ import { createPool, getAccountByUsername, verifyToken } from "../opt/nodejs/ind
 /**
  * 
  * @param {{token: string}} event The account to get the information from
- * @returns 
  */
 export const handler = async (event) => {
+  /**
+   * @type {mysql.Pool}
+   */
   let pool;
 
   try {
@@ -19,7 +21,7 @@ export const handler = async (event) => {
 
   try {
     const { username } = await verifyToken(event.token).catch(error => {
-      if (error instanceof Error && error.name === "TokenExpiredError") {
+      if (error?.name === "TokenExpiredError") {
         return {
           statusCode: 400,
           error: "Your token has expired. Please log in again."
@@ -41,7 +43,11 @@ export const handler = async (event) => {
     };
   }
   finally {
-    pool.end();
+    pool.end((err) => {
+      if (err) {
+        console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+      }
+    });
   }
   return response;
 };
