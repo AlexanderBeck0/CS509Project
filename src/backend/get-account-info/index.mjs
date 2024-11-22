@@ -5,6 +5,14 @@ import { createPool, getAccountByUsername, verifyToken } from "../opt/nodejs/ind
  * @param {{token: string}} event The account to get the information from
  */
 export const handler = async (event) => {
+
+  if (!event.token) {
+    return {
+      statusCode: 200,
+      account: undefined
+    }
+  }
+
   /**
    * @type {mysql.Pool}
    */

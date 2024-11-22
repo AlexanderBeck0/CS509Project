@@ -1,5 +1,6 @@
-import { Account, AccountType } from '@/utils/types';
+import type { Account, AccountType } from '@/utils/types';
 import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import AdminPage from './AdminPage';
 import BuyerPage from './BuyerPage';
 import SellerPage from './SellerPage';
@@ -18,11 +19,12 @@ export default function AccountPage(props: AccountPageProps) {
             const payload = {
                 token: localStorage.getItem('token'),
             };
+            if (!payload.token) return;
             try {
                 const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo', {
-                        method: 'POST',
-                        body: JSON.stringify(payload),
-                    });
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                });
 
                 const resultData: { statusCode: 200, account: Account } | { statusCode: 400, error: string } = await response.json();
                 if (resultData.statusCode !== 200) {
@@ -85,13 +87,11 @@ export default function AccountPage(props: AccountPageProps) {
         );
     } else if (props.accountType === "Admin") {
         return (
-            <AdminPage logout={props.logout} />
+            (accountInfo && <AdminPage logout={props.logout} />)
         );
     } else {
         return (
-            <div>
-                account page
-            </div>
-        );
+            <Navigate to="/" />
+        )
     }
 }

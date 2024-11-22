@@ -153,16 +153,18 @@ export default function AdminPage(props: AccountPageProps) {
         if (!Array.isArray(jsonData)) {
             return (
                 <table className={`border border-black border-collapse max-w-2xl w-full mx-auto`}>
-                    {
-                        Object.entries(jsonData).map(([key, value], index) => {
-                            return (
-                                <tr key={index}>
-                                    <th className="p-1 text-left border-b border-b-zinc-300 whitespace-nowrap">{key}</th>
-                                    <td className="text-left border-b border-b-zinc-300 whitespace-nowrap">{String(value)}</td>
-                                </tr>
-                            )
-                        })
-                    }
+                    <tbody>
+                        {
+                            Object.entries(jsonData).map(([key, value], index) => {
+                                return (
+                                    <tr key={index}>
+                                        <th className="p-1 text-left border-b border-b-zinc-300 whitespace-nowrap">{key}</th>
+                                        <td className="text-left border-b border-b-zinc-300 whitespace-nowrap">{String(value)}</td>
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
                 </table>
             )
         }

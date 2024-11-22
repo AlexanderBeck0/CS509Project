@@ -1,9 +1,9 @@
 'use client';
-import { AccountType } from '@/utils/types';
+import type { AccountType } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from "react";
 import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
-import { AccountPage, AddItemPage, HomePage, LoginPage, RegisterPage, SearchBar, SortDropdown, RecentlySold } from './components/';
+import { AccountPage, AddItemPage, HomePage, LoginPage, RecentlySold, RegisterPage, SearchBar, SortDropdown } from './components/';
 import { EditItemPage, ItemPage } from './components/ItemPage';
 
 function AppContent() {
@@ -18,7 +18,7 @@ function AppContent() {
   useEffect(() => {
     const verifyToken = async () => {
       if (token === undefined || token === null) {
-        setIsLoggedIn(false);
+        logout();
         return;
       }
 
@@ -89,10 +89,10 @@ function AppContent() {
             </div>
           </>
         }
-        {accountType === "Seller" && 
+        {accountType === "Seller" &&
           <Link to="/"><button className="HomeButton h-full flex items-center" onClick={() => logout()}>Logout</button></Link>
         }
-        <Link to="/login">
+        <Link to={isLoggedIn ? "/account" : "/login"}>
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
             <Image src="/accountSymbol.png" height={40} width={40} alt="Account" />
           </button>
@@ -106,7 +106,7 @@ function AppContent() {
           <Route path="/createAccount" element={!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to="/account" />} />
           <Route path="/account" element={isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to="/" />} />
           <Route path="/item/:id" element={<ItemPage accountType={accountType} token={token} />} />
-          <Route path="/edit/:id" element={isLoggedIn && accountType === "Seller" && <EditItemPage accountType={accountType} token={token} />} />
+          <Route path="/edit/:id" element={isLoggedIn && accountType === "Seller" ? <EditItemPage accountType={accountType} token={token} /> : <Navigate to="/" />} />
         </Routes>
       </div>
     </main>
