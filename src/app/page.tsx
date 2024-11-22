@@ -75,16 +75,23 @@ function AppContent() {
   return (
     <main className="main-container">
       <div className="heading">
-        <Link to="/"><button className="HomeButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>Auction House</button></Link>
-        {accountType !== "Seller" && <div className="search">
-          <SearchBar setSearchInput={setSearchInput} />
-          <div style={{ display: "flex", flexDirection: "column"}}>
-            {accountType === "Buyer" && (
-              <RecentlySold setRecentlySold={setRecentlySold} recentlySold={recentlySold}/>
-            )}
-            <SortDropdown setSortBy={setSortBy} />
-          </div>
-        </div>}
+        {accountType !== "Seller" &&
+          <>
+            <Link to="/"><button className="HomeButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>Auction House</button></Link>
+            <div className="search">
+              <SearchBar setSearchInput={setSearchInput} />
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {accountType === "Buyer" && (
+                  <RecentlySold setRecentlySold={setRecentlySold} recentlySold={recentlySold} />
+                )}
+                <SortDropdown setSortBy={setSortBy} />
+              </div>
+            </div>
+          </>
+        }
+        {accountType === "Seller" && 
+          <button className="HomeButton h-full flex items-center" onClick={() => logout()}>Logout</button>
+        }
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
             <Image src="/accountSymbol.png" height={40} width={40} alt="Account" />
@@ -93,12 +100,12 @@ function AppContent() {
       </div>
       <div className="content">
         <Routes>
-          <Route path="/" element={accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} recentlySold={accountType === "Buyer" ? recentlySold : false}/> : <Navigate to={"/account"} />} />
+          <Route path="/" element={accountType !== "Seller" ? <HomePage searchInput={searchInput} sortBy={sortBy} recentlySold={accountType === "Buyer" ? recentlySold : false} /> : <Navigate to={"/account"} />} />
           <Route path="/addItem" element={isLoggedIn && token ? <AddItemPage /> : <Navigate to="/account" />} />
           <Route path="/login" element={!isLoggedIn ? <LoginPage onLogin={onLogin} /> : <Navigate to="/account" />} />
           <Route path="/createAccount" element={!isLoggedIn ? <RegisterPage onRegister={onRegister} /> : <Navigate to="/account" />} />
           <Route path="/account" element={isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to="/" />} />
-          <Route path="/item/:id" element={<ItemPage accountType={accountType} token={token} />} /> 
+          <Route path="/item/:id" element={<ItemPage accountType={accountType} token={token} />} />
           <Route path="/edit/:id" element={isLoggedIn && accountType === "Seller" && <EditItemPage accountType={accountType} token={token} />} />
         </Routes>
       </div>
