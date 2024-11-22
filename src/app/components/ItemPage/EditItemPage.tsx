@@ -180,7 +180,7 @@ export default function ItemPage(props: ItemPageProps) {
             const data = await response.json();
             if (data.statusCode === 200) {
                 setItem(data.item);
-                setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
+                setBids(data.item?.bids ? data.item.bids : []);
                 setPublished(data.item.status === 'Active');
                 setForSale(data.item.forSale === 1);
                 setArchived(data.item.archived === 1);

@@ -281,7 +281,7 @@ export async function verifyToken(token) {
  * Gets an item from its id. Does not do any checks.
  * @param {number} id The item id.
  * @param {mysql.Pool} pool The pool to get the item with.
- * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string, bids: {id: number, bid: number, timeOfBid: Date | string, buyer_username: string} | []} | undefined>} The item, or `undefined` if it is not found.
+ * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string, bids: [{id: number, bid: number, timeOfBid: Date | string, buyer_username: string}] | []} | undefined>} The item, or `undefined` if it is not found.
  * @throws {TypeError} Throws a {@link TypeError} when the ID is less than 0 or is not a number.
  * @throws {TypeError} Throws a {@link TypeError} when username is not a valid username.
  * @throws {TypeError} Throws a {@link TypeError} when the pool is invalid.
@@ -346,7 +346,7 @@ function _getItemFromIDNoChecks(id, pool) {
  * @param {number} id The item's id.
  * @param {mysql.Pool} pool The current pool connection.
  * @param {string | undefined} [username=undefined] The username requesting the item. The resulting item will change depending on the account type. Defaults to `undefined`.
- * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string} | {id: number, name: string, description: string, image: string, price: number, startDate: Date | string, endDate?: Date | string, forSale: boolean} | undefined>} The item. Will reject if the user does not have sufficient permission.
+ * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string, bids: [{id: number, bid: number, timeOfBid: Date | string, buyer_username: string}] | []} | {id: number, name: string, description: string, image: string, price: number, startDate: Date | string, endDate?: Date | string, forSale: boolean} | undefined>} The item. Will reject if the user does not have sufficient permission.
  * @throws {TypeError} Throws a {@link TypeError} when the ID is less than 0 or is not a number.
  * @throws {TypeError} Throws a {@link TypeError} when username is not a valid username.
  * @throws {TypeError} Throws a {@link TypeError} when the pool is invalid.
@@ -478,6 +478,21 @@ export async function getItemFromID(id, pool, username = undefined) {
             // If the difference is smaller than the buffer, it has been over BUYER_BUFFER_IN_HOURS ms.
             // If the difference is greater than the buffer, it either A) is over and within the buffer or B has not reached the end date.
             return difference >= -BUFFER_IN_MS;
+        }
+
+        foundItem.bids = JSON.parse(foundItem.bids);
+
+        // Allow Buyers who have won to see this item
+        if (accountType === "Buyer" && (foundItem.status === "Completed" || foundItem.status === "Fulfilled")) {
+            // Since the status is Completed or fulfilled, there must be at least 1 bid
+
+            // A copy of the bids
+            const sortedBids = foundItem.bids.map(a => a);
+
+            // Sort the bids in-place in descending order (last bid is first index)
+            sortedBids.sort((a, b) => b.timeOfBid - a.timeOfBid);
+
+            if (sortedBids[0].buyer_username === username) return resolve(foundItem);
         }
 
         // At this point there is only Buyer and Seller

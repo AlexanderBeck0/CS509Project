@@ -29,7 +29,7 @@ export default function ItemPage(props: ItemPageProps) {
                 if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
                     setItem(data.item);
-                    setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
+                    setBids(data.item?.bids ? data.item.bids : []);
                 }
             }).catch(error => {
                 // Log actual errors and not just insufficient permission errors

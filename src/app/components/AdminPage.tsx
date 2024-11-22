@@ -38,13 +38,16 @@ export default function AdminPage(props: AccountPageProps) {
         { name: "Delete Item", query: "DELETE FROM Item WHERE id = ___" },
         { name: "Publish Item", query: "UPDATE Item SET status = 'Active' WHERE id = ___" },
         { name: "Unpublish Item", query: "UPDATE Item SET status = 'Inactive' WHERE id = ___" },
-        { name: "Create Item", query: "INSERT IGNORE INTO Item (id, name, description, image, initialPrice, price, startDate, endDate, archived, status, seller_username, forSale) VALUES (null, '___', '___', '___', ___, ___, '___', '___', ___, '___', '___', ___)" },
-        { name: "Edit Item", query: "UPDATE Item SET name = '___', description = '___', image = '___', initialPrice = ___, price = ___, startDate = '___', endDate = '___', archived = ___, forSale = ___ WHERE id = ___" },
+        { name: "Create Item", query: "INSERT IGNORE INTO Item (id, name, description, image, initialPrice, price, startDate, endDate, archived, status, seller_username, forSale) VALUES (null, '___', '___', '___', ___, ___, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR), ___, '___', '___', ___)" },
+        { name: "Edit Item", query: "UPDATE Item SET name = '___', description = '___', image = '___', initialPrice = ___, price = ___, startDate = NOW(), endDate = '___', archived = ___, forSale = ___ WHERE id = ___" },
         { name: "Find Bid (Bid id)", query: "SELECT * FROM Bid WHERE id = ___" },
         { name: "Find Bids (Item id)", query: "SELECT Bid.* FROM Bid LEFT JOIN Item ON Bid.item_id = Item.id WHERE Bid.item_id = ___" },
         { name: "Find Bids (Seller username)", query: "SELECT Bid.* FROM Bid LEFT JOIN Item ON Bid.item_id = Item.id WHERE Item.seller_username = '___'" },
         { name: "Find Bids (Buyer username)", query: "SELECT * FROM Bid WHERE buyer_username = '___'" },
+        { name: "Create Bid", query: "INSERT IGNORE INTO Bid (id, bid, timeOfBid, buyer_username, item_id) VALUES (null, ___, NOW(), '___', ___)" },
+        { name: "Edit Bid", query: "UPDATE Bid SET bid = ___ WHERE id = ___" },
         { name: "Delete Bid", query: "DELETE FROM Bid WHERE id = ___" },
+        { name: "Subtract 1 Day From EndDate", query: "UPDATE Item SET endDate = DATE_ADD(NOW(), INTERVAL -1 DAY) WHERE id = ___" },
     ]
     // #endregion
     // #region view-db
