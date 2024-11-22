@@ -90,7 +90,7 @@ function AppContent() {
           </>
         }
         {accountType === "Seller" && 
-          <button className="HomeButton h-full flex items-center" onClick={() => logout()}>Logout</button>
+          <Link to="/"><button className="HomeButton h-full flex items-center" onClick={() => logout()}>Logout</button></Link>
         }
         <Link to="/login">
           <button className="AccountButton" style={{ height: "100%", display: "flex", alignItems: "center" }}>
