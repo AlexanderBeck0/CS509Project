@@ -224,52 +224,62 @@ export default function ItemPage(props: ItemPageProps) {
         });
     }
 
-    async function handlePublishClick(): Promise<string> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (item?.status === "Frozen") {
-                    alert("NOT YET IMPLEMENTED; FROZEN ITEMS CANNOT BE UNPUBLISHED");
-                    reject("Frozen items cannot be unpublished");
-                } else if (item?.status === 'Active') {
-                    await unpublish(Number(id));
-                    resolve("Item unpublished successfully");
-                } else if (item?.status === 'Inactive') {
-                    await publish(Number(id), forSale);
-                    setPublished(true);
-                    resolve("Item published successfully");
-                }
-            } catch (error) {
-                setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                reject(error);
+    function handlePublishClick(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            if (item?.status === "Frozen") {
+                alert("NOT YET IMPLEMENTED; FROZEN ITEMS CANNOT BE UNPUBLISHED");
+                reject("Frozen items cannot be unpublished");
+            } else if (item?.status === 'Active') {
+                unpublish(Number(id))
+                    .then(() => {
+                        resolve("Item unpublished successfully");
+                    })
+                    .catch((error) => {
+                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                        reject(error);
+                    });
+            } else if (item?.status === 'Inactive') {
+                publish(Number(id), forSale)
+                    .then(() => {
+                        setPublished(true);
+                        resolve("Item published successfully");
+                    })
+                    .catch((error) => {
+                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                        reject(error);
+                    });
             }
         });
     }
 
-    async function handleArchiveClick(): Promise<string> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (item?.status === 'Inactive') {
-                    await archive(Number(id));
-                    setArchived(true);
-                    resolve("Item archived successfully");
-                }
-            } catch (error) {
-                setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                reject(error);
+    function handleArchiveClick(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            if (item?.status === 'Inactive') {
+                archive(Number(id))
+                    .then(() => {
+                        setArchived(true);
+                        resolve("Item archived successfully");
+                    })
+                    .catch((error) => {
+                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                        reject(error);
+                    });
             }
         });
     }
 
-    async function handleRemoveClick(): Promise<string> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (item?.status === 'Inactive') {
-                    await remove(Number(id));
-                    resolve("Item removed successfully");
-                }
-            } catch (error) {
-                setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                reject(error);
+    function handleRemoveClick(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (item?.status === 'Inactive') {
+                remove(Number(id))
+                    .then(() => {
+                        navigate('/account');
+                        resolve();
+                    })
+                    .catch((error) => {
+                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                        reject(error);
+                    });
             }
         });
     }
