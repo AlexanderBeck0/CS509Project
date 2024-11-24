@@ -18,7 +18,7 @@ export default function ItemPage(props: ItemPageProps) {
     useEffect(() => {
         const fetchItem = async () => {
             const payload = { id: id, token: props.token };
-
+            
             await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
                 method: "POST",
                 headers: {
@@ -29,13 +29,13 @@ export default function ItemPage(props: ItemPageProps) {
                 if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
                     setItem(data.item);
-                    setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
+                    setBids(data.item?.bids ? (data.item.bids) : []); // JSON.parse on bids was throwing an error
                 }
             }).catch(error => {
                 // Log actual errors and not just insufficient permission errors
                 if (error instanceof Error) console.error(error);
                 if (typeof error === 'string' && error.includes("jwt expired")) {
-                    setErrorMessage("Your token has expired. Please log in again.");
+                    setErrorMessage("Please log in to see this page.");
                     return;
                 }
                 setErrorMessage(error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error));
@@ -64,7 +64,7 @@ export default function ItemPage(props: ItemPageProps) {
                     {/* Middle Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <p><strong>Current Price:</strong> ${item.price}</p>
-                        {props.accountType !== null && <>
+                        {props.accountType !== null && !item.forSale && <> {/** if item for sale, no bids. !!!do we need to show bought by for seller */}
                             <h3>Bids:</h3>
                             {bids.length > 0 ? (
                                 <ul>
@@ -81,7 +81,7 @@ export default function ItemPage(props: ItemPageProps) {
                             props.accountType === "Seller" && <SellerItemPage status={item.status} item_id={item.id} />
                         }
                         {
-                            props.accountType === "Buyer" && <BuyerItemPage />
+                            props.accountType === "Buyer" && <BuyerItemPage status={item.status} item_id={item.id} itemForSale={item.forSale}/>
                         }
 
                     </div>
