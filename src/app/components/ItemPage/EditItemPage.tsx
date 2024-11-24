@@ -235,18 +235,17 @@ export default function ItemPage(props: ItemPageProps) {
                         resolve("Item unpublished successfully");
                     })
                     .catch((error) => {
-                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                        reject(error);
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
                     });
             } else if (item?.status === 'Inactive') {
                 publish(Number(id), forSale)
                     .then(() => {
-                        setPublished(true);
                         resolve("Item published successfully");
                     })
                     .catch((error) => {
-                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                        reject(error);
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
                     });
             }
         });
@@ -257,12 +256,11 @@ export default function ItemPage(props: ItemPageProps) {
             if (item?.status === 'Inactive') {
                 archive(Number(id))
                     .then(() => {
-                        setArchived(true);
                         resolve("Item archived successfully");
                     })
                     .catch((error) => {
-                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                        reject(error);
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
                     });
             }
         });
@@ -277,8 +275,8 @@ export default function ItemPage(props: ItemPageProps) {
                         resolve();
                     })
                     .catch((error) => {
-                        setErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                        reject(error);
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
                     });
             }
         });
