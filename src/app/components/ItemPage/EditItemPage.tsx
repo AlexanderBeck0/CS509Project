@@ -193,8 +193,11 @@ export default function ItemPage(props: ItemPageProps) {
         Object.entries(changes).forEach(([key, value]) => {
             // console.log(new Date(value))
             if (key in newItem) {
-                // Convert date to ISO format
-                if (isDate(value)) {
+                if (!isNaN(Number.parseInt(value))) {
+                    // Make sure that numbers are not treated as dates
+                    value = Number.parseInt(value)
+                } else if (isDate(value)) {
+                    // Convert date to ISO format
                     value = new Date(value).toISOString().slice(0, -8)
                 }
                 newItem[key as keyof Item] = value;
