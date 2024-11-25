@@ -70,7 +70,7 @@ export default function ItemPage(props: ItemPageProps) {
                             {bids.length > 0 ? (
                                 <ul>
                                     {bids.map((bid, index) => (
-                                        <li key={index}>${bid.bid} by {bid.buyer_username}</li>
+                                        <li key={index}>${bid.bid} by {bid.buyer_username} on {typeof bid.timeOfBid === "string" ? new Date(bid.timeOfBid).toLocaleString() : bid.timeOfBid.toLocaleString()}</li>
                                     ))}
                                 </ul>
                             ) : (
