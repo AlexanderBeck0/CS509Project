@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BuyerItemPage from './BuyerItemPage';
 import SellerItemPage from './SellerItemPage';
+import TimeDisplay from '../TimeDisplay';
 
 interface ItemPageProps {
     accountType: AccountType | null;
@@ -57,8 +58,7 @@ export default function ItemPage(props: ItemPageProps) {
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
                         </picture>
                         <p><strong>Description: </strong> {item.description}</p>
-                        <p><strong>Start Date: </strong> {new Date(item.startDate).toLocaleDateString()}</p>
-                        <p><strong>End Date: </strong> {item?.endDate ? new Date(item.endDate).toLocaleDateString() : 'No end date available'}</p>
+                        <TimeDisplay startDate={item.startDate} endDate={item.endDate} />
                     </div>
 
                     {/* Middle Container */}

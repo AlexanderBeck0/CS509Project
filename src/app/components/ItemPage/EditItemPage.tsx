@@ -2,6 +2,7 @@ import type { AccountType, Bid, Item } from '@/utils/types';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditItemForm from './EditItemForm';
+import TimeDisplay from '../TimeDisplay';
 
 interface ItemPageProps {
     accountType: AccountType | null;
@@ -295,8 +296,7 @@ export default function ItemPage(props: ItemPageProps) {
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
                         </picture>
                         <p><strong>Description: </strong> {item.description}</p>
-                        <p><strong>Start Date: </strong> {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleString() : item.startDate.toLocaleString()}</p>
-                        <p><strong>End Date: </strong> {item?.endDate ? (typeof item.endDate === "string" ? new Date(item.endDate).toLocaleString() : item.endDate?.toLocaleString()) : 'No end date available'}</p>
+                        <TimeDisplay startDate={item.startDate} endDate={item.endDate}/>
                         <p><strong>Status: </strong> {item.status}</p>
                     </div>
 

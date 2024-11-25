@@ -1,5 +1,6 @@
 import { Item } from "@/utils/types";
 import { ReactNode } from "react";
+import TimeDisplay from "./TimeDisplay";
 
 interface ItemDisplayProps {
   item: Item,
@@ -18,17 +19,7 @@ export default function ItemDisplay(props: ItemDisplayProps) {
       <b className="text-xl p-1 text-wrap">{item.name} - ${item.price}</b>
       <p>{item.description} </p>
       <div className="flex flex-row">
-        <div className="flex row basis-2/3"> {/* dates */}
-          <p style={{ fontSize: "30px" }}>🕒</p>
-          <div className='dateContainer'>
-            <div className='dateLabel' style={{ width: "100%" }}>
-              {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleString() : item.startDate.toLocaleString()}
-            </div>
-            <div className='dateLabel' style={{ width: "100%" }}>
-              {(typeof item.endDate === "string" ? new Date(item.endDate).toLocaleString() : item.endDate?.toLocaleString()) || "No end date"}
-            </div>
-          </div>
-        </div>
+        <TimeDisplay startDate={item.startDate} endDate={item.endDate}/>
         <div className="flex flex-col">
           {item?.status && <p className="text-lg basis-1/3">{item.status}</p>}
           {!!item?.archived && <p className="text-lg basis-1/3">Archived</p>}
