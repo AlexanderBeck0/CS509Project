@@ -29,7 +29,11 @@ const JWT_KEY = `${process.env.WEB_TOKEN_KEY}`;
  *          // Your code here
  *      } finally {
  *          // Close the connection to the pool
- *          pool.end();
+ *          pool.end((err) => {
+ *              if (err) {
+ *                  console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+ *              }
+ *          });
  *      }
  * });
  * ```
@@ -69,7 +73,11 @@ export async function createPool() {
  *      console.error(error);
  *      // Handle error here
  * } finally {
- *      pool.end();
+ *      pool.end((err) => {
+ *          if (err) {
+ *              console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+ *          }
+ *      });
  * }
  * ```
  */
@@ -155,6 +163,7 @@ export async function generateToken(account) {
 
 
 /**
+ * @deprecated Use {@link verifyToken} instead
  * @param {string} token The token to get the username from.
  * @returns {Promise<string | undefined>} The username from `token`, or `undefined` if the username is not proper.
  * @example
@@ -179,6 +188,7 @@ export async function getUsernameFromToken(token) {
 }
 
 /**
+ * @deprecated Use {@link verifyToken} instead
  * @param {string} token The token to get the accountType from.
  * @returns {Promise<string | undefined>} The accountType from `token`, or `undefined` if the token is invalid.
  * @example
@@ -206,6 +216,7 @@ export async function getAccountTypeFromToken(token) {
  * Verifies the authenticity of a given JWT (jsonwebtoken)
  * @param {string} token The token to verify.
  * @returns {Promise<{username: string | null, accountType: ("Seller" | "Buyer" | "Admin") | null}>} A Promise of the validitity of `Token`
+ * @throws {TokenExpiredError} A {@link jwt.TokenExpiredError TokenExpiredError} if the token is expired. See example for an example of how to handle this.
  * @example
  * ```JS
  * // Synchronous
@@ -229,9 +240,23 @@ export async function getAccountTypeFromToken(token) {
  *      });
  * });
  * ```
+ * @example
+ * ```JS
+ * // A usage example
+ * const { username } = await verifyToken(event.token).catch(error => {
+ *      if (error instanceof Error && error.name === "TokenExpiredError") {
+ *          return {
+ *              statusCode: 400,
+ *              error: "Your token has expired. Please log in again."
+ *          };
+ *      }
+ * });
+ * const account = await getAccountByUsername(username, pool);
+ * ```
  */
 export async function verifyToken(token) {
     return new Promise((resolve, reject) => {
+        if (token === undefined || token === null) return reject(new jwt.TokenExpiredError());
         return jwt.verify(token, JWT_KEY, (err, decoded) => {
             if (err) {
                 // Ensure that TokenExpiredError does not reject but rather resolves false
@@ -256,14 +281,14 @@ export async function verifyToken(token) {
  * Gets an item from its id. Does not do any checks.
  * @param {number} id The item id.
  * @param {mysql.Pool} pool The pool to get the item with.
- * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string, bids: {id: number, bid: number, timeOfBid: Date | string, buyer_username: string} | []} | undefined>} The item, or `undefined` if it is not found.
+ * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string, bids: [{id: number, bid: number, timeOfBid: Date | string, buyer_username: string}] | []} | undefined>} The item, or `undefined` if it is not found.
  * @throws {TypeError} Throws a {@link TypeError} when the ID is less than 0 or is not a number.
  * @throws {TypeError} Throws a {@link TypeError} when username is not a valid username.
  * @throws {TypeError} Throws a {@link TypeError} when the pool is invalid.
  */
 function _getItemFromIDNoChecks(id, pool) {
     // DO NOT EXPORT THIS FUNCTION  
-    if ((typeof id !== 'number' || id === NaN) && Number.parseInt(id) === NaN) throw new TypeError(`ID must be a number. Instead recieved " ${+id} of type ${typeof +id} (${id} of type ${typeof id})`);
+    if ((typeof id !== 'number' || isNaN(id)) && isNaN(Number.parseInt(id))) throw new TypeError(`ID must be a number. Instead recieved "${+id}" of type ${typeof +id} (${id} of type ${typeof id})`);
     if (+id < 0) throw new TypeError("ID must be greater than 0! Instead recieved " + id);
 
     // Validate pool
@@ -321,7 +346,7 @@ function _getItemFromIDNoChecks(id, pool) {
  * @param {number} id The item's id.
  * @param {mysql.Pool} pool The current pool connection.
  * @param {string | undefined} [username=undefined] The username requesting the item. The resulting item will change depending on the account type. Defaults to `undefined`.
- * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string} | {id: number, name: string, description: string, image: string, price: number, startDate: Date | string, endDate?: Date | string, forSale: boolean} | undefined>} The item. Will reject if the user does not have sufficient permission.
+ * @returns {Promise<{id: number, name: string, description?: string, image: string, initialPrice: number, price?: number, startDate: Date | string, endDate?: Date | string, archived: boolean, status: "Active" | "Inactive" | "Frozen" | "Requested" | "Failed" | "Completed" | "Fulfilled", forSale: boolean, seller_username: string, bids: [{id: number, bid: number, timeOfBid: Date | string, buyer_username: string}] | []} | {id: number, name: string, description: string, image: string, price: number, startDate: Date | string, endDate?: Date | string, forSale: boolean} | undefined>} The item. Will reject if the user does not have sufficient permission.
  * @throws {TypeError} Throws a {@link TypeError} when the ID is less than 0 or is not a number.
  * @throws {TypeError} Throws a {@link TypeError} when username is not a valid username.
  * @throws {TypeError} Throws a {@link TypeError} when the pool is invalid.
@@ -347,12 +372,16 @@ function _getItemFromIDNoChecks(id, pool) {
  *      // Handle error here
  * } finally {
  *      // Close the connection
- *      pool.end();
+ *      pool.end((err) => {
+ *          if (err) {
+ *              console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+ *          }
+ *      });
  * }
  * ```
  */
 export async function getItemFromID(id, pool, username = undefined) {
-    if ((typeof id !== 'number' || id === NaN) && Number.parseInt(id) === NaN) throw new TypeError(`ID must be a number. Instead recieved " ${+id} of type ${typeof +id} (${id} of type ${typeof id})`);
+    if ((typeof id !== 'number' || isNaN(id)) && isNaN(Number.parseInt(id))) throw new TypeError(`ID must be a number. Instead recieved "${+id}" of type ${typeof +id} (${id} of type ${typeof id})`);
     if (+id < 0) throw new TypeError("ID must be greater than 0! Instead recieved " + id);
 
     if (username !== undefined && typeof username !== 'string') {
@@ -378,7 +407,7 @@ export async function getItemFromID(id, pool, username = undefined) {
         // Return undefined if the item was not found
         if (foundItem === undefined) {
             console.log("No item found");
-            return resolve(undefined);
+            return reject("Item with this ID not found!");
         }
 
         // Check if item is active
@@ -386,21 +415,25 @@ export async function getItemFromID(id, pool, username = undefined) {
         console.log(foundItem)
 
         if (accountType === "Admin") {
+            console.log("Admin attempted to view item.");
             return reject("Admins cannot view items.");
         }
         // Check if user has permissions to get the bids
         if (username === undefined && !isActive) {
             // No permission to view item.
+            console.log("Customer attempted to view an inactive item.");
             return reject("Customers cannot view items that are not active.");
         }
 
         if (foundItem.archived && accountType === undefined) {
             // Item has been archived. Pretend it doesn't exist.
+            console.log("Customer attempted to view an archived item.");
             return reject("Customers cannot view archived items.");
         }
 
         if (accountType === "Seller" && foundItem['seller_username'] !== username) {
             // Sellers are only allowed to access their own items
+            console.log(`Seller '${username}' attempted to view ${foundItem['seller_username']}'s item.`);
             return reject("Permission denied. This is not your item.");
         }
 
@@ -447,10 +480,26 @@ export async function getItemFromID(id, pool, username = undefined) {
             return difference >= -BUFFER_IN_MS;
         }
 
+        foundItem.bids = JSON.parse(foundItem.bids);
+
+        // Allow Buyers who have won to see this item
+        if (accountType === "Buyer" && (foundItem.status === "Completed" || foundItem.status === "Fulfilled")) {
+            // Since the status is Completed or fulfilled, there must be at least 1 bid
+
+            // A copy of the bids
+            const sortedBids = foundItem.bids.map(a => a);
+
+            // Sort the bids in-place in descending order (last bid is first index)
+            sortedBids.sort((a, b) => b.timeOfBid - a.timeOfBid);
+
+            if (sortedBids[0].buyer_username === username) return resolve(foundItem);
+        }
+
         // At this point there is only Buyer and Seller
         const inBuffer = withinBuyerBuffer();
         if (accountType === "Buyer" && (!inBuffer || (inBuffer && !BUYER_VIEWABLE_ITEM_STATUSES.includes(foundItem.status)))) {
             // Not an item within the buyer buffer period
+            console.log("Buyer attemped to view an item that is more than " + BUYER_BUFFER_IN_HOURS + " hours completed.");
             return reject("Permission denied. It has been more than " + BUYER_BUFFER_IN_HOURS + " hours since this item has been completed.");
         }
 

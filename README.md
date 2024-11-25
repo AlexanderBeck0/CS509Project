@@ -27,6 +27,24 @@ Here are the Use Cases we have completed for Iteration One:
 * [Customer: Sort Items](#sort-items)
 * [Customer: View Items](#view-items)
 
+## Iteration Two Use Cases
+
+Here are the Use Cases we have completed for Iteration Two:
+
+* [Seller: Edit Item](#edit-item)
+* [Seller: Publish Item](#publish-item)
+* [Seller: Unpublish Item](#unpublish-item)
+* [Seller: Fulfill Item](#fulfill-item)
+* [Seller: Remove Inactive Item](#remove-inactive-item)
+* [Buyer: Search Recently Sold](#search-recently-sold)
+* [Buyer: Sort Recently Sold](#sort-recently-sold)
+* [Buyer: View Item](#view-item)
+* [Buyer: Review Active Bids](#review-active-bids)
+* [Buyer: Place Bid](#place-bid)
+* [Buyer: Purchase Item (For Sale use case)](#purchase-item)
+* [Admin: Freeze Item](#freeze-item)
+* [Admin: Unfreeze Item](#unfreeze-item)
+
 ## Project Details
 
 The Auction House consists of three main actors: [Seller](#seller), [Buyer](#buyer), and [Customer](#customer). Additionally, there is a fourth actor, [Admin](#admin), which controls the freezing and unfreezing of items and managing the Auction House itself.
@@ -103,6 +121,7 @@ A Buyer is the only actor able to place bids on an item. A Buyer can...
 * [Sort Recently Sold](#sort-recently-sold)
 * [View Item](#view-item)
 * [Place Bid](#place-bid)
+* [Purchase Item](#purchase-item)
 * [Review Active Bids](#review-active-bids)
 * [Review Purchases](#review-purchases)
 
@@ -124,17 +143,31 @@ A buyer can add funds to their account on their account page. They can add a pos
 
 #### Search Recently Sold
 
+A buyer can search for items that were recently sold (within 24 hours). A sold item is one that has been fulfilled.
+
 #### Sort Recently Sold
+
+A buyer can sort the items that were recently sold based on criteria. Such criteria include name, price, and time sold.
 
 #### View Item
 
+A buyer can view an item with more information than a Customer. The buyer will see all bid information for the item. The item is viewable until 24 hours has passed since the item was sold.
+
 #### Place Bid
+
+A buyer can place a bid on an item that is active. The buyer must specify the bid amount, in whole positive numbers. The buyer must have enough funds within their account to place the bid. The funds will only be withdrawn from the buyer when the seller fulfills the item.
+
+#### Purchase Item
+
+After a seller places an item For Sale, it is able to be purchased by the buyer. It is a one time purchase, with the buyer needing the required amount of funds to purchase the item.
 
 #### Review Active Bids
 
+A buyer can review their own bids that are active.
+
 #### Review Purchases
 
-#### Request Unfreeze
+A buyer can review any purchases/bids that they have made in the past.
 
 ### Customer
 
@@ -162,8 +195,16 @@ As of iteration 1: Admin can also view the database data on their account page.
 
 #### Freeze Item
 
+An Admin can freeze items. Frozen items are unable to be bid on, and unless unfrozen, will fail. Sellers are able to request their frozen items be unfrozen.
+
 #### Unfreeze Item
+
+An Admin can unfreeze items. An unfrozen item will return to being Active, with all bids in place.
 
 #### Generate Auction Report
 
+An Admin can generate an auction report. The auction report includes the amount of funds that the auction house has.
+
 #### Generate Forensics Report
+
+An Admin can generate a forensics report. The forensics report includes all items that are completed but not fulfilled.

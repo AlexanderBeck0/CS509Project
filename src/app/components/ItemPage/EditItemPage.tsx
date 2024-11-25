@@ -1,82 +1,7 @@
 import type { AccountType, Bid, Item } from '@/utils/types';
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditItemForm from './EditItemForm';
-
-async function unpublish(id: number) {
-    try {
-        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/unpublishItem", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                token: localStorage.getItem("token"),
-                item_id: id
-            })
-        });
-
-        const data = await response.json();
-        // console.log(data)
-        if (data.error) {
-            console.error(data.error);
-            alert(`Error unpublishing item: ${data.error}`);
-            return;
-        }
-
-        return data;
-
-    } catch (error) {
-        console.error(error instanceof Error ? error.message : error);
-    }
-}
-
-async function archive(id: number) {
-    try {
-        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/archive", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                token: localStorage.getItem("token"),
-                item_id: id
-            })
-        });
-
-        const data = await response.json();
-        if (data.error) {
-            console.error(data.error);
-            alert(`Error archiving item: ${data.error}`);
-            return;
-        }
-        return data;
-
-    } catch (error) {
-        console.error(error instanceof Error ? error.message : error);
-    }
-}
-
-async function publish(id: number, forSale: boolean) {
-    try {
-        const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/publishItem", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                token: localStorage.getItem("token"),
-                item_id: id,
-                forSale: forSale
-            })
-        });
-
-        const data = await response.json();
-        if (data.error) {
-            console.error(data.error);
-            alert(`Error publishing item: ${data.error}`);
-            return;
-        }
-        return data;
-
-    } catch (error) {
-        console.error(error instanceof Error ? error.message : error);
-    }
-}
 
 interface ItemPageProps {
     accountType: AccountType | null;
@@ -88,41 +13,121 @@ export default function ItemPage(props: ItemPageProps) {
     const [item, setItem] = useState<Item | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
     const [forSale, setForSale] = useState(false);
-    const [published, setPublished] = useState<boolean | null>(null)
-    const [archived, setArchived] = useState<boolean | null>(null)
+    const [published, setPublished] = useState<boolean | null>(null);
+    const [archived, setArchived] = useState<boolean | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    /**
+     * Used when there is a fatal error that should prevent the page from being shown.
+     */
+    const [fatalErrorMessage, setFatalErrorMessage] = useState<string | null>(null);
+    const navigate = useNavigate()
 
     useEffect(() => {
+        // Ensure that if the item is archived, the Seller is taken to view item instead of edit
         if (archived) {
-            // TODO: Should go to view item since it is now archived and cannot be edited
-            console.log("TODO IMPLEMENT GO TO VIEW ITEM")
+            navigate(`/item/${id}`)
         }
-    }, [archived]);
+    }, [archived, id, navigate]);
 
+    const unpublish = useCallback(async (id: number): Promise<void> => {
+        const payload = { token: props.token, item_id: id };
+        try {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/unpublishItem", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload)
+            });
 
-    async function handlePublishClick() {
-        if (item?.status === "Frozen") alert("NOT YET IMPLEMENTED; FROZEN ITEMS CANNOT BE UNPUBLISHED");
-        if (item?.status === 'Active') {
-            const unpublishResults = await unpublish(item.id)
-            if (unpublishResults['statusCode'] === 200) {
-                setPublished(false)
+            const data = await response.json();
+
+            if (data.statusCode === 200) {
+                setPublished(false);
             }
-        } else if (item?.status === 'Inactive') {
-            const publishResults = await publish(item.id, forSale)
-            if (publishResults['statusCode'] === 200) {
-                setPublished(true)
+
+            if (data?.error !== undefined) {
+                if (data.error.includes("jwt expired")) {
+                    throw new Error("Your token has expired. Please log in again.");
+                }
+                setErrorMessage(data.error); // Non-fatal error handling
             }
+
+        } catch (error) {
+            setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
         }
+    }, [props.token]);
 
-    }
+    const archive = useCallback(async (id: number): Promise<void> => {
+        const payload = { token: props.token, item_id: id };
+        try {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/archive", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
 
-    async function handleArchiveClick() {
-        if (item?.status === 'Inactive') {
-            const archiveResults = await archive(item.id)
-            if (archiveResults['statusCode'] === 200) {
-                setArchived(true)
+            const data = await response.json();
+
+            if (data.statusCode === 200) {
+                setArchived(true);
             }
+
+            if (data?.error !== undefined) {
+                if (data.error.includes("jwt expired")) {
+                    throw new Error("Your token has expired. Please log in again.");
+                }
+                setErrorMessage(data.error); // Non-fatal error handling
+            }
+
+        } catch (error) {
+            setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
         }
-    }
+    }, [props.token]);
+
+    const publish = useCallback(async (id: number, forSale: boolean): Promise<void> => {
+        const payload = { token: props.token, item_id: id, forSale: forSale };
+        try {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/publishItem", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (data.error) {
+                if (data.error.includes("jwt expired")) {
+                    throw new Error("Your token has expired. Please log in again.");
+                }
+                setErrorMessage(data.error);
+            } else {
+                setPublished(true);
+            }
+        } catch (error) {
+            setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+        }
+    }, [props.token]);
+
+    const remove = useCallback(async (id: number): Promise<void> => {
+        const payload = { token: props.token, item_id: id };
+        try {
+            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/remove-item", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (data.error) {
+                if (data.error.includes("jwt expired")) {
+                    throw new Error("Your token has expired. Please log in again.");
+                }
+                setErrorMessage(data.error);
+            } else {
+                console.log("Successfully removed item!");
+            }
+        } catch (error) {
+            setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+        }
+    }, [props.token]);
 
     /**
      * Function to call when fetching an item.
@@ -141,17 +146,22 @@ export default function ItemPage(props: ItemPageProps) {
             const data = await response.json();
             if (data.statusCode === 200) {
                 setItem(data.item);
-                setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
+                setBids(data.item?.bids ? data.item.bids : []);
                 setPublished(data.item.status === 'Active');
                 setForSale(data.item.forSale === 1);
                 setArchived(data.item.archived === 1);
                 return;
             }
-            console.log(data);
-            if (data?.error !== undefined) alert(data.error);
+            if (data?.error !== undefined) {
+                if (data.error.includes("jwt expired")) {
+                    throw new Error("Your token has expired. Please log in again.");
+                }
+                setErrorMessage(data.error); // Non-fatal error handling
+            }
 
         } catch (error) {
-            console.error('Error fetching item:', error);
+            // Fatal error (not an expected error)
+            setFatalErrorMessage(typeof error === "string" ? error : error instanceof Error ? error.message : JSON.stringify(error));
         }
     }, [id, props.token]);
 
@@ -164,11 +174,28 @@ export default function ItemPage(props: ItemPageProps) {
         setArchived(item?.archived === true)
     }, [item]);
 
+    /**
+     * @param changes The changes to be made.
+     * @returns A string promise of the resulting message. Could be a success message, or an error message.
+     */
     async function handleEdit(changes: object): Promise<string> {
+        /**
+         * @param str The date string to check.
+         * @returns A boolean representing if str is a date string.
+         */
+        const isDate = (str: string): boolean => {
+            return !isNaN(new Date(str).getTime());
+        }
+
         // Create a new item that contains all the new changes
         const newItem: Partial<Item> = { ...item }!;
         Object.entries(changes).forEach(([key, value]) => {
+            // console.log(new Date(value))
             if (key in newItem) {
+                // Convert date to ISO format
+                if (isDate(value)) {
+                    value = new Date(value).toISOString().slice(0, -8)
+                }
                 newItem[key as keyof Item] = value;
             }
         });
@@ -197,10 +224,69 @@ export default function ItemPage(props: ItemPageProps) {
         });
     }
 
+    function handlePublishClick(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            if (item?.status === "Frozen") {
+                alert("NOT YET IMPLEMENTED; FROZEN ITEMS CANNOT BE UNPUBLISHED");
+                reject("Frozen items cannot be unpublished");
+            } else if (item?.status === 'Active') {
+                unpublish(Number(id))
+                    .then(() => {
+                        resolve("Item unpublished successfully");
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                    });
+            } else if (item?.status === 'Inactive') {
+                publish(Number(id), forSale)
+                    .then(() => {
+                        resolve("Item published successfully");
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                    });
+            }
+        });
+    }
+
+    function handleArchiveClick(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            if (item?.status === 'Inactive') {
+                archive(Number(id))
+                    .then(() => {
+                        resolve("Item archived successfully");
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                    });
+            }
+        });
+    }
+
+    function handleRemoveClick(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (item?.status === 'Inactive') {
+                remove(Number(id))
+                    .then(() => {
+                        navigate('/account');
+                        resolve();
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+                    });
+            }
+        });
+    }
 
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
-            {item ? (
+            {/* Would probably be better to use an ErrorBoundary but I do not have the time to look into it */}
+            {!!fatalErrorMessage && <p className="text-lg">{fatalErrorMessage}</p>}
+            {!!!fatalErrorMessage && (item ? (
                 <>
                     {/* Left Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -209,8 +295,8 @@ export default function ItemPage(props: ItemPageProps) {
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
                         </picture>
                         <p><strong>Description: </strong> {item.description}</p>
-                        <p><strong>Start Date: </strong> {new Date(item.startDate).toLocaleDateString()}</p>
-                        <p><strong>End Date: </strong> {item?.endDate ? new Date(item.endDate).toLocaleDateString() : 'No end date available'}</p>
+                        <p><strong>Start Date: </strong> {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleString() : item.startDate.toLocaleString()}</p>
+                        <p><strong>End Date: </strong> {item?.endDate ? (typeof item.endDate === "string" ? new Date(item.endDate).toLocaleString() : item.endDate?.toLocaleString()) : 'No end date available'}</p>
                         <p><strong>Status: </strong> {item.status}</p>
                     </div>
 
@@ -261,7 +347,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </button>
                         {!published &&
                             <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
-                                onClick={() => alert("Not yet implemented")}>Remove Item</button>}
+                                onClick={handleRemoveClick}>Remove Item</button>}
 
                         {/* archive item */}
                         {!archived && !published && (
@@ -272,12 +358,12 @@ export default function ItemPage(props: ItemPageProps) {
                                 Archive
                             </button>
                         )}
-
+                        {!!errorMessage && <p className="text-sm">{errorMessage}</p>}
                     </div>
                 </>
             ) : (
                 <p>Loading...</p>
-            )}
+            ))}
         </div>
     );
 }

@@ -1,6 +1,6 @@
-import { Account, Buyer } from '@/utils/types';
+import { Account } from '@/utils/types';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface BuyerPageProps {
     userData: Account
@@ -10,7 +10,7 @@ interface BuyerPageProps {
 
 export default function BuyerPage(props: BuyerPageProps) {
     const fundsRef = useRef<HTMLInputElement | null>(null);
-    
+
     const [selectedOption, setSelectedOption] = useState("All");
 
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -103,8 +103,8 @@ export default function BuyerPage(props: BuyerPageProps) {
                     <div className='buttons'>
                         <input type="number" min={1} step={1} ref={fundsRef} placeholder="Funds #"
                             className="input"
-                        // The below line would make it not allow decimals, but it causes the cursor to move to the start
-                        onInput={(e) => (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, "")}
+                            // The below line would make it not allow decimals, but it causes the cursor to move to the start
+                            onInput={(e) => (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, "")}
                         ></input>
                         <button className="accountButton"
                             type="button" onClick={addFunds}>Add Funds</button>
