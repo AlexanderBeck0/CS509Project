@@ -113,7 +113,7 @@ export default function BuyerPage(props: BuyerPageProps) {
                     </div>
                 </div>
                 <div className='pageContentColumn' style={{ width: "60%", }}>
-                    <div className='flex row'>
+                    <div className='flex row' style={{ justifyContent: "space-between", alignItems: "center" }}>
                         <p><b>Items:</b></p>
                         <select value={selectedOption} onChange={handleSelectChange}>
                             <option value={"All"}>All</option> {/* what are the status options for buyer? */}
