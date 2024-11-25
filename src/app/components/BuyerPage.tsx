@@ -1,8 +1,8 @@
 import { Account, Bid, Item } from '@/utils/types';
 import Image from 'next/image';
-import { useRef, useState, useEffect } from 'react';
-import ItemDisplay from './ItemDisplay';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ItemDisplay from './ItemDisplay';
 
 interface BuyerPageProps {
   userData: Account;
@@ -14,7 +14,7 @@ export default function BuyerPage(props: BuyerPageProps) {
   const fundsRef = useRef<HTMLInputElement | null>(null);
   const [selectedOption, setSelectedOption] = useState("All");
   const [items, setItems] = useState<Item[]>([]);
-  const [bids, setBids] = useState<Bid[]>([]);
+  // const [bids, setBids] = useState<Bid[]>([]);
   const [funds, setFunds] = useState<number>(props.userData.balance);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -94,10 +94,10 @@ export default function BuyerPage(props: BuyerPageProps) {
         const data = await response.json();
         console.log(data);
         if (data.statusCode === 200 && data.body.bids) {
-          const mappedItems = data.body.bids.map((bid: any) => bid.item);
-          const mappedBids = data.body.bids.map((bid: any) => (bid.id, bid.bid, bid.timeOfBid, bid.item.id))
+          const mappedItems = data.body.bids.map((bid: { item: Item } & Bid) => bid.item);
+          // const mappedBids = data.body.bids.map((bid: Bid) => (bid.id, bid.bid, bid.timeOfBid, bid.item_id))
           setItems(mappedItems);
-          setBids(mappedBids);
+          // setBids(mappedBids);
         } else {
           console.error(data.error || "Failed to fetch active bids.");
         }
