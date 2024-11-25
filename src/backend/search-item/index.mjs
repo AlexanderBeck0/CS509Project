@@ -20,66 +20,74 @@ export const handler = async (event)  => {
     console.log("Sort by: "+sort);
     console.log("Order: "+order);
 
-    const isEmptyQuery = !query || query.trim() === "";
-    let isNumeric = isEmptyQuery ? false : !isNaN(query);
-    let isDate = /^\d{2}\/\d{2}\/\d{4}$/.test(query); 
     let formattedDate = null;
+    let priceRange = null;
+    const pricePattern = /\b(\d+)-(\d+)\b/;
+    const datePattern = /\b(\d{2}\/\d{2}\/\d{4})\b/;
+    
+    const priceMatch = query.match(pricePattern);
+    if (priceMatch) {
+      priceRange = {
+        minPrice: parseFloat(priceMatch[1]),
+        maxPrice: parseFloat(priceMatch[2])
+      };
+      query = query.replace(pricePattern, "").trim();
+    }
 
-    if (isDate) {
+    let dateMatch = query.match(datePattern);
+    if (dateMatch) {
+      const detectedDate = dateMatch[0];
+      query = query.replace(datePattern, "").trim();
       try {
-        const [month, day, year] = query.split('/');
+        const [month, day, year] = detectedDate.split('/');
         if (!isNaN(new Date(`${year}-${month}-${day}`).getTime())) {
           formattedDate = `${year}-${month}-${day}`;
         }
       } catch (err) {
-        console.error("Invalid date format: " + query);
+        console.error("Invalid date format: " + detectedDate);
       }
     }
-
+    console.log(priceRange);
     console.log(formattedDate);
+    console.log(query);
+
+    const isEmptyQuery = !query || query.trim() === "";
 
     query = `%${query}%`;
     return new Promise((resolve, reject) => {
       let sqlQuery = `
       SELECT * FROM Item
       `;
-      if(recentlySold) {
-        sqlQuery += `WHERE (status = 'Completed' OR status = 'Fulfilled')
-        AND (DATE(endDate) = CURDATE() - INTERVAL 1 DAY OR DATE(endDate) = CURDATE() - INTERVAL 2 DAY)
-        `;
-      } else {
-        sqlQuery += `WHERE status = 'Active'
-        `;
-      }
-      
+            
+      const conditions = [];
       const params = [];
 
-      if (!isEmptyQuery) {
-        sqlQuery += `
-          AND (
-            name LIKE ? OR 
-            description LIKE ?
-        `;
-        params.push(query, query);
-  
-        if (isNumeric) {
-          sqlQuery += ` OR price LIKE ?
-          `;
-          params.push(query);
-        }
-  
-        if (formattedDate) {
-          sqlQuery += ` OR DATE(startDate) = ? OR DATE(endDate) = ?
-          `;
-          params.push(formattedDate, formattedDate);
-        }
-  
-        sqlQuery += `)
-        `;
+      if (recentlySold) {
+        conditions.push(`(status = 'Completed' OR status = 'Fulfilled')`);
+        conditions.push(`endDate >= NOW() - INTERVAL 1 DAY AND endDate <= NOW()`);
+      } else {
+        conditions.push(`status = 'Active'`);
       }
-      sqlQuery += `ORDER BY ${sort} ${order}, startDate, endDate, price, name`;
 
-      console.log("Query: "+sqlQuery);
+      if (!isEmptyQuery) {
+        conditions.push(`(name LIKE ? OR description LIKE ?)`);
+        params.push(query, query);
+      }
+
+      if (priceRange) {
+        conditions.push(`price BETWEEN ? AND ?`);
+        params.push(priceRange.minPrice, priceRange.maxPrice);
+      }
+
+      if (formattedDate) {
+        conditions.push(`(DATE(startDate) = ? OR DATE(endDate) = ?)`);
+        params.push(formattedDate, formattedDate);
+      }
+
+      if (conditions.length > 0) {
+        sqlQuery += ` WHERE ` + conditions.join(' AND ');
+      }
+      console.log(sqlQuery);
       pool.query(sqlQuery, params, (error, rows) => {
         if (error) { console.log("DB error"); return reject(error); }
         return resolve(rows);

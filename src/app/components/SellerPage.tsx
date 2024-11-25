@@ -84,7 +84,6 @@ export default function SellerPage(props: SellerPageProps) {
 
     return (
         <div className='content'>
-            {/* need to handle account active/closed */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}> {/* heading of seller */}
                 <Image src="/accountSymbol.png" alt="Seller Account Symbol" width={100} height={100} style={{ objectFit: "contain", margin: "1rem" }} />
                 <b>{props.userData!.username}</b>
@@ -131,16 +130,6 @@ export default function SellerPage(props: SellerPageProps) {
                             )}
                         </div>
                     </div>
-                    {/*
-                    <div className="container" onWheel={handleScroll}>
-                        {/* Get sold Items }
-                            {Array.from({ length: 10 }, (_, index) => (
-                            <div className="scrollItem" key={index}>
-                            {index + 1}
-                            </div>
-                        ))}
-                    </div>
-                    */}
                 </div>
                 <div className='sellerContentColumn' style={{ width: "6%", justifyContent: "center", alignItems: "center" }}>
                     <Link to="/addItem"><button style={{ fontSize: "5vw", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
