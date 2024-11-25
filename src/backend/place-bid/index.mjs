@@ -117,7 +117,7 @@ export const handler = async (event) => {
     if (item.forSale) {
       // Handle forSale items
       if (account.balance < item.price + totalBidCost) {
-        response = { statusCode: 400, error: "Insufficient balance to purchase this item!" }
+        return { statusCode: 400, error: "Insufficient balance to purchase this item!" }
       }
 
       // account.balance >= item.price + totalBidCost
@@ -135,12 +135,12 @@ export const handler = async (event) => {
 
     // Handle bids
     if (account.balance < item.price + totalBidCost) {
-      response = { statusCode: 400, error: "Insufficient balance to bid on this item!" }
+      return { statusCode: 400, error: "Insufficient balance to bid on this item!" }
     }
 
     // account.balance >= item.price + totalBidCost
     if (event.bid < item.price || (item.initialPrice !== item.price && event.bid <= item.price)) {
-      response = { statusCode: 400, error: "Must increase the bid on the item!" }
+      return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
     // event.bid > item.price
@@ -149,8 +149,6 @@ export const handler = async (event) => {
     });
 
     response = response || { statusCode: 200, response: "Item bid on" };
-
-
   } catch (error) {
     console.error("Error:", error.message);
     response = { statusCode: 500, error: error.message };
