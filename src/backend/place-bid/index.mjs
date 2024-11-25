@@ -18,17 +18,24 @@ export const handler = async (event) => {
     return new Promise((resolve, reject) => {
       let sqlQuery = `
         INSERT INTO Bid
-        VALUES (null, ?, null, ?, ?)
+        VALUES (null, ?, NOW(), ?, ?)
       `;
       console.log("Query: "+sqlQuery);
       pool.query(sqlQuery, [bid, username, id], (error, rows) => {
-        if (error) { console.log("DB error"); return reject(error); }
-        sqlQuery = `UPDATE Item SET price = ? WHERE id = ?`
-        pool.query(sqlQuery, [(bid+1), id], (error, rows) => {
-          if (error) { console.log("DB error"); return reject(error); }
+        if (error) {
+          console.log("DB error");
+          return reject(error);
+        }
+  
+        let updateQuery = `UPDATE Item SET price = ? WHERE id = ?`;
+        console.log(updateQuery);
+        pool.query(updateQuery, [(bid + 1), id], (error, rows) => {
+          if (error) {
+            console.log("DB error");
+            return reject(error);
+          }
           return resolve(rows);
         });
-        return resolve(rows);
       });
     });
   }
@@ -66,11 +73,13 @@ export const handler = async (event) => {
 
   let response = undefined;
   try {
+    
     let username = undefined;
     if (event.token) {
       const token = await verifyToken(event.token);
       username = token.username;
     }
+    let username = "DummyBuyer";
     
     const item = await getItemFromID(Number.parseInt(event.id), pool, username);
     const account = await getAccountByUsername(username, pool);
@@ -79,7 +88,7 @@ export const handler = async (event) => {
     if (item.forSale && account.balance >= item.price+totalBidCost) {
       await buyItem(event.id, username, account.balance-item.price);
       response = { statusCode: 200, response: "Item purchased" };
-    } else if (account.balance >= event.bid && event.bid >= item.price+totalBidCost) {
+    } else if (account.balance >= event.bid+totalBidCost && event.bid >= item.price) {
       await makeBid(event.bid, username, event.id);
       response = { statusCode: 200, response: "Item bid on" };
     } else {
