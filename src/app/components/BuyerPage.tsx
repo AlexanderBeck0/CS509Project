@@ -82,24 +82,18 @@ export default function BuyerPage(props: BuyerPageProps) {
     const fetchActiveBids = async () => {
       try {
         const payload = {
-          token: localStorage.getItem('token')
+          token: localStorage.getItem('token'),
+          status: selectedOption,
         };
+        console.log(payload)
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        /*
-        const data: {
-          statusCode: 200 | 400;
-          username?: string;
-          bids?: { id: number; bid: number; timeOfBid: string; item: Item }[];
-          error?: string;
-        } = await response.json();
-        console.log(data);*/
         const data = await response.json();
+        console.log(data);
         if (data.statusCode === 200 && data.body.bids) {
-          // !!! need to store bids
           const mappedItems = data.body.bids.map((bid: any) => bid.item);
           const mappedBids = data.body.bids.map((bid: any) => (bid.id, bid.bid, bid.timeOfBid, bid.item.id))
           setItems(mappedItems);
@@ -118,7 +112,7 @@ export default function BuyerPage(props: BuyerPageProps) {
     };
 
     fetchActiveBids();
-  }, []);
+  }, [selectedOption]);
 
   return (
     <div className="content">
@@ -150,14 +144,8 @@ export default function BuyerPage(props: BuyerPageProps) {
             <p><b>Active Bids:</b></p>
             <select value={selectedOption} onChange={handleSelectChange}>
               <option value={"All"}>All</option>
-              {/* <option value={"Active"}>Active</option>
-              <option value={"Inactive"}>Inactive</option>
-              <option value={"Frozen"}>Frozen</option>
-              <option value={"Requested"}>Requested</option>
-              <option value={"Failed"}>Failed</option>
-              <option value={"Archived"}>Archived</option>
-              <option value={"Completed"}>Completed</option>
-              <option value={"Fulfilled"}>Fulfilled</option> */}
+              <option value={"Active"}>Active</option>
+              <option value={"Fulfilled"}>Fulfilled</option>
             </select>
           </div>
           <div className="flex row">
