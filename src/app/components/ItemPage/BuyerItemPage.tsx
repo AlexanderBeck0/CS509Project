@@ -65,8 +65,10 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
             {/* <p><strong>Available Funds:</strong> ${availableFunds}</p> */}
         </div>
     );
-    } else if (props.status === "Complete") {
-        return (<div>complete</div>);
+    } else if (props.status === "Completed") {
+        return (<div>Item has been purchased</div>);
+    }  else if (props.status === "Fullfilled") {
+        return (<div>Item has been fulfilled</div>);
     } else {
         return (<div>unhandled status {props.status}</div>);
     }
