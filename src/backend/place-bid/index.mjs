@@ -52,6 +52,7 @@ export const handler = async (event) => {
           console.error(JSON.stringify(error));
           return reject(error);
         }
+        console.log(rows)
         if (rows && rows.length > 0 && rows[0].buyer_username === username) {
           // Prevent Buyer from bidding on themselves
           console.log("Equal usernames")
@@ -102,7 +103,7 @@ export const handler = async (event) => {
         if (error) {
           return reject(error);
         }
-        const totalBidCost = result[0].totalBidCost || 0; // Default to 0 if no bids
+        const totalBidCost = result[0].totalBidCost || 0;
         return resolve(totalBidCost);
       });
     });
@@ -117,7 +118,7 @@ export const handler = async (event) => {
     if (item.forSale) {
       // Handle forSale items
       if (account.balance < item.price + totalBidCost) {
-        response = { statusCode: 400, error: "Insufficient balance to purchase this item!" }
+        return { statusCode: 400, error: "Insufficient balance to purchase this item!" }
       }
 
       // account.balance >= item.price + totalBidCost
@@ -134,13 +135,16 @@ export const handler = async (event) => {
     }
 
     // Handle bids
+    console.log(account.balance)
+    console.log(item.price)
+    console.log(totalBidCost)
     if (account.balance < item.price + totalBidCost) {
-      response = { statusCode: 400, error: "Insufficient balance to bid on this item!" }
+      return { statusCode: 400, error: "Insufficient balance to bid on this item!" }
     }
 
     // account.balance >= item.price + totalBidCost
     if (event.bid < item.price || (item.initialPrice !== item.price && event.bid <= item.price)) {
-      response = { statusCode: 400, error: "Must increase the bid on the item!" }
+      return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
     // event.bid > item.price
@@ -149,8 +153,6 @@ export const handler = async (event) => {
     });
 
     response = response || { statusCode: 200, response: "Item bid on" };
-
-
   } catch (error) {
     console.error("Error:", error.message);
     response = { statusCode: 500, error: error.message };
