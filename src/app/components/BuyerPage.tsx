@@ -1,7 +1,8 @@
-import { Account, Item } from '@/utils/types';
+import { Account, Bid, Item } from '@/utils/types';
 import Image from 'next/image';
 import { useRef, useState, useEffect } from 'react';
 import ItemDisplay from './ItemDisplay';
+import { Link } from 'react-router-dom';
 
 interface BuyerPageProps {
   userData: Account;
@@ -13,6 +14,7 @@ export default function BuyerPage(props: BuyerPageProps) {
   const fundsRef = useRef<HTMLInputElement | null>(null);
   const [selectedOption, setSelectedOption] = useState("All");
   const [items, setItems] = useState<Item[]>([]);
+  const [bids, setBids] = useState<Bid[]>([]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -81,7 +83,6 @@ export default function BuyerPage(props: BuyerPageProps) {
         const payload = {
             token: localStorage.getItem('token')
           };
-          console.log(payload);
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -97,8 +98,11 @@ export default function BuyerPage(props: BuyerPageProps) {
         console.log(data);*/
         const data = await response.json();
         if (data.statusCode === 200 && data.body.bids) {
-            console.log(data.body);
-          //setItems(data.body.bids.map(bid => bid.item));
+            // !!! need to store bids
+            const mappedItems = data.body.bids.map((bid: any) => bid.item);
+            const mappedBids = data.body.bids.map((bid:any) => (bid.id, bid.bid, bid.timeOfBid, bid.item.id))
+            setItems(mappedItems);
+            setBids(mappedBids);
         } else {
           console.error(data.error || "Failed to fetch active bids.");
         }
@@ -145,21 +149,27 @@ export default function BuyerPage(props: BuyerPageProps) {
             <p><b>Active Bids:</b></p>
             <select value={selectedOption} onChange={handleSelectChange}>
               <option value={"All"}>All</option>
-              <option value={"Active"}>Active</option>
+              {/* <option value={"Active"}>Active</option>
               <option value={"Inactive"}>Inactive</option>
               <option value={"Frozen"}>Frozen</option>
               <option value={"Requested"}>Requested</option>
               <option value={"Failed"}>Failed</option>
               <option value={"Archived"}>Archived</option>
               <option value={"Completed"}>Completed</option>
-              <option value={"Fulfilled"}>Fulfilled</option>
+              <option value={"Fulfilled"}>Fulfilled</option> */}
             </select>
           </div>
           <div className="flex row">
             <div className="container" onWheel={handleScroll}>
               {items.length > 0 ? (
                 items.map((item, index) => (
-                  <ItemDisplay key={index} item={item} />
+                    <ItemDisplay key={index} item={item}>
+                        <Link to={`/item/${item.id}`}>
+                            <button className={`p-2 border border-black rounded-lg select-none`}>
+                                View Item
+                            </button>
+                        </Link>
+                    </ItemDisplay>
                 ))
               ) : (
                 <p>No items found.</p>
