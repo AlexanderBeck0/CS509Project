@@ -22,6 +22,7 @@ export default function HomePage(props: { searchInput: string, sortBy: string, r
           });
 
         const resultData: { statusCode: 200 | 400, items: Item[] } = await response.json();
+        console.log(resultData);
         if (resultData.statusCode == 200) {
           setResult(resultData.items);
         }
