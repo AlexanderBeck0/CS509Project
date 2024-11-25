@@ -32,7 +32,7 @@ export const handler = async (event) => {
 
     // Query to get active bids for the user
     const fetchActiveBids = () => {
-      const sqlQuery = `
+      let sqlQuery = `
       SELECT 
         b.id AS bidId,
         b.bid,
@@ -45,12 +45,17 @@ export const handler = async (event) => {
         i.startDate,
         i.endDate,
         i.status
-      FROM Bid b
+      FROM MostRecentBids b
       JOIN Item i ON b.item_id = i.id
-      WHERE b.buyer_username = ?;
+      WHERE b.buyer_username = ? AND i.status != "Completed"
       `;
+      const params = [username];
+      if (event.status === "Active" || event.status === "Fulfilled") {
+        sqlQuery += ` AND i.status = ?`;
+        params.push(event.status);
+      }
       return new Promise((resolve, reject) => {
-        pool.query(sqlQuery, [username], (error, rows) => {
+        pool.query(sqlQuery, params, (error, rows) => {
           if (error) return reject(error);
           resolve(rows);
         });
