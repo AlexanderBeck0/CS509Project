@@ -1,10 +1,8 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-// interface AddItemPageProps {
-// }
 
-export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment the props when actually in use. Causes build errors.
+export default function AddItemPage() {
 
     const navigate = useNavigate();
     const [userImage, setUserImage] = useState<string>("");
@@ -29,8 +27,8 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                     description: descriptionRef.current!.value,
                     image: userImage,
                     initialPrice: Math.max(1, parseFloat(priceRef.current!.value) || 1),
-                    startDate: startDateRef.current!.value,
-                    endDate: endDateRef.current!.value === "" ? null : endDateRef.current!.value
+                    startDate: new Date(startDateRef.current!.value).toISOString().slice(0, -8),
+                    endDate: endDateRef.current!.value === "" ? null : new Date(endDateRef.current!.value).toISOString().slice(0, -8)
                 }
             };
             try {
@@ -55,17 +53,6 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
         fetchData();
     }
     // #endregion
-
-    useEffect(() => {
-        const today = new Date().toISOString().split('T')[0];
-
-        if (startDateRef.current) {
-            startDateRef.current.min = today;
-        }
-        if (endDateRef.current) {
-            endDateRef.current.min = today;
-        }
-    }, []);
 
     const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -94,15 +81,17 @@ export default function AddItemPage(/*props: AddItemPageProps*/) { // Uncomment 
                         <div className='dateContainer'>
                             <div className='dateLabel' style={{ width: "100%" }}>
                                 <b>Start Date:</b>
-                                <input className="itemPageInput" ref={startDateRef} style={{ fontSize: "12px" }} type="date" name="StartDate" data-length="10" required
-                                    placeholder="MM/DD/YYYY" min={new Date().toISOString().split("T")[0]}
-                                    defaultValue={new Date().toISOString().split("T")[0]} />
+                                <input className="itemPageInput" ref={startDateRef} style={{ fontSize: "12px" }} type="datetime-local" name="StartDate" data-length="10" required
+                                    placeholder="MM/DD/YYYY"
+                                    min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)}
+                                    defaultValue={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)} />
                             </div>
                             <div className='dateLabel' style={{ width: "100%" }}>
                                 <b>End Date:</b>
-                                <input className="itemPageInput" ref={endDateRef} style={{ fontSize: "12px" }} type="date" name="EndDate" data-length="10"
-                                    placeholder="MM/DD/YYYY" min={new Date().toISOString().split("T")[0]}
-                                    defaultValue={new Date().toISOString().split("T")[0]} />
+                                <input className="itemPageInput" ref={endDateRef} style={{ fontSize: "12px" }} type="datetime-local" name="EndDate" data-length="10"
+                                    placeholder="MM/DD/YYYY"
+                                    min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)}
+                                    defaultValue={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)} />
                             </div>
                         </div>
                     </div>

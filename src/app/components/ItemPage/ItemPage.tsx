@@ -1,9 +1,9 @@
 import type { AccountType, Bid, Item } from '@/utils/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import TimeDisplay from '../TimeDisplay';
 import BuyerItemPage from './BuyerItemPage';
 import SellerItemPage from './SellerItemPage';
-import TimeDisplay from '../TimeDisplay';
 
 interface ItemPageProps {
     accountType: AccountType | null;
@@ -16,35 +16,35 @@ export default function ItemPage(props: ItemPageProps) {
     const [bids, setBids] = useState<Bid[]>([]);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchItem = async () => {
-            const payload = { id: id, token: props.token };
-            
-            await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            }).then(response => response.json()).then(data => {
-                if (data.statusCode !== 200) throw data.error;
-                if (data.statusCode === 200) {
-                    setItem(data.item);
-                    setBids(data.item?.bids ? (data.item.bids) : []); // JSON.parse on bids was throwing an error
-                }
-            }).catch(error => {
-                // Log actual errors and not just insufficient permission errors
-                if (error instanceof Error) console.error(error);
-                if (typeof error === 'string' && error.includes("jwt expired")) {
-                    setErrorMessage("Please log in to see this page.");
-                    return;
-                }
-                setErrorMessage(error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error));
-            });
-        };
+    const fetchItem = useCallback(async () => {
+        const payload = { id: id, token: props.token };
 
+        await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getItemFromID", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        }).then(response => response.json()).then(data => {
+            if (data.statusCode !== 200) throw data.error;
+            if (data.statusCode === 200) {
+                setItem(data.item);
+                setBids(data.item?.bids ? (data.item.bids) : []); // JSON.parse on bids was throwing an error
+            }
+        }).catch(error => {
+            // Log actual errors and not just insufficient permission errors
+            if (error instanceof Error) console.error(error);
+            if (typeof error === 'string' && error.includes("jwt expired")) {
+                setErrorMessage("Please log in to see this page.");
+                return;
+            }
+            setErrorMessage(error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error));
+        });
+    }, [id, props.token]);
+
+    useEffect(() => {
         fetchItem();
-    }, [id, props]);
+    }, [fetchItem, id, props]);
 
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
@@ -82,7 +82,7 @@ export default function ItemPage(props: ItemPageProps) {
                             props.accountType === "Seller" && <SellerItemPage status={item.status} item_id={item.id} archived={item.archived} />
                         }
                         {
-                            props.accountType === "Buyer" && <BuyerItemPage status={item.status} item_id={item.id} itemForSale={item.forSale} price={item.price ? item.price : item.initialPrice}/>
+                            props.accountType === "Buyer" && <BuyerItemPage status={item.status} item_id={item.id} itemForSale={item.forSale} price={item.price ? item.price : item.initialPrice} fetchItem={fetchItem} />
                         }
 
                     </div>

@@ -1,8 +1,8 @@
 import type { AccountType, Bid, Item } from '@/utils/types';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import EditItemForm from './EditItemForm';
 import TimeDisplay from '../TimeDisplay';
+import EditItemForm from './EditItemForm';
 
 interface ItemPageProps {
     accountType: AccountType | null;
@@ -30,83 +30,81 @@ export default function ItemPage(props: ItemPageProps) {
         }
     }, [archived, id, navigate]);
 
-    const unpublish = useCallback(async (id: number): Promise<void> => {
-        const payload = { token: props.token, item_id: id };
-        try {
-            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/unpublishItem", {
+    async function unpublish(id: number): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const payload = { token: props.token, item_id: id };
+
+            fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/unpublishItem", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-
-            if (data.statusCode === 200) {
-                setPublished(false);
-            }
-
-            if (data?.error !== undefined) {
-                if (data.error.includes("jwt expired")) {
-                    throw new Error("Your token has expired. Please log in again.");
+            }).then(response => response.json()).then(data => {
+                if (data.statusCode === 200) {
+                    setPublished(false);
+                    return resolve("Successfully published item!");
                 }
-                setErrorMessage(data.error); // Non-fatal error handling
-            }
 
-        } catch (error) {
-            setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-        }
-    }, [props.token]);
+                if (data?.error !== undefined) {
+                    if (data.error.includes("jwt expired")) {
+                        throw new Error("Your token has expired. Please log in again.");
+                    }
+                    return reject(data.error);
+                }
 
-    const archive = useCallback(async (id: number): Promise<void> => {
-        const payload = { token: props.token, item_id: id };
-        try {
-            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/archive", {
+            }).catch(error => setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error)));
+        })
+
+    }
+
+    async function archive(id: number): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const payload = { token: props.token, item_id: id };
+            fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/archive", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-
-            if (data.statusCode === 200) {
-                setArchived(true);
-            }
-
-            if (data?.error !== undefined) {
-                if (data.error.includes("jwt expired")) {
-                    throw new Error("Your token has expired. Please log in again.");
+            }).then(response => response.json()).then(data => {
+                if (data.statusCode === 200) {
+                    setArchived(true);
+                    return resolve("Successfully archived item!");
                 }
-                setErrorMessage(data.error); // Non-fatal error handling
-            }
 
-        } catch (error) {
-            setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-        }
-    }, [props.token]);
+                if (data?.error !== undefined) {
+                    if (data.error.includes("jwt expired")) {
+                        throw new Error("Your token has expired. Please log in again.");
+                    }
+                    return reject(data.error); // Non-fatal error handling
+                }
+            }).catch(error => setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error)))
+        })
+    }
 
-    const publish = useCallback(async (id: number, forSale: boolean): Promise<void> => {
-        const payload = { token: props.token, item_id: id, forSale: forSale };
-        try {
-            const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/publishItem", {
+    async function publish(id: number, forSale: boolean): Promise<string> {
+        return new Promise((resolve, reject) => {
+
+            const payload = { token: props.token, item_id: id, forSale: forSale };
+            fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/publishItem", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            if (data.error) {
-                if (data.error.includes("jwt expired")) {
-                    throw new Error("Your token has expired. Please log in again.");
+            }).then(response => response.json()).then(data => {
+                if (data.error) {
+                    if (data.error.includes("jwt expired")) {
+                        throw new Error("Your token has expired. Please log in again.");
+                    }
+                    return reject(data.error);
                 }
-                setErrorMessage(data.error);
-            } else {
+
                 setPublished(true);
-            }
-        } catch (error) {
-            setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-        }
-    }, [props.token]);
+                return resolve("Successfully published item!");
+
+            }).catch(error => {
+                setFatalErrorMessage(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
+            })
+        })
+    };
 
     const remove = useCallback(async (id: number): Promise<void> => {
         const payload = { token: props.token, item_id: id };
@@ -185,13 +183,12 @@ export default function ItemPage(props: ItemPageProps) {
          * @returns A boolean representing if str is a date string.
          */
         const isDate = (str: string): boolean => {
-            return !isNaN(new Date(str).getTime());
+            return !isNaN(new Date(str).getTime()) && str.indexOf("T") !== -1;
         }
 
         // Create a new item that contains all the new changes
         const newItem: Partial<Item> = { ...item }!;
         Object.entries(changes).forEach(([key, value]) => {
-            // console.log(new Date(value))
             if (key in newItem) {
                 // Convert date to ISO format
                 if (isDate(value)) {
@@ -200,6 +197,7 @@ export default function ItemPage(props: ItemPageProps) {
                 newItem[key as keyof Item] = value;
             }
         });
+        console.log(newItem)
 
         return new Promise((resolve, reject) => {
             fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/saveItem", {
@@ -225,46 +223,25 @@ export default function ItemPage(props: ItemPageProps) {
         });
     }
 
-    function handlePublishClick(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            if (item?.status === "Frozen") {
-                alert("NOT YET IMPLEMENTED; FROZEN ITEMS CANNOT BE UNPUBLISHED");
-                reject("Frozen items cannot be unpublished");
-            } else if (item?.status === 'Active') {
-                unpublish(Number(id))
-                    .then(() => {
-                        resolve("Item unpublished successfully");
-                    })
-                    .catch((error) => {
-                        console.error(error)
-                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                    });
-            } else if (item?.status === 'Inactive') {
-                publish(Number(id), forSale)
-                    .then(() => {
-                        resolve("Item published successfully");
-                    })
-                    .catch((error) => {
-                        console.error(error)
-                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                    });
-            }
-        });
+    async function handlePublishClick(): Promise<void> {
+        if (item?.status === "Frozen") {
+            setErrorMessage("Frozen items cannot be published!");
+            return;
+        }
+        if (item?.status === 'Active') {
+            await unpublish(Number(id)).then(() => setErrorMessage(null)).catch((error) => setErrorMessage(error));
+        }
+        if (item?.status === 'Inactive') {
+            publish(Number(id), forSale).then(() => setErrorMessage(null)).catch((error) => setErrorMessage(error));
+        }
     }
 
-    function handleArchiveClick(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            if (item?.status === 'Inactive') {
-                archive(Number(id))
-                    .then(() => {
-                        resolve("Item archived successfully");
-                    })
-                    .catch((error) => {
-                        console.error(error)
-                        reject(error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error));
-                    });
-            }
-        });
+    async function handleArchiveClick(): Promise<void> {
+        if (item?.status === 'Inactive') {
+            await archive(Number(id)).then(() => {
+                console.log("Archived item")
+            }).catch((error) => setErrorMessage(error));
+        }
     }
 
     function handleRemoveClick(): Promise<void> {
@@ -296,7 +273,7 @@ export default function ItemPage(props: ItemPageProps) {
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
                         </picture>
                         <p><strong>Description: </strong> {item.description}</p>
-                        <TimeDisplay startDate={item.startDate} endDate={item.endDate}/>
+                        <TimeDisplay startDate={item.startDate} endDate={item.endDate} />
                         <p><strong>Status: </strong> {item.status}</p>
                     </div>
 

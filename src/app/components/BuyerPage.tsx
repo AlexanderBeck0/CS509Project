@@ -15,6 +15,7 @@ export default function BuyerPage(props: BuyerPageProps) {
   const [selectedOption, setSelectedOption] = useState("All");
   const [items, setItems] = useState<Item[]>([]);
   const [bids, setBids] = useState<Bid[]>([]);
+  const [funds, setFunds] = useState<number>(props.userData.balance);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -71,7 +72,7 @@ export default function BuyerPage(props: BuyerPageProps) {
         throw new Error(data.error);
       }
 
-      props.userData.balance = data.newBalance;
+      setFunds(data.newBalance)
     } catch (error) {
       console.error(error instanceof Error ? error.message : error);
     }
@@ -81,43 +82,37 @@ export default function BuyerPage(props: BuyerPageProps) {
     const fetchActiveBids = async () => {
       try {
         const payload = {
-            token: localStorage.getItem('token')
-          };
+          token: localStorage.getItem('token'),
+          status: selectedOption,
+        };
+        console.log(payload)
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        /*
-        const data: {
-          statusCode: 200 | 400;
-          username?: string;
-          bids?: { id: number; bid: number; timeOfBid: string; item: Item }[];
-          error?: string;
-        } = await response.json();
-        console.log(data);*/
         const data = await response.json();
+        console.log(data);
         if (data.statusCode === 200 && data.body.bids) {
-            // !!! need to store bids
-            const mappedItems = data.body.bids.map((bid: any) => bid.item);
-            const mappedBids = data.body.bids.map((bid:any) => (bid.id, bid.bid, bid.timeOfBid, bid.item.id))
-            setItems(mappedItems);
-            setBids(mappedBids);
+          const mappedItems = data.body.bids.map((bid: any) => bid.item);
+          const mappedBids = data.body.bids.map((bid: any) => (bid.id, bid.bid, bid.timeOfBid, bid.item.id))
+          setItems(mappedItems);
+          setBids(mappedBids);
         } else {
           console.error(data.error || "Failed to fetch active bids.");
         }
       } catch (error) {
         if (error instanceof Error) console.error(error);
         if (typeof error === 'string' && error.includes("jwt expired")) {
-            console.error("Please log in to see this page.");
-            return;
+          console.error("Please log in to see this page.");
+          return;
         }
         console.error("Error fetching active bids:", error);
       }
     };
 
     fetchActiveBids();
-  }, []);
+  }, [selectedOption]);
 
   return (
     <div className="content">
@@ -127,7 +122,7 @@ export default function BuyerPage(props: BuyerPageProps) {
       </div>
       <div className="pageContent">
         <div className="pageContentColumn" style={{ width: "25%" }}>
-          <p><b>Funds:</b> ${props.userData.balance}</p>
+          <p><b>Funds:</b> ${funds}</p>
           <div className="buttons">
             <input
               type="number"
@@ -149,27 +144,21 @@ export default function BuyerPage(props: BuyerPageProps) {
             <p><b>Active Bids:</b></p>
             <select value={selectedOption} onChange={handleSelectChange}>
               <option value={"All"}>All</option>
-              {/* <option value={"Active"}>Active</option>
-              <option value={"Inactive"}>Inactive</option>
-              <option value={"Frozen"}>Frozen</option>
-              <option value={"Requested"}>Requested</option>
-              <option value={"Failed"}>Failed</option>
-              <option value={"Archived"}>Archived</option>
-              <option value={"Completed"}>Completed</option>
-              <option value={"Fulfilled"}>Fulfilled</option> */}
+              <option value={"Active"}>Active</option>
+              <option value={"Fulfilled"}>Fulfilled</option>
             </select>
           </div>
           <div className="flex row">
             <div className="container" onWheel={handleScroll}>
               {items.length > 0 ? (
                 items.map((item, index) => (
-                    <ItemDisplay key={index} item={item}>
-                        <Link to={`/item/${item.id}`}>
-                            <button className={`p-2 border border-black rounded-lg select-none`}>
-                                View Item
-                            </button>
-                        </Link>
-                    </ItemDisplay>
+                  <ItemDisplay key={index} item={item}>
+                    <Link to={`/item/${item.id}`}>
+                      <button className={`p-2 border border-black rounded-lg select-none`}>
+                        View Item
+                      </button>
+                    </Link>
+                  </ItemDisplay>
                 ))
               ) : (
                 <p>No items found.</p>

@@ -5,21 +5,20 @@ interface BuyerItemPageProps {
     item_id: number;
     itemForSale: boolean;
     price: number;
+    fetchItem: () => Promise<void>;
 }
 
 export default function BuyerItemPage(props: BuyerItemPageProps) {
     const [newBid, setNewBid] = useState<number>(props.price);
-
     // get funds from getToken
-
     const handlePlaceBid = () => {
         const placeBid = async () => {
-            const payload = { 
-                token : localStorage.getItem('token'),
-                id : props.item_id,
+            const payload = {
+                token: localStorage.getItem('token'),
+                id: props.item_id,
                 bid: newBid,
             };
-            
+
             await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/placeBid", {
                 method: "POST",
                 headers: {
@@ -30,23 +29,27 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                 console.log(data);
                 if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
-                    alert(props.itemForSale ? "Purchased item" : "Bid placed");
+                    alert(data.response);
+                    props.fetchItem();
+
                 }
             }).catch(error => {
                 // Log actual errors and not just insufficient permission errors
                 if (error instanceof Error) console.error(error);
                 if (typeof error === 'string' && error.includes("Insufficient funds")) {
-                    alert(`Insuddicient funds to ${props.itemForSale ? "purchase": "bid on"} this item`);
+                    alert(`Insufficient funds to ${props.itemForSale ? "purchase": "bid on"} this item`);
                 }
+                if (typeof error === 'string') alert(error)
             });
         };
 
         placeBid();
+        // setReload(reload+1);
     };
-    
-    if(props.status === "Active") {
-    return (
-        <div>
+
+    if (props.status === "Active") {
+        return (
+            <div>
                 {!props.itemForSale &&
                     <label>
                         Place bid of: $
@@ -55,19 +58,21 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                             value={newBid}
                             onChange={(e) => setNewBid(Number(e.target.value))}
                             style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
+                            min={props.price}
+                            step={1}
                         />
                     </label>
                 }
-                <button className="accountButton"onClick={handlePlaceBid} style={{ marginLeft: '0.5rem' }}>
+                <button className="accountButton" onClick={handlePlaceBid} style={{ marginLeft: '0.5rem' }}>
                     {props.itemForSale ? "Buy" : "Place Bid"}
                 </button>
-            
-            {/* <p><strong>Available Funds:</strong> ${availableFunds}</p> */}
-        </div>
-    );
+
+                {/* <p><strong>Available Funds:</strong> ${availableFunds}</p> */}
+            </div>
+        );
     } else if (props.status === "Completed") {
         return (<div>Item has been purchased</div>);
-    }  else if (props.status === "Fullfilled") {
+    } else if (props.status === "Fulfilled") {
         return (<div>Item has been fulfilled</div>);
     } else {
         return (<div>unhandled status {props.status}</div>);
