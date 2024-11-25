@@ -9,6 +9,7 @@ interface BuyerItemPageProps {
 
 export default function BuyerItemPage(props: BuyerItemPageProps) {
     const [newBid, setNewBid] = useState<number>(props.price);
+    const [reload, setReload] = useState(0);
 
     // get funds from getToken
 
@@ -42,6 +43,7 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
         };
 
         placeBid();
+        setReload(reload+1);
     };
     
     if(props.status === "Active") {
@@ -67,7 +69,7 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
     );
     } else if (props.status === "Completed") {
         return (<div>Item has been purchased</div>);
-    }  else if (props.status === "Fullfilled") {
+    }  else if (props.status === "Fulfilled") {
         return (<div>Item has been fulfilled</div>);
     } else {
         return (<div>unhandled status {props.status}</div>);

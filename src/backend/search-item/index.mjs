@@ -80,13 +80,14 @@ export const handler = async (event)  => {
       }
 
       if (formattedDate) {
-        conditions.push(`(DATE(startDate) = ? OR DATE(endDate) = ?)`);
+        conditions.push(`(DATE(CONVERT_TZ(startDate, 'UTC', 'America/New_York')) = ? OR DATE(CONVERT_TZ(endDate, 'UTC', 'America/New_York')) = ?)`);
         params.push(formattedDate, formattedDate);
       }
 
       if (conditions.length > 0) {
         sqlQuery += ` WHERE ` + conditions.join(' AND ');
       }
+      sqlQuery += ` ORDER BY ${sort} ${order}, startDate, endDate, price, name`;
       console.log(sqlQuery);
       pool.query(sqlQuery, params, (error, rows) => {
         if (error) { console.log("DB error"); return reject(error); }
