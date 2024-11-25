@@ -78,25 +78,36 @@ export default function BuyerPage(props: BuyerPageProps) {
   useEffect(() => {
     const fetchActiveBids = async () => {
       try {
+        const payload = {
+            token: localStorage.getItem('token')
+          };
+          console.log(payload);
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: localStorage.getItem("token") }),
+          body: JSON.stringify(payload),
         });
-
+        /*
         const data: {
           statusCode: 200 | 400;
           username?: string;
           bids?: { id: number; bid: number; timeOfBid: string; item: Item }[];
           error?: string;
         } = await response.json();
-
-        if (data.statusCode === 200 && data.bids) {
-          setItems(data.bids.map(bid => bid.item));
+        console.log(data);*/
+        const data = await response.json();
+        if (data.statusCode === 200 && data.body.bids) {
+            console.log(data.body);
+          //setItems(data.body.bids.map(bid => bid.item));
         } else {
           console.error(data.error || "Failed to fetch active bids.");
         }
       } catch (error) {
+        if (error instanceof Error) console.error(error);
+        if (typeof error === 'string' && error.includes("jwt expired")) {
+            console.error("Please log in to see this page.");
+            return;
+        }
         console.error("Error fetching active bids:", error);
       }
     };
