@@ -102,7 +102,7 @@ export const handler = async (event) => {
         if (error) {
           return reject(error);
         }
-        const totalBidCost = result[0].totalBidCost || 0; // Default to 0 if no bids
+        const totalBidCost = result[0].totalBidCost || 0;
         return resolve(totalBidCost);
       });
     });

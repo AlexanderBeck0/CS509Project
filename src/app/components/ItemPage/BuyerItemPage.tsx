@@ -37,8 +37,7 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                 // Log actual errors and not just insufficient permission errors
                 if (error instanceof Error) console.error(error);
                 if (typeof error === 'string' && error.includes("Insufficient funds")) {
-                    console.log(error)
-                    alert(`Insufficient funds to ${props.itemForSale ? "purchase" : "bid on"} this item`);
+                    alert(`Insufficient funds to ${props.itemForSale ? "purchase": "bid on"} this item`);
                 }
                 if (typeof error === 'string') alert(error)
             });
