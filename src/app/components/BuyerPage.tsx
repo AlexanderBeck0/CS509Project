@@ -83,7 +83,6 @@ export default function BuyerPage(props: BuyerPageProps) {
         const payload = {
             token: localStorage.getItem('token')
           };
-          console.log(payload);
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -99,7 +98,6 @@ export default function BuyerPage(props: BuyerPageProps) {
         console.log(data);*/
         const data = await response.json();
         if (data.statusCode === 200 && data.body.bids) {
-            console.log(data.body);
             // !!! need to store bids
             const mappedItems = data.body.bids.map((bid: any) => bid.item);
             const mappedBids = data.body.bids.map((bid:any) => (bid.id, bid.bid, bid.timeOfBid, bid.item.id))
