@@ -79,7 +79,6 @@ export const handler = async (event) => {
       const token = await verifyToken(event.token);
       username = token.username;
     }
-    let username = "DummyBuyer";
     
     const item = await getItemFromID(Number.parseInt(event.id), pool, username);
     const account = await getAccountByUsername(username, pool);
