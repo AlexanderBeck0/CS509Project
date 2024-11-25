@@ -15,6 +15,11 @@ export default function HomePage(props: { searchInput: string, sortBy: string, r
         recentlySold: props.recentlySold,
       };
       try {
+        try {
+          await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/complete-items', { method: 'GET' });
+        } catch (error) {
+          console.error('Error updating items to be complete:', error)
+        }
         const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/searchItems',
           {
             method: 'POST',
