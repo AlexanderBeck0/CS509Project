@@ -59,6 +59,8 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                             value={newBid}
                             onChange={(e) => setNewBid(Number(e.target.value))}
                             style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
+                            min={props.price}
+                            step={1}
                         />
                     </label>
                 }

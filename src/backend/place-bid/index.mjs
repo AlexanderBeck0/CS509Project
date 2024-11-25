@@ -2,7 +2,7 @@ import { createPool, getAccountByUsername, getItemFromID, verifyToken } from "..
 
 /**
  * 
- * @param {{id: string, token?: string}} event The get item event.
+ * @param {{id: string, token?: string, bid: number}} event The bid.
  */
 export const handler = async (event) => {
 
@@ -14,6 +14,27 @@ export const handler = async (event) => {
       };
     }
   });
+
+  if (isNaN(+event.bid)) {
+    return {
+      statusCode: 400,
+      error: "Bid must be a number!"
+    }
+  }
+
+  if (Number.parseInt(event.bid) !== Math.floor(Number.parseInt(event.bid))) {
+    return {
+      statusCode: 400,
+      error: "Bid must be a whole number!"
+    }
+  }
+
+  if (+event.bid < 1) {
+    return {
+      statusCode: 400,
+      error: "Bid must be a number greater than 0!"
+    }
+  }
   
   let pool;
 
@@ -31,7 +52,7 @@ export const handler = async (event) => {
           console.error(JSON.stringify(error));
           return reject(error);
         }
-        if (rows[0].buyer_username === username) {
+        if (rows && rows.length > 0 && rows[0].buyer_username === username) {
           // Prevent Buyer from bidding on themselves
           console.log("Equal usernames")
           return reject("Permission denied. Cannot outbid yourself.");
@@ -118,7 +139,7 @@ export const handler = async (event) => {
     }
 
     // account.balance >= item.price + totalBidCost
-    if (event.bid <= item.price) {
+    if (event.bid < item.price || (item.initialPrice !== item.price && event.bid <= item.price)) {
       response = { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
