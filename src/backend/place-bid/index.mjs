@@ -40,27 +40,21 @@ export const handler = async (event) => {
     });
   }
 
-  let buyItem = (id, username, balance) => {
+  let buyItem = (id) => {
     return new Promise((resolve, reject) => {
       const updateItemStatusQuery = `UPDATE Item SET status = 'Completed' WHERE id = ?`;
       pool.query(updateItemStatusQuery, [id], (error, result) => {
         if (error) {
           return reject(error);
         }
-        const deductBalanceQuery = `UPDATE Account SET balance = ? WHERE username = ?`;
-        pool.query(deductBalanceQuery, [balance, username], (error, result) => {
-          if (error) {
-            return reject(error);
-          }
-          return resolve();
-        });
+        resolve(result);
       });
     });
   }
 
   let getTotalBidCost = (username) => {
     return new Promise((resolve, reject) => {
-      const sqlQuery = `SELECT SUM(bid) AS totalBidCost FROM Bid WHERE buyer_username = ?`;
+      const sqlQuery = `SELECT SUM(bid) AS totalBidCost FROM MostRecentBids WHERE buyer_username = ?`;
         pool.query(sqlQuery, [username], (error, result) => {
             if (error) {
                 return reject(error);
@@ -85,7 +79,8 @@ export const handler = async (event) => {
     const totalBidCost = await getTotalBidCost(username);
 
     if (item.forSale && account.balance >= item.price+totalBidCost) {
-      await buyItem(event.id, username, account.balance-item.price);
+      await makeBid(item.price, username, event.id);
+      await buyItem(event.id);
       response = { statusCode: 200, response: "Item purchased" };
     } else if (account.balance >= event.bid+totalBidCost && event.bid >= item.price) {
       await makeBid(event.bid, username, event.id);
