@@ -497,10 +497,15 @@ export async function getItemFromID(id, pool, username = undefined) {
 
         // At this point there is only Buyer and Seller
         const inBuffer = withinBuyerBuffer();
-        if (accountType === "Buyer" && (!inBuffer || (inBuffer && !BUYER_VIEWABLE_ITEM_STATUSES.includes(foundItem.status)))) {
+        if (accountType === "Buyer" && !inBuffer) {
             // Not an item within the buyer buffer period
             console.log("Buyer attemped to view an item that is more than " + BUYER_BUFFER_IN_HOURS + " hours completed.");
             return reject("Permission denied. It has been more than " + BUYER_BUFFER_IN_HOURS + " hours since this item has been completed.");
+        }
+
+        if (accountType === "Buyer" && !BUYER_VIEWABLE_ITEM_STATUSES.includes(foundItem.status)) {
+            console.log("Buyer attempted to view an item that is not one of: " + BUYER_VIEWABLE_ITEM_STATUSES.toString());
+            return reject("Permission denied. Buyers are not allowed to view this item.");
         }
 
         return resolve(foundItem);

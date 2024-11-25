@@ -1,10 +1,20 @@
-import { createPool, getAccountByUsername, verifyToken, getItemFromID } from "../opt/nodejs/index.mjs";
+import { createPool, getAccountByUsername, getItemFromID, verifyToken } from "../opt/nodejs/index.mjs";
 
 /**
  * 
  * @param {{id: string, token?: string}} event The get item event.
  */
 export const handler = async (event) => {
+
+  const { username } = await verifyToken(event.token).catch(error => {
+    if (error?.name === "TokenExpiredError") {
+      return {
+        statusCode: 400,
+        error: "Your token has expired. Please log in again."
+      };
+    }
+  });
+  
   let pool;
 
   try {
@@ -15,21 +25,33 @@ export const handler = async (event) => {
   }
 
   let makeBid = (bid, username, id) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      pool.query('SELECT buyer_username FROM MostRecentBids WHERE item_id = ?', [id], (error, rows) => {
+        if (error) {
+          console.error(JSON.stringify(error));
+          return reject(error);
+        }
+        if (rows[0].buyer_username === username) {
+          // Prevent Buyer from bidding on themselves
+          console.log("Equal usernames")
+          return reject("Permission denied. Cannot outbid yourself.");
+        }
+      });
+
       let sqlQuery = `
         INSERT INTO Bid
         VALUES (null, ?, NOW(), ?, ?)
       `;
-      console.log("Query: "+sqlQuery);
+      console.log("Query: " + sqlQuery);
       pool.query(sqlQuery, [bid, username, id], (error, rows) => {
         if (error) {
-          console.log("DB error");
+          console.error(JSON.stringify(error));
           return reject(error);
         }
-  
+
         let updateQuery = `UPDATE Item SET price = ? WHERE id = ?`;
         console.log(updateQuery);
-        pool.query(updateQuery, [(bid + 1), id], (error, rows) => {
+        pool.query(updateQuery, [bid, id], (error, rows) => {
           if (error) {
             console.log("DB error");
             return reject(error);
@@ -67,13 +89,6 @@ export const handler = async (event) => {
 
   let response = undefined;
   try {
-    
-    let username = undefined;
-    if (event.token) {
-      const token = await verifyToken(event.token);
-      username = token.username;
-    }
-    
     const item = await getItemFromID(Number.parseInt(event.id), pool, username);
     const account = await getAccountByUsername(username, pool);
     const totalBidCost = await getTotalBidCost(username);
@@ -89,11 +104,33 @@ export const handler = async (event) => {
       response = { statusCode: 400, error: "Insufficient funds" };
     }
 
+    // Handle bids
+    if (account.balance < item.price + totalBidCost) {
+      response = { statusCode: 400, error: "Insufficient balance to bid on this item!" }
+    }
+
+    // account.balance >= item.price + totalBidCost
+    if (event.bid <= item.price) {
+      response = { statusCode: 400, error: "Must increase the bid on the item!" }
+    }
+
+    // event.bid > item.price
+    await makeBid(event.bid, username, event.id).catch(error => {
+      throw (typeof error === "string" ? new Error(error) : error)
+    });
+
+    response = response || { statusCode: 200, response: "Item bid on" };
+
+
   } catch (error) {
     console.error("Error:", error.message);
     response = { statusCode: 500, error: error.message };
   } finally {
-    pool.end();
+    pool.end((err) => {
+      if (err) {
+        console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+      }
+    });
   }
   return response;
 };

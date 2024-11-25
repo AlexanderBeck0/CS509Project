@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { ReactNode, useRef, useState } from 'react';
 
 export default function AdminSQL() {
@@ -7,7 +6,7 @@ export default function AdminSQL() {
      * 
      * @see {@link selectedRef}
      */
-    const TABLES = ["Account", "Item", "Bid"] as const;
+    const TABLES = ["Account", "Item", "Bid", "MostRecentBids"] as const;
 
     /**
      * The ref that stores what the user currently has selected. Used a ref instead of a State so there is no rerendering.
