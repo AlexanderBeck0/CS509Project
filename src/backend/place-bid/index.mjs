@@ -77,13 +77,13 @@ export const handler = async (event) => {
   let getTotalBidCost = (username) => {
     return new Promise((resolve, reject) => {
       const sqlQuery = `SELECT SUM(bid) AS totalBidCost FROM MostRecentBids WHERE buyer_username = ?`;
-        pool.query(sqlQuery, [username], (error, result) => {
-            if (error) {
-                return reject(error);
-            }
-            const totalBidCost = result[0].totalBidCost || 0; // Default to 0 if no bids
-            return resolve(totalBidCost);
-        });
+      pool.query(sqlQuery, [username], (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        const totalBidCost = result[0].totalBidCost || 0;
+        return resolve(totalBidCost);
+      });
     });
   }
 
@@ -93,15 +93,23 @@ export const handler = async (event) => {
     const account = await getAccountByUsername(username, pool);
     const totalBidCost = await getTotalBidCost(username);
 
-    if (item.forSale && account.balance >= item.price+totalBidCost) {
-      await makeBid(item.price, username, event.id);
+    if (item.forSale) {
+      // Handle forSale items
+      if (account.balance < item.price + totalBidCost) {
+        response = { statusCode: 400, error: "Insufficient balance to purchase this item!" }
+      }
+
+      // account.balance >= item.price + totalBidCost
+      await makeBid(item.price, username, event.id).catch(error => {
+        throw (typeof error === "string" ? new Error(error) : error)
+      });
       await buyItem(event.id);
-      response = { statusCode: 200, response: "Item purchased" };
-    } else if (account.balance >= event.bid+totalBidCost && event.bid >= item.price) {
-      await makeBid(event.bid, username, event.id);
-      response = { statusCode: 200, response: "Item bid on" };
-    } else {
-      response = { statusCode: 400, error: "Insufficient funds" };
+      pool.end((err) => {
+        if (err) {
+          console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+        }
+      });
+      return response || { statusCode: 200, response: "Item purchased" };
     }
 
     // Handle bids
