@@ -29,7 +29,7 @@ export default function ItemPage(props: ItemPageProps) {
                 if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
                     setItem(data.item);
-                    setBids(data.item?.bids ? JSON.parse(data.item.bids) : []);
+                    setBids(data.item?.bids ? data.item.bids : []);
                 }
             }).catch(error => {
                 // Log actual errors and not just insufficient permission errors
@@ -56,14 +56,14 @@ export default function ItemPage(props: ItemPageProps) {
                         <picture>
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
                         </picture>
-                        <p><strong> Description: </strong> {item.description}</p>
-                        <p><strong> Start Date: </strong> {new Date(item.startDate).toLocaleDateString()}</p>
-                        <p><strong>End Date:</strong> {item?.endDate ? new Date(item.endDate).toLocaleDateString() : 'No end date available'}</p>
+                        <p><strong>Description: </strong> {item.description}</p>
+                        <p><strong>Start Date: </strong> {new Date(item.startDate).toLocaleDateString()}</p>
+                        <p><strong>End Date: </strong> {item?.endDate ? new Date(item.endDate).toLocaleDateString() : 'No end date available'}</p>
                     </div>
 
                     {/* Middle Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <p><strong>Current Price:</strong> ${item.price}</p>
+                        <p><strong>{item.archived ? "Final" : "Current"} Price:</strong> ${item.price}</p>
                         {props.accountType !== null && <>
                             <h3>Bids:</h3>
                             {bids.length > 0 ? (
@@ -78,7 +78,7 @@ export default function ItemPage(props: ItemPageProps) {
                         </>
                         }
                         {
-                            props.accountType === "Seller" && <SellerItemPage status={item.status} item_id={item.id} />
+                            props.accountType === "Seller" && <SellerItemPage status={item.status} item_id={item.id} archived={item.archived} />
                         }
                         {
                             props.accountType === "Buyer" && <BuyerItemPage />

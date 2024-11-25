@@ -93,8 +93,8 @@ function EditItemField(props: EditItemFieldProps) {
     const INPUT_TYPE_MAP: Record<typeof EDITABLE_ITEM_KEYS[number], HTMLInputTypeAttribute> = {
         "name": "text",
         "description": "text",
-        "endDate": "date",
-        "startDate": "date",
+        "endDate": "datetime-local",
+        "startDate": "datetime-local",
         "initialPrice": "number",
         "image": "url"
     };
@@ -104,7 +104,7 @@ function EditItemField(props: EditItemFieldProps) {
             <label className="flex items-center p-1 font-bold bg-slate-200 rounded-tl-md rounded-bl-md">{props.itemField}</label>
             <input type={INPUT_TYPE_MAP[props.itemField]} required={true} className="bg-slate-100 rounded-tl-none rounded-bl-none mr-1"
                 name={props.itemField} min={INPUT_TYPE_MAP[props.itemField] === "number" ? 1 :
-                    INPUT_TYPE_MAP[props.itemField] === "date" ? new Date().toISOString().split("T")[0] : undefined}></input>
+                    INPUT_TYPE_MAP[props.itemField] === "datetime-local" ? new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8) : undefined}></input>
             <button type="button" className="button p-1 max-w-fit max-h-fit bg-red-300 hover:bg-red-400 active:bg-red-500 rounded-lg"
                 onClick={props.onRemove}>Remove</button>
         </div>

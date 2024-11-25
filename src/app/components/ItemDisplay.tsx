@@ -22,14 +22,17 @@ export default function ItemDisplay(props: ItemDisplayProps) {
           <p style={{ fontSize: "30px" }}>🕒</p>
           <div className='dateContainer'>
             <div className='dateLabel' style={{ width: "100%" }}>
-              {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleDateString() : item.startDate.toLocaleDateString()}
+              {typeof item.startDate === "string" ? new Date(item.startDate).toLocaleString() : item.startDate.toLocaleString()}
             </div>
             <div className='dateLabel' style={{ width: "100%" }}>
-              {(typeof item.endDate === "string" ? new Date(item.endDate).toLocaleDateString() : item.endDate?.toLocaleDateString()) || "No end date"}
+              {(typeof item.endDate === "string" ? new Date(item.endDate).toLocaleString() : item.endDate?.toLocaleString()) || "No end date"}
             </div>
           </div>
         </div>
-        {item?.status && <p className="text-lg basis-1/3">{item.status}</p>}
+        <div className="flex flex-col">
+          {item?.status && <p className="text-lg basis-1/3">{item.status}</p>}
+          {!!item?.archived && <p className="text-lg basis-1/3">Archived</p>}
+        </div>
       </div>
       {props.children}
     </div>

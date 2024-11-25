@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 interface SellerItemProps {
     status: string;
     item_id: number;
+    archived: boolean;
 }
 
 export default function SellerItemPage(props: SellerItemProps) {
@@ -60,6 +61,8 @@ export default function SellerItemPage(props: SellerItemProps) {
             ) : fulfill !== null && status === 'Fulfilled' ? (
                 <p>This item has been fulfilled, the funds deposited in your account</p>
             ) : null}
+
+            {!!props.archived && <p><strong>This item is archived</strong></p>}
         </div>
     );
 }
