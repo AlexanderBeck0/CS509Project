@@ -52,7 +52,6 @@ export const handler = async (event) => {
           console.error(JSON.stringify(error));
           return reject(error);
         }
-        console.log(rows)
         if (rows && rows.length > 0 && rows[0].buyer_username === username) {
           // Prevent Buyer from bidding on themselves
           console.log("Equal usernames")
@@ -135,9 +134,6 @@ export const handler = async (event) => {
     }
 
     // Handle bids
-    console.log(account.balance)
-    console.log(item.price)
-    console.log(totalBidCost)
     if (account.balance < item.price + totalBidCost) {
       return { statusCode: 400, error: "Insufficient balance to bid on this item!" }
     }
