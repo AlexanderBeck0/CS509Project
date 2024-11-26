@@ -36,7 +36,6 @@ Here are the Use Cases we have completed for grading in Iteration Two:
 * [Seller: Unpublish Item](#unpublish-item)
 * [Seller: Fulfill Item](#fulfill-item)
 * [Seller: Remove Inactive Item](#remove-inactive-item)
-
 * [Buyer: Review Purchases](#review-purchases)
 * [Buyer: View Item](#view-item)
 * [Buyer: Review Active Bids](#review-active-bids)
