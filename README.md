@@ -29,19 +29,24 @@ Here are the Use Cases we have completed for Iteration One:
 
 ## Iteration Two Use Cases
 
-Here are the Use Cases we have completed for Iteration Two:
+Here are the Use Cases we have completed for grading in Iteration Two:
 
 * [Seller: Edit Item](#edit-item)
 * [Seller: Publish Item](#publish-item)
 * [Seller: Unpublish Item](#unpublish-item)
 * [Seller: Fulfill Item](#fulfill-item)
 * [Seller: Remove Inactive Item](#remove-inactive-item)
-* [Buyer: Search Recently Sold](#search-recently-sold)
-* [Buyer: Sort Recently Sold](#sort-recently-sold)
+
+* [Buyer: Review Purchases](#review-purchases)
 * [Buyer: View Item](#view-item)
 * [Buyer: Review Active Bids](#review-active-bids)
 * [Buyer: Place Bid](#place-bid)
 * [Buyer: Purchase Item (For Sale use case)](#purchase-item)
+
+We have also completed these use cases:
+
+* [Buyer: Search Recently Sold](#search-recently-sold)
+* [Buyer: Sort Recently Sold](#sort-recently-sold)
 * [Admin: Freeze Item](#freeze-item)
 * [Admin: Unfreeze Item](#unfreeze-item)
 
