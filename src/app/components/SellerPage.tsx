@@ -1,6 +1,6 @@
 import { Account, Item } from '@/utils/types';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ItemDisplay from './ItemDisplay';
 
@@ -15,6 +15,7 @@ export default function SellerPage(props: SellerPageProps) {
     /*get JSON of seller id from database*/
     const [selectedOption, setSelectedOption] = useState("All");
     const [filteredItemresult, setFilteredItemresult] = useState<Item[]>([]);
+    const [reload, setReload] = useState(0);
 
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
@@ -55,7 +56,7 @@ export default function SellerPage(props: SellerPageProps) {
             }
         }
         fetchData();
-    }, [props.userData.username, selectedOption]); // Changed to include props.userData.username because ESLint wasn't happy about it
+    }, [props.userData.username, selectedOption, reload]); // Changed to include props.userData.username because ESLint wasn't happy about it
     // #endregion
 
     const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -82,6 +83,31 @@ export default function SellerPage(props: SellerPageProps) {
         props.closeAccount();
     }
 
+    const handleRequestUnfreeze = (id: number) => {
+        const fetchData = async () => {
+            const payload = {
+                token: localStorage.getItem('token'),
+                id: id,
+            };
+            try {
+                const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/requestUnfreezeItem',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                    });
+
+                const resultData = await response.json();
+                if (resultData.statusCode == 200) {
+                    console.log("item status is requested");
+                    setReload(reload+1);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        fetchData();
+    }
+
     return (
         <div className='content'>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}> {/* heading of seller */}
@@ -92,7 +118,7 @@ export default function SellerPage(props: SellerPageProps) {
                 <div className='pageContentColumn' style={{ width: "25%", }}>
                     <p><b>Profit:</b></p>
                     ${props.userData!.balance}
-                    <div className='buttons' style={{ marginTop: "auto" }}>
+                    <div className='buttons'>
                         <button className='accountButton select-none' onClick={handleCloseAccount}>Close Account</button>
                         <button className='accountButton select-none' onClick={handleLogout}>Log out</button>
                     </div>
@@ -118,11 +144,14 @@ export default function SellerPage(props: SellerPageProps) {
                             {filteredItemresult.length > 0 ? (
                                 filteredItemresult.map((item, index) => (
                                     <ItemDisplay key={index} item={item}>
-                                        <Link to={getItemAction(item).url}>
-                                            <button className={`p-2 border border-black rounded-lg select-none`}>
-                                                {getItemAction(item).text}
-                                            </button>
-                                        </Link>
+                                        <div className='flex row' style={{ justifyContent: "space-between", alignItems: "center" }}>
+                                            <Link to={getItemAction(item).url}>
+                                                <button className='accountButton'>
+                                                    {getItemAction(item).text}
+                                                </button>
+                                            </Link>
+                                            {item.status === "Frozen" && <button onClick={() => handleRequestUnfreeze(item.id)} className='accountButton'>Request Unfreeze</button>}
+                                        </div>
                                     </ItemDisplay>
                                 ))
                             ) : (
