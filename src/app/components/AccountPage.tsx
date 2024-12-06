@@ -82,7 +82,6 @@ export default function AccountPage(props: AccountPageProps) {
         );
     } else if (props.accountType === "Buyer") {
         return (
-            // TODO: Pass data instead of fetching in function
             (accountInfo && <BuyerPage userData={accountInfo} logout={props.logout} closeAccount={closeAccount} />)
         );
     } else if (props.accountType === "Admin") {
