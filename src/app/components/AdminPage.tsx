@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import AdminSQL from './AdminSQL';
 import ItemDisplay from './ItemDisplay';
+import { Link } from 'react-router-dom';
 
 interface AccountPageProps {
     logout: () => void;
@@ -95,7 +96,14 @@ export default function AdminPage(props: AccountPageProps) {
                 <Image src="/accountSymbol.png" alt="Admin Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
                 <p><b>ADMIN PAGE</b></p>
             </div>
-            <button className='accountButton' onClick={toggleSQL}>{sqlOpen ? "Close SQL" : "Open SQL"}</button>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center"}}>
+                <div className='flex row' style={{ gap: "10px" }}>
+                    <Link to="/auctionReport"><button className='accountButton'>Auction Report</button></Link>
+                    <Link to="/forensicsReport"><button className='accountButton'>Forensics Report</button></Link>
+                    <button className='accountButton' onClick={handleLogout}>Log out</button>
+                </div>
+                <button className='accountButton' onClick={toggleSQL}>{sqlOpen ? "Close SQL" : "Open SQL"}</button>
+            </div>
             {sqlOpen ? <AdminSQL /> :
                 <div className='pageContentColumn' style={{ width: "100%", }}>
                     <div className='flex row' style={{ justifyContent: "space-between", alignItems: "center" }}>
@@ -129,7 +137,6 @@ export default function AdminPage(props: AccountPageProps) {
                     </div>
                 </div>
             }
-            <button className='accountButton' onClick={handleLogout}>Log out</button>
         </div>
     );
 }
