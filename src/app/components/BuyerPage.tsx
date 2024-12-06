@@ -142,49 +142,37 @@ export default function BuyerPage(props: BuyerPageProps) {
         </div>
 
         <div className="pageContentColumn" style={{ width: "60%" }}>
-          <p><b>Active Bids:</b></p>
-          {/* <div className="flex row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-            <p><b>Active Bids:</b></p>
-            {/* <select value={selectedOption} onChange={handleSelectChange}>
-              <option value={"All"}>All</option>
-              <option value={"Active"}>Active</option>
-              <option value={"Fulfilled"}>Fulfilled</option>
-            </select> }
-          </div> */}
-          <div className="flex row">
-            <div className="container" onWheel={handleScroll}>
-              {activeBids.length > 0 ? (
-                activeBids.map((item, index) => (
-                  <ItemDisplay key={index} item={item}>
-                    <Link to={`/item/${item.id}`}>
-                      <button className={`p-2 border border-black rounded-lg select-none`}>
-                        View Item
-                      </button>
-                    </Link>
-                  </ItemDisplay>
-                ))
-              ) : (
-                <p>No items found.</p>
-              )}
-            </div>
+        <p><b>Active Bids:</b></p>
+          <div className="flex row container" onWheel={handleScroll}>
+            {activeBids.length > 0 ? (
+              activeBids.map((item, index) => (
+                <ItemDisplay key={index} item={item}>
+                  <Link to={`/item/${item.id}`}>
+                    <button className={`p-2 border border-black rounded-lg select-none`}>
+                      View Item
+                    </button>
+                  </Link>
+                </ItemDisplay>
+              ))
+            ) : (
+              <p>No items found.</p>
+            )}
           </div>
           <p><b>Purchases:</b></p>
-          <div className="flex row">
-            <div className="container" onWheel={handleScroll}>
-              {fulfilledPurchases.length > 0 ? (
-                fulfilledPurchases.map((item, index) => (
-                  <ItemDisplay key={index} item={item}>
-                    <Link to={`/item/${item.id}`}>
-                      <button className={`p-2 border border-black rounded-lg select-none`}>
-                        View Item
-                      </button>
-                    </Link>
-                  </ItemDisplay>
-                ))
-              ) : (
-                <p>No items found.</p>
-              )}
-            </div>
+          <div className="flex row container" onWheel={handleScroll}>
+            {fulfilledPurchases.length > 0 ? (
+              fulfilledPurchases.map((item, index) => (
+                <ItemDisplay key={index} item={item}>
+                  <Link to={`/item/${item.id}`}>
+                    <button className={`p-2 border border-black rounded-lg select-none`}>
+                      View Item
+                    </button>
+                  </Link>
+                </ItemDisplay>
+              ))
+            ) : (
+              <p>No items found.</p>
+            )}
           </div>
         </div>
       </div>
