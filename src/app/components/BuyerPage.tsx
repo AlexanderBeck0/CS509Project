@@ -86,14 +86,12 @@ export default function BuyerPage(props: BuyerPageProps) {
           token: localStorage.getItem('token'),
           status: option,
         };
-        console.log(payload)
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         const data = await response.json();
-        console.log(data);
         if (data.statusCode === 200 && data.body.bids) {
           const mappedItems = data.body.bids.map((bid: { item: Item } & Bid) => bid.item);
           // const mappedBids = data.body.bids.map((bid: Bid) => (bid.id, bid.bid, bid.timeOfBid, bid.item_id))
@@ -112,8 +110,8 @@ export default function BuyerPage(props: BuyerPageProps) {
       }
     };
 
-    fetchActiveBids("Active",setActiveBids);
-    fetchActiveBids("Fulfilled",setFulfilledPurchases);
+    fetchActiveBids("Active", setActiveBids);
+    fetchActiveBids("Fulfilled", setFulfilledPurchases);
   }, [props]);
 
   return (
