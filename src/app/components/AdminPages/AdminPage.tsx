@@ -1,8 +1,8 @@
 import { Item, ItemStatus } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import AdminSQL from './AdminPages/AdminSQL';
-import ItemDisplay from './ItemDisplay';
+import AdminSQL from './AdminSQL';
+import ItemDisplay from '../ItemDisplay';
 import { Link } from 'react-router-dom';
 
 interface AccountPageProps {

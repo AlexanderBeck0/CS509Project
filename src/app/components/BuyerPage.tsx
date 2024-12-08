@@ -80,7 +80,7 @@ export default function BuyerPage(props: BuyerPageProps) {
   }
 
   useEffect(() => {
-    const fetchActiveBids = async (option: String, setItems: Dispatch<SetStateAction<Item[]>>) => {
+    const fetchActiveBids = async (option: string, setItems: Dispatch<SetStateAction<Item[]>>) => {
       try {
         const payload = {
           token: localStorage.getItem('token'),
