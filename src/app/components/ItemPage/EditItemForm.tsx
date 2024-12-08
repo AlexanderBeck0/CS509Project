@@ -14,7 +14,7 @@ interface EditItemFormProps {
 /**
  * The values of Item that are allowed to be edited by the Seller
  */
-const EDITABLE_ITEM_KEYS = ['name', 'description', 'startDate', 'endDate', 'image', 'initialPrice'] as const;
+const EDITABLE_ITEM_KEYS = ['name', 'description', 'endDate', 'image', 'initialPrice'] as const;
 
 export default function EditItemForm(props: EditItemFormProps): ReactNode {
     const [keysInUse, setKeysInUse] = useState<typeof EDITABLE_ITEM_KEYS[number][]>([]);
@@ -94,7 +94,6 @@ function EditItemField(props: EditItemFieldProps) {
         "name": "text",
         "description": "text",
         "endDate": "datetime-local",
-        "startDate": "datetime-local",
         "initialPrice": "number",
         "image": "url"
     };
