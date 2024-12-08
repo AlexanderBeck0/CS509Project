@@ -15,6 +15,27 @@ export const handler = async (event) => {
     }
   });
   
+  if (isNaN(+event.bid)) {
+    return {
+      statusCode: 400,
+      error: "Bid must be a number!"
+    }
+  }
+
+  if (Number.parseInt(event.bid) !== Math.floor(Number.parseInt(event.bid))) {
+    return {
+      statusCode: 400,
+      error: "Bid must be a whole number!"
+    }
+  }
+
+  if (+event.bid < 1) {
+    return {
+      statusCode: 400,
+      error: "Bid must be a number greater than 0!"
+    }
+  }
+
   let pool;
 
   try {
@@ -116,12 +137,12 @@ export const handler = async (event) => {
 
     // Handle bids
     if (account.balance < item.price + totalBidCost) {
-      response = { statusCode: 400, error: "Insufficient balance to bid on this item!" }
+      return { statusCode: 400, error: "Insufficient balance to bid on this item!" }
     }
 
     // account.balance >= item.price + totalBidCost
-    if (event.bid <= item.price) {
-      response = { statusCode: 400, error: "Must increase the bid on the item!" }
+    if ((event.bid <= item.price && item.price != item.initialPrice) || event.bid < item.initialPrice) {
+      return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
     // event.bid > item.price
