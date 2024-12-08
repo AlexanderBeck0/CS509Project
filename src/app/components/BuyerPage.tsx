@@ -12,15 +12,10 @@ interface BuyerPageProps {
 
 export default function BuyerPage(props: BuyerPageProps) {
   const fundsRef = useRef<HTMLInputElement | null>(null);
-  const [selectedOption, setSelectedOption] = useState("All");
   const [activeBids, setActiveBids] = useState<Item[]>([]);
   const [fulfilledPurchases, setFulfilledPurchases] = useState<Item[]>([]);
   // const [bids, setBids] = useState<Bid[]>([]);
   const [funds, setFunds] = useState<number>(props.userData.balance);
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(event.target.value);
-  };
 
   const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
     const container = event.target as HTMLDivElement;
