@@ -15,17 +15,45 @@ Link to active site: [Auction House](http://auctionhouse2024.s3-website-us-east-
 
 Here are the Use Cases we have completed for Iteration One:
 
-* [Seller: Create Account](#create-account)
-* [Seller: Close Account](#close-account)
-* [Seller: Login Account](#login-account)
-* [Seller: Add Item](#login-account)
-* [Buyer: Open Account](#open-account)
-* [Buyer: Close an Account](#close-an-account)
-* [Buyer: Login](#login)
-* [Buyer: Add Funds](#add-funds)
+* [Seller: Create Account](#create-account) ✓
+  * Unique username
+  * Valid prevention with duplicate usernames
+* [Seller: Close Account](#close-account) ✓
+  * Valid close with NO items
+  * Valid close with INACTIVE items
+  * Valid prevention with ACTIVE items
+* [Seller: Login Account](#login-account) ✓
+  * Valid prevention of invalid password
+  * Valid prevention of unknown account
+* [Seller: Add Item](#login-account) 1/2
+  * See [#52](https://github.com/AlexanderBeck0/auction-house/issues/52)
+  * Adds item properly when startDate is present
+* [Buyer: Open Account](#open-account) ✓
+  * Unique username
+  * Valid prevention with duplicate usernames
+* [Buyer: Close an Account](#close-an-account) ✓
+  * Valid close with NO bids
+  * Valid close with ACTIVE bids
+* [Buyer: Login](#login) ✓
+  * Valid prevention of invalid password
+  * Valid prevention of unknown account
+* [Buyer: Add Funds](#add-funds) ✓
+  * Valid positive, whole numbers
+  * Valid prevention of negative numbers
+  * See [#53](https://github.com/AlexanderBeck0/auction-house/issues/53)
 * [Customer: Search Items](#search-items)
-* [Customer: Sort Items](#sort-items)
-* [Customer: View Items](#view-items)
+  * Item found by name
+  * I have no idea how to search by date @MurkingtonWizard
+  * See [#54](https://github.com/AlexanderBeck0/auction-house/issues/54)
+* [Customer: Sort Items](#sort-items) ✓
+  * Sorting by name works
+  * Sorting by price works
+  * Sorting by date works
+* [Customer: View Items](#view-items) ✓
+  * Customer can view active item
+  * Customer cannot view archived item
+  * Customer cannot view bid information
+  * Customer can only see latest price
 
 ## Iteration Two Use Cases
 
@@ -33,14 +61,28 @@ Here are the Use Cases we have completed for grading in Iteration Two:
 
 * [Seller: Edit Item](#edit-item)
 * [Seller: Publish Item](#publish-item)
+  * An item is published
+  * Start date is set to the current time
+  * Item for SALE (not for bidding) is not able to be bid on
 * [Seller: Unpublish Item](#unpublish-item)
+  * Unpublishing works on items with NO bids
+  * Unpublishing prevented on items WITH bids
 * [Seller: Fulfill Item](#fulfill-item)
+  * Funds are added to Seller's account (minus tax)
+  * See [#55](https://github.com/AlexanderBeck0/auction-house/issues/55)
 * [Seller: Remove Inactive Item](#remove-inactive-item)
 * [Buyer: Review Purchases](#review-purchases)
+  * See [#56](https://github.com/AlexanderBeck0/auction-house/issues/56)
 * [Buyer: View Item](#view-item)
+  * Buyer can see bid history
+    * Buyer CANNOT see initial bid (BUG?)
 * [Buyer: Review Active Bids](#review-active-bids)
+  * See [#54](https://github.com/AlexanderBeck0/auction-house/issues/54)
 * [Buyer: Place Bid](#place-bid)
+  * Bid on item works
+  * Item DISAPPEARS when item is Complete (BUG)
 * [Buyer: Purchase Item (For Sale use case)](#purchase-item)
+  * See [#56](https://github.com/AlexanderBeck0/auction-house/issues/56)
 
 We have also completed these use cases:
 
@@ -48,11 +90,6 @@ We have also completed these use cases:
 * [Buyer: Sort Recently Sold](#sort-recently-sold)
 * [Admin: Freeze Item](#freeze-item)
 * [Admin: Unfreeze Item](#unfreeze-item)
-
-## Missing
-
-* [Seller: Review Items](#review-items)
-* [Seller: Archive Item](#archive-item)
 
 ## Project Details
 
@@ -72,7 +109,6 @@ A Seller is the only actor able to sell items on the Auction House. A Seller can
 * [Review Items](#review-items)
 * [Fulfill Item](#fulfill-item)
 * [Unpublish Item](#unpublish-item)
-* [Archive Item](#archive-item)
 * [Request Item Unfreeze](#request-item-unfreeze)
 
 #### Create Account
@@ -101,11 +137,11 @@ An active seller can edit an inactive item.
 
 #### Publish Item
 
-An active seller can publish an item that has all the required information for an item (name, description, initial price, image, end date). The item cannot be edited.
+An active seller can publish an item that has all the required information for an item (name, description, initial price, image, start date, end date). The item cannot be frozen.
 
 #### Review Items
 
-A seller can review their items to see which ones are inactive (not yet published), active (waiting for more bids), failed (time has expired without any bids), completed (time has expired with bids) and archived (item has been fulfilled).
+A seller can review their items to see which ones are inactive (not yet published), active (waiting for more bids), failed (time has expired without any bids), completed (time has expired with bids) and archived (item has been fulfilled)
 
 #### Fulfill Item
 
@@ -114,10 +150,6 @@ An active seller is responsible for fulfilling an item whose ending time has exp
 #### Unpublish Item
 
 An active seller can unpublish an active item that does not have any current bids. Unpublishing an item makes the item inactive.
-
-#### Archive Item
-
-An active seller can archive an inactive item. An archived item cannot be unarchived.
 
 #### Request Item Unfreeze
 
