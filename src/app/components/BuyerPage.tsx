@@ -1,6 +1,6 @@
 import { Account, Bid, Item } from '@/utils/types';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ItemDisplay from './ItemDisplay';
 
@@ -13,7 +13,8 @@ interface BuyerPageProps {
 export default function BuyerPage(props: BuyerPageProps) {
   const fundsRef = useRef<HTMLInputElement | null>(null);
   const [selectedOption, setSelectedOption] = useState("All");
-  const [items, setItems] = useState<Item[]>([]);
+  const [activeBids, setActiveBids] = useState<Item[]>([]);
+  const [fulfilledPurchases, setFulfilledPurchases] = useState<Item[]>([]);
   // const [bids, setBids] = useState<Bid[]>([]);
   const [funds, setFunds] = useState<number>(props.userData.balance);
 
@@ -79,11 +80,11 @@ export default function BuyerPage(props: BuyerPageProps) {
   }
 
   useEffect(() => {
-    const fetchActiveBids = async () => {
+    const fetchActiveBids = async (option: string, setItems: Dispatch<SetStateAction<Item[]>>) => {
       try {
         const payload = {
           token: localStorage.getItem('token'),
-          status: selectedOption,
+          status: option,
         };
         console.log(payload)
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
@@ -111,8 +112,9 @@ export default function BuyerPage(props: BuyerPageProps) {
       }
     };
 
-    fetchActiveBids();
-  }, [selectedOption]);
+    fetchActiveBids("Active",setActiveBids);
+    fetchActiveBids("Fulfilled",setFulfilledPurchases);
+  }, [props]);
 
   return (
     <div className="content">
@@ -140,30 +142,37 @@ export default function BuyerPage(props: BuyerPageProps) {
         </div>
 
         <div className="pageContentColumn" style={{ width: "60%" }}>
-          <div className="flex row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-            <p><b>Active Bids:</b></p>
-            <select value={selectedOption} onChange={handleSelectChange}>
-              <option value={"All"}>All</option>
-              <option value={"Active"}>Active</option>
-              <option value={"Fulfilled"}>Fulfilled</option>
-            </select>
+        <p><b>Active Bids:</b></p>
+          <div className="flex row container" onWheel={handleScroll}>
+            {activeBids.length > 0 ? (
+              activeBids.map((item, index) => (
+                <ItemDisplay key={index} item={item}>
+                  <Link to={`/item/${item.id}`}>
+                    <button className={`p-2 border border-black rounded-lg select-none`}>
+                      View Item
+                    </button>
+                  </Link>
+                </ItemDisplay>
+              ))
+            ) : (
+              <p>No items found.</p>
+            )}
           </div>
-          <div className="flex row">
-            <div className="container" onWheel={handleScroll}>
-              {items.length > 0 ? (
-                items.map((item, index) => (
-                  <ItemDisplay key={index} item={item}>
-                    <Link to={`/item/${item.id}`}>
-                      <button className={`p-2 border border-black rounded-lg select-none`}>
-                        View Item
-                      </button>
-                    </Link>
-                  </ItemDisplay>
-                ))
-              ) : (
-                <p>No items found.</p>
-              )}
-            </div>
+          <p><b>Purchases:</b></p>
+          <div className="flex row container" onWheel={handleScroll}>
+            {fulfilledPurchases.length > 0 ? (
+              fulfilledPurchases.map((item, index) => (
+                <ItemDisplay key={index} item={item}>
+                  <Link to={`/item/${item.id}`}>
+                    <button className={`p-2 border border-black rounded-lg select-none`}>
+                      View Item
+                    </button>
+                  </Link>
+                </ItemDisplay>
+              ))
+            ) : (
+              <p>No items found.</p>
+            )}
           </div>
         </div>
       </div>

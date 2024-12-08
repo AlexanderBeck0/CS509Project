@@ -1,7 +1,7 @@
 import type { Account, AccountType } from '@/utils/types';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import AdminPage from './AdminPage';
+import AdminPage from './AdminPages/AdminPage';
 import BuyerPage from './BuyerPage';
 import SellerPage from './SellerPage';
 
@@ -82,7 +82,6 @@ export default function AccountPage(props: AccountPageProps) {
         );
     } else if (props.accountType === "Buyer") {
         return (
-            // TODO: Pass data instead of fetching in function
             (accountInfo && <BuyerPage userData={accountInfo} logout={props.logout} closeAccount={closeAccount} />)
         );
     } else if (props.accountType === "Admin") {

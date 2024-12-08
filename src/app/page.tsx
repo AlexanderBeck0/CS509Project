@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from "react";
 import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import { AccountPage, AddItemPage, HomePage, LoginPage, RecentlySold, RegisterPage, SearchBar, SortDropdown } from './components/';
+import { AuctionReport, ForensicsReport } from './components/AdminPages';
 import { EditItemPage, ItemPage } from './components/ItemPage';
 
 function AppContent() {
@@ -107,6 +108,8 @@ function AppContent() {
           <Route path="/account" element={isLoggedIn ? <AccountPage accountType={accountType} logout={logout} /> : <Navigate to="/" />} />
           <Route path="/item/:id" element={<ItemPage accountType={accountType} token={token} />} />
           <Route path="/edit/:id" element={isLoggedIn && accountType === "Seller" ? <EditItemPage accountType={accountType} token={token} /> : <Navigate to="/" />} />
+          <Route path="/auctionReport" element={isLoggedIn && accountType === "Admin" ? <AuctionReport /> : <Navigate to="/account" />} />
+          <Route path="/forensicsReport" element={isLoggedIn && accountType === "Admin" ? <ForensicsReport /> : <Navigate to="/account" />} />
         </Routes>
       </div>
     </main>

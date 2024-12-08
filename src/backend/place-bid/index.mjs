@@ -2,7 +2,7 @@ import { createPool, getAccountByUsername, getItemFromID, verifyToken } from "..
 
 /**
  * 
- * @param {{id: string, token?: string, bid: number}} event The bid.
+ * @param {{id: string, token?: string}} event The get item event.
  */
 export const handler = async (event) => {
 
@@ -14,7 +14,7 @@ export const handler = async (event) => {
       };
     }
   });
-
+  
   if (isNaN(+event.bid)) {
     return {
       statusCode: 400,
@@ -35,7 +35,7 @@ export const handler = async (event) => {
       error: "Bid must be a number greater than 0!"
     }
   }
-  
+
   let pool;
 
   try {
@@ -63,7 +63,6 @@ export const handler = async (event) => {
         INSERT INTO Bid
         VALUES (null, ?, NOW(), ?, ?)
       `;
-      console.log("Query: " + sqlQuery);
       pool.query(sqlQuery, [bid, username, id], (error, rows) => {
         if (error) {
           console.error(JSON.stringify(error));
@@ -71,7 +70,6 @@ export const handler = async (event) => {
         }
 
         let updateQuery = `UPDATE Item SET price = ? WHERE id = ?`;
-        console.log(updateQuery);
         pool.query(updateQuery, [bid, id], (error, rows) => {
           if (error) {
             console.log("DB error");
@@ -97,9 +95,13 @@ export const handler = async (event) => {
 
   let getTotalBidCost = (username) => {
     return new Promise((resolve, reject) => {
-      const sqlQuery = `SELECT SUM(bid) AS totalBidCost FROM MostRecentBids WHERE buyer_username = ?`;
-      pool.query(sqlQuery, [username], (error, result) => {
+      const sqlQuery = `SELECT SUM(b.bid) AS totalBidCost
+        FROM MostRecentBids b
+        INNER JOIN Item i ON b.item_id = i.id
+        WHERE b.buyer_username = '${username}' AND (i.status = 'Active' OR i.status = 'Completed')`;
+      pool.query(sqlQuery, [], (error, result) => {
         if (error) {
+          console.log("DB sum error");
           return reject(error);
         }
         const totalBidCost = result[0].totalBidCost || 0;
@@ -117,7 +119,7 @@ export const handler = async (event) => {
     if (item.forSale) {
       // Handle forSale items
       if (account.balance < item.price + totalBidCost) {
-        return { statusCode: 400, error: "Insufficient balance to purchase this item!" }
+        response = { statusCode: 400, error: "Insufficient balance to purchase this item!" }
       }
 
       // account.balance >= item.price + totalBidCost
@@ -139,7 +141,7 @@ export const handler = async (event) => {
     }
 
     // account.balance >= item.price + totalBidCost
-    if (event.bid < item.price || (item.initialPrice !== item.price && event.bid <= item.price)) {
+    if ((event.bid <= item.price && item.price != item.initialPrice) || event.bid < item.initialPrice) {
       return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
@@ -149,6 +151,8 @@ export const handler = async (event) => {
     });
 
     response = response || { statusCode: 200, response: "Item bid on" };
+
+
   } catch (error) {
     console.error("Error:", error.message);
     response = { statusCode: 500, error: error.message };
