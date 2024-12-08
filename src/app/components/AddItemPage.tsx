@@ -72,7 +72,7 @@ export default function AddItemPage() {
                     </div>
                     <input className="itemPageInput" style={{ fontSize: "16px" }} type="url" name="ItemURL" data-length="20"
                         placeholder="Image URL" value={userImage} onChange={handleURLChange} maxLength={200} />
-                    <input className="itemPageInput" ref={descriptionRef} style={{ fontSize: "16px" }} type="text" name="ItemURL" data-length="20"
+                    <input className="itemPageInput" ref={descriptionRef} style={{ fontSize: "16px" }} type="text" name="ItemDescription" data-length="20"
                         placeholder="Item Description" maxLength={100} />
                     <input className="itemPageInput" ref={priceRef} style={{ fontSize: "16px" }} type="number" name="ItemPrice" data-length="20"
                         step={1} min={0} maxLength={10} placeholder="Item Price" />
