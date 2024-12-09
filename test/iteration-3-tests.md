@@ -25,7 +25,7 @@ Here are the Use Cases we have completed for Iteration One:
 * [Seller: Login Account](#login-account) ✓
   * Valid prevention of invalid password
   * Valid prevention of unknown account
-* [Seller: Add Item](#login-account) 1/2
+* [Seller: Add Item](#login-account)
   * See [#52](https://github.com/AlexanderBeck0/auction-house/issues/52)
   * Adds item properly when startDate is present
 * [Buyer: Open Account](#open-account) ✓
@@ -60,17 +60,23 @@ Here are the Use Cases we have completed for Iteration One:
 Here are the Use Cases we have completed for grading in Iteration Two:
 
 * [Seller: Edit Item](#edit-item)
-* [Seller: Publish Item](#publish-item)
+  * Works with valid name, description, end date
+  * Prevents empty values from being sent
+  * Prevents past dates from being sent
+  * Prevents editting an active item
+  * See [#59](https://github.com/AlexanderBeck0/auction-house/issues/59)
+* [Seller: Publish Item](#publish-item) ✓
   * An item is published
   * Start date is set to the current time
   * Item for SALE (not for bidding) is not able to be bid on
-* [Seller: Unpublish Item](#unpublish-item)
+* [Seller: Unpublish Item](#unpublish-item) ✓
   * Unpublishing works on items with NO bids
   * Unpublishing prevented on items WITH bids
 * [Seller: Fulfill Item](#fulfill-item)
   * Funds are added to Seller's account (minus tax)
   * See [#55](https://github.com/AlexanderBeck0/auction-house/issues/55)
 * [Seller: Remove Inactive Item](#remove-inactive-item)
+  * See [#61](https://github.com/AlexanderBeck0/auction-house/issues/61)
 * [Buyer: Review Purchases](#review-purchases)
   * See [#56](https://github.com/AlexanderBeck0/auction-house/issues/56)
 * [Buyer: View Item](#view-item)
@@ -81,15 +87,28 @@ Here are the Use Cases we have completed for grading in Iteration Two:
 * [Buyer: Place Bid](#place-bid)
   * Bid on item works
   * Item DISAPPEARS when item is Complete (BUG)
+  * SOMEWHAT Prevents outbidding yourself
+    * See [#63](https://github.com/AlexanderBeck0/auction-house/issues/63)
 * [Buyer: Purchase Item (For Sale use case)](#purchase-item)
   * See [#56](https://github.com/AlexanderBeck0/auction-house/issues/56)
 
 We have also completed these use cases:
 
 * [Buyer: Search Recently Sold](#search-recently-sold)
-* [Buyer: Sort Recently Sold](#sort-recently-sold)
-* [Admin: Freeze Item](#freeze-item)
-* [Admin: Unfreeze Item](#unfreeze-item)
+* [Buyer: Sort Recently Sold](#sort-recently-sold) ✓
+* [Admin: Freeze Item](#freeze-item) ✓
+* [Admin: Unfreeze Item](#unfreeze-item) ✓
+
+## Missing
+
+* [Seller: Archive Item](#archive-item)
+  * See [#61](https://github.com/AlexanderBeck0/auction-house/issues/61)
+* [Seller: Review Items](#review-items) ✓
+  * Can see Inactive, Completed, Fulfilled, Failed, Active
+  * Can see archived status
+  * Filtering wroks for Active, Inactive, Failed, Archived, Completed, Fulfilled
+* [Seller: Request Unfreeze](#request-item-unfreeze)
+  * See [#61](https://github.com/AlexanderBeck0/auction-house/issues/61)
 
 ## Project Details
 
@@ -150,6 +169,10 @@ An active seller is responsible for fulfilling an item whose ending time has exp
 #### Unpublish Item
 
 An active seller can unpublish an active item that does not have any current bids. Unpublishing an item makes the item inactive.
+
+#### Archive Item
+
+An active seller can archive an inactive item. An archived item cannot be unarchived.
 
 #### Request Item Unfreeze
 
