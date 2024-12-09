@@ -63,7 +63,7 @@ export default function ItemPage(props: ItemPageProps) {
 
                     {/* Middle Container */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <p><strong>{item.archived ? "Final" : "Current"} Price:</strong> ${item.price}</p>
+                        <p><strong>{item.archived ? "Final" : item.forSale ? "" : "Current"} Price:</strong> ${item.price}</p>
                         {props.accountType !== null && !item.forSale && <> {/** if item for sale, no bids. !!!do we need to show bought by for seller */}
 
                             <h3>Bids:</h3>
