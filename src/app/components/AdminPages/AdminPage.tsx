@@ -14,6 +14,7 @@ export default function AdminPage(props: AccountPageProps) {
     const [selectedOption, setSelectedOption] = useState('All');
     const [filteredItemresult, setFilteredItemresult] = useState<Item[]>([]);
     const [reload, setReload] = useState(0);
+    const [auctionReport, setAuctionReport] = useState<string | null>(null); // To store the auction report
 
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
@@ -39,14 +40,10 @@ export default function AdminPage(props: AccountPageProps) {
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
-        }
+        };
         fetchData();
     }, [selectedOption, reload]);
 
-    /**
-     * Used to call `logout()`
-     * @param event The event object.
-     */
     const handleLogout = () => {
         props.logout();
     };
@@ -54,7 +51,8 @@ export default function AdminPage(props: AccountPageProps) {
     const toggleSQL = () => {
         setSqlOpen(!sqlOpen);
         setReload(reload + 1);
-    }
+    };
+
     const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
         const container = event.target as HTMLDivElement;
         const scrollAmount = event.deltaY;
@@ -86,9 +84,25 @@ export default function AdminPage(props: AccountPageProps) {
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
-        }
+        };
         fetchData();
-    }
+    };
+
+    const fetchAuctionReport = async () => {
+        try {
+            const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/generateAuctionReport', {
+                method: 'GET',
+            });
+            const result = await response.json();
+            console.log(result)
+            if (result.statusCode === 200 && result.totalPrice !== undefined) {
+                setAuctionReport(`Total fulfilled items value: $${result.totalPrice}`);
+            } else throw Error;
+
+        } catch (error) {
+            console.error('Error fetching auction report:', error);
+        }
+    };
 
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -96,12 +110,13 @@ export default function AdminPage(props: AccountPageProps) {
                 <Image src="/accountSymbol.png" alt="Admin Account Symbol" width={100} height={100} style={{ objectFit: "contain" }} />
                 <p><b>ADMIN PAGE</b></p>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className='flex row' style={{ gap: "10px" }}>
-                    <Link to="/auctionReport"><button className='accountButton'>Auction Report</button></Link>
+                    <button className='accountButton' onClick={fetchAuctionReport}>Auction Report</button>
                     <Link to="/forensicsReport"><button className='accountButton'>Forensics Report</button></Link>
                     <button className='accountButton' onClick={handleLogout}>Log out</button>
                 </div>
+                {auctionReport && <p style={{ marginTop: "10px" }}>{auctionReport}</p>}
                 <button className='accountButton' onClick={toggleSQL}>{sqlOpen ? "Close SQL" : "Open SQL"}</button>
             </div>
             {sqlOpen ? <AdminSQL /> :
@@ -124,7 +139,7 @@ export default function AdminPage(props: AccountPageProps) {
                                 filteredItemresult.map((item, index) => (
                                     <ItemDisplay key={index} item={item}>
                                         {(item.status === "Active" || item.status === "Frozen" || item.status === "Requested") && (
-                                            <button onClick={() => toggleFreeze(item.id, item.status)} className="accountButton" >
+                                            <button onClick={() => toggleFreeze(item.id, item.status)} className="accountButton">
                                                 {item.status === "Active" ? "Freeze" : "Unfreeze"}
                                             </button>
                                         )}
