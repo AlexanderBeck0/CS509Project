@@ -13,7 +13,6 @@ export default function AddItemPage() {
     const endDateRef = useRef<HTMLInputElement | null>(null);
 
     const handleURLChange = (e: ChangeEvent<HTMLInputElement>) => {
-        //if(e.target.value === "") setUserImage(undefined);
         setUserImage(e.target.value);
     }
 

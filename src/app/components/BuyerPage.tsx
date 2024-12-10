@@ -14,7 +14,6 @@ export default function BuyerPage(props: BuyerPageProps) {
   const fundsRef = useRef<HTMLInputElement | null>(null);
   const [activeBids, setActiveBids] = useState<Item[]>([]);
   const [fulfilledPurchases, setFulfilledPurchases] = useState<Item[]>([]);
-  // const [bids, setBids] = useState<Bid[]>([]);
   const [funds, setFunds] = useState<number>(props.userData.balance);
 
   const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -89,11 +88,9 @@ export default function BuyerPage(props: BuyerPageProps) {
         const data = await response.json();
         if (data.statusCode === 200 && data.body.bids) {
           const mappedItems = data.body.bids.map((bid: { item: Item } & Bid) => bid.item);
-          // const mappedBids = data.body.bids.map((bid: Bid) => (bid.id, bid.bid, bid.timeOfBid, bid.item_id))
           setItems(mappedItems);
-          // setBids(mappedBids);
         } else {
-          console.error(data.error || "Failed to fetch active bids.");
+          console.error(data.error || data.errorMessage || "Failed to fetch active bids.");
         }
       } catch (error) {
         if (error instanceof Error) console.error(error);
@@ -135,7 +132,7 @@ export default function BuyerPage(props: BuyerPageProps) {
         </div>
 
         <div className="pageContentColumn" style={{ width: "60%" }}>
-        <p><b>Active Bids:</b></p>
+          <p><b>Active Bids:</b></p>
           <div className="flex row container" onWheel={handleScroll}>
             {activeBids.length > 0 ? (
               activeBids.map((item, index) => (
