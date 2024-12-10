@@ -14,7 +14,7 @@ export default function AdminPage(props: AccountPageProps) {
     const [selectedOption, setSelectedOption] = useState('All');
     const [filteredItemresult, setFilteredItemresult] = useState<Item[]>([]);
     const [reload, setReload] = useState(0);
-    const [auctionReport, setAuctionReport] = useState<string | null>(null); // To store the auction report
+    const [adminBalance, setAdminBalance] = useState<number | null>(null);
 
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
@@ -88,19 +88,24 @@ export default function AdminPage(props: AccountPageProps) {
         fetchData();
     };
 
-    const fetchAuctionReport = async () => {
+    const fetchAdminBalance = async () => {
+        const payload = {
+            token: localStorage.getItem('token'),
+        };
         try {
-            const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/generateAuctionReport', {
-                method: 'GET',
+            const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/getAccountInfo', {
+                method: 'POST',
+                body: JSON.stringify(payload),
             });
-            const result = await response.json();
-            console.log(result)
-            if (result.statusCode === 200 && result.totalPrice !== undefined) {
-                setAuctionReport(`Total fulfilled items value: $${result.totalPrice}`);
-            } else throw Error;
 
+            const resultData = await response.json();
+            if (resultData.statusCode === 200) {
+                setAdminBalance(resultData.account.balance || 0);
+            } else {
+                console.error("Failed to fetch admin balance:", resultData.error || "Unknown error");
+            }
         } catch (error) {
-            console.error('Error fetching auction report:', error);
+            console.error("Error fetching admin balance:", error);
         }
     };
 
@@ -112,11 +117,11 @@ export default function AdminPage(props: AccountPageProps) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div className='flex row' style={{ gap: "10px" }}>
-                    <button className='accountButton' onClick={fetchAuctionReport}>Auction Report</button>
+                    <button className='accountButton' onClick={fetchAdminBalance}>Auction Report</button>
                     <Link to="/forensicsReport"><button className='accountButton'>Forensics Report</button></Link>
                     <button className='accountButton' onClick={handleLogout}>Log out</button>
                 </div>
-                {auctionReport && <p style={{ marginTop: "10px" }}>{auctionReport}</p>}
+                {adminBalance !== null && (<p>Admin Balance: ${adminBalance}</p>)}
                 <button className='accountButton' onClick={toggleSQL}>{sqlOpen ? "Close SQL" : "Open SQL"}</button>
             </div>
             {sqlOpen ? <AdminSQL /> :
