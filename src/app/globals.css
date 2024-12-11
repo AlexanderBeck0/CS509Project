@@ -265,26 +265,3 @@ input:focus {
   border-bottom: 2px solid #ccc;
   justify-content: space-between;
 }
-
-.tableRow {
-  display: table-row;
-}
-
-.tableCell {
-  display: table-cell;
-  padding: 0.5rem;
-  vertical-align: middle;
-}
-
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.userImage {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
