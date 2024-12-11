@@ -26,7 +26,7 @@ export default function ForensicsReport() {
             }
         };
         fetchData();
-    });
+    }, []);
 
     return (
         <div style={{width: "100%", maxWidth: "100%"}}>

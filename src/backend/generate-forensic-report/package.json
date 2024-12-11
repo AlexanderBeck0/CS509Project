@@ -1,7 +1,7 @@
 {
-    "name": "create-account",
+    "name": "generate-forensic-report",
     "version": "1.0.0",
-    "description": "creates a new account in the database",
+    "description": "",
     "main": "index.mjs",
     "type": "commonjs",
     "dependencies": {
