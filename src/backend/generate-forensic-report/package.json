@@ -1,0 +1,15 @@
+{
+    "name": "generate-forensic-report",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.mjs",
+    "type": "commonjs",
+    "dependencies": {
+        "mysql": "^2.18.1"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC"
+}
