@@ -1,5 +1,13 @@
 import { createPool, getAccountByUsername, getItemFromID, verifyToken } from "../opt/nodejs/index.mjs";
 
+function closePool(pool) {
+  pool.end((err) => {
+    if (err) {
+      console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+    }
+  });
+}
+
 /**
  * 
  * @param {{id: string, token?: string}} event The get item event.
@@ -135,6 +143,7 @@ export const handler = async (event) => {
     if (item.forSale) {
       // Handle forSale items
       if (account.balance < item.price + totalBidCost) {
+        closePool(pool);
         return { statusCode: 400, error: "Insufficient balance to purchase this item!" }
       }
 
@@ -143,21 +152,19 @@ export const handler = async (event) => {
         throw (typeof error === "string" ? new Error(error) : error)
       });
       await buyItem(event.id);
-      pool.end((err) => {
-        if (err) {
-          console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
-        }
-      });
+      closePool(pool);
       return { statusCode: 200, response: "Item purchased" };
     }
 
     // Handle bids
     if (account.balance < item.price + totalBidCost) {
+      closePool(pool);
       return { statusCode: 400, error: "Insufficient balance to bid on this item!" }
     }
 
     // account.balance >= item.price + totalBidCost
     if ((event.bid < item.price && bidsOnItem.length === 0) || (event.bid <= item.price)) {
+      closePool(pool);
       return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
@@ -173,11 +180,7 @@ export const handler = async (event) => {
     console.error("Error:", error.message);
     response = { statusCode: 500, error: error.message };
   } finally {
-    pool.end((err) => {
-      if (err) {
-        console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
-      }
-    });
+    closePool(pool);
   }
   return response;
 };
