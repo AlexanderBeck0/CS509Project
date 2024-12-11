@@ -117,7 +117,7 @@ export const handler = async (event) => {
 
             pool.query(localQuery, [item_id], (err) => {
                 if (err) return reject(err);
-                return resolve({ statusCode: 200, item_id });
+                return resolve({ statusCode: 200, funds: itemPrice * 0.95 });
             });
         });
     } catch (error) {

@@ -10,6 +10,7 @@ export default function SellerItemPage(props: SellerItemProps) {
 
     const [fulfill, setFulfill] = useState<boolean | null>(null)
     const [status, setStatus] = useState<string | null>(null)
+    const [funds, setFunds] = useState<number | null>(null)
 
     useEffect(() => {
         setStatus(props.status)
@@ -38,11 +39,12 @@ export default function SellerItemPage(props: SellerItemProps) {
                     body: JSON.stringify(payload),
                 });
 
-            const resultData: { statusCode: 200, item_id: number } | { statusCode: 400, error: string } = await response.json();
+            const resultData: { statusCode: 200, funds: number } | { statusCode: 400, error: string } = await response.json();
             console.log(resultData)
             if (resultData.statusCode !== 200) throw new Error(resultData.error);
             if (resultData.statusCode == 200) {
                 setFulfill(true);
+                setFunds(resultData.funds)
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -59,7 +61,7 @@ export default function SellerItemPage(props: SellerItemProps) {
                     Fulfill
                 </button>
             ) : fulfill !== null && status === 'Fulfilled' ? (
-                <p>This item has been fulfilled, the funds deposited in your account</p>
+                <p>This item has been fulfilled, ${funds} of profit has been deposited in your account</p>
             ) : null}
 
             {!!props.archived && <p><strong>This item is archived</strong></p>}
