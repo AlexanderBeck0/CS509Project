@@ -117,7 +117,6 @@ export const handler = async (event) => {
     const item = await getItemFromID(Number.parseInt(event.id), pool, username);
     const account = await getAccountByUsername(username, pool);
     const totalBidCost = await getTotalBidCost(username);
-
     if (item.forSale) {
       // Handle forSale items
       if (account.balance < item.price + totalBidCost) {
@@ -143,7 +142,7 @@ export const handler = async (event) => {
     }
 
     // account.balance >= item.price + totalBidCost
-    if (event.bid <= item.price || (item.initialPrice !== item.price && event.bid <= item.price)) {
+    if ((event.bid < item.price && item.initialPrice === item.price) || (item.initialPrice !== item.price && event.bid <= item.price)) {
       return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
