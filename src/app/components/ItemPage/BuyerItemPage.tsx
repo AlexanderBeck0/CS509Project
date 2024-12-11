@@ -18,7 +18,7 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
             const payload = {
                 token: localStorage.getItem('token'),
                 id: props.item_id,
-                bid: props.itemForSale ? props.price : bidRef.current!.valueAsNumber,
+                bid: props.itemForSale ? props.price : Number(bidRef.current!.valueAsNumber),
             };
 
             await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/placeBid", {
@@ -28,7 +28,7 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                 },
                 body: JSON.stringify(payload),
             }).then(response => response.json()).then(data => {
-                console.log(data);
+
                 if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
                     alert(data.response);

@@ -10,7 +10,7 @@ export default function SellerItemPage(props: SellerItemProps) {
 
     const [fulfill, setFulfill] = useState<boolean | null>(null)
     const [status, setStatus] = useState<string | null>(null)
-    const [funds, setFunds] = useState<number | null>(null)
+    const [funds, setFunds] = useState<number>(0)
 
     useEffect(() => {
         setStatus(props.status)
@@ -61,7 +61,7 @@ export default function SellerItemPage(props: SellerItemProps) {
                     Fulfill
                 </button>
             ) : fulfill !== null && status === 'Fulfilled' ? (
-                <p>This item has been fulfilled, ${funds} of profit has been deposited in your account</p>
+                <p>This item has been fulfilled, ${Math.floor(funds)} of profit has been deposited in your account</p>
             ) : null}
 
             {!!props.archived && <p><strong>This item is archived</strong></p>}
