@@ -112,11 +112,26 @@ export const handler = async (event) => {
     });
   }
 
+  let getBidsOnItemID = (id) => {
+    return new Promise((resolve, reject) => {
+      const sqlQuery = `SELECT * FROM MostRecentBids WHERE item_id=?`;
+      pool.query(sqlQuery, [id], (error, result) => {
+        if (error) {
+          console.error(error);
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    });
+  }
+
   let response = undefined;
   try {
     const item = await getItemFromID(Number.parseInt(event.id), pool, username);
     const account = await getAccountByUsername(username, pool);
     const totalBidCost = await getTotalBidCost(username);
+    const bidsOnItem = getBidsOnItemID(event.id);
+
     if (item.forSale) {
       // Handle forSale items
       if (account.balance < item.price + totalBidCost) {
@@ -142,7 +157,7 @@ export const handler = async (event) => {
     }
 
     // account.balance >= item.price + totalBidCost
-    if ((event.bid < item.price && item.initialPrice === item.price) || (item.initialPrice !== item.price && event.bid <= item.price)) {
+    if ((event.bid < item.price && bidsOnItem.length === 0) || (event.bid <= item.price)) {
       return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 
