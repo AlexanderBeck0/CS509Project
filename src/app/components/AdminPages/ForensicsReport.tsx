@@ -23,7 +23,7 @@ export default function ForensicsReport() {
                 }
 
                 if (resultData.statusCode === 400 || resultData.statusCode === 500) {
-                    if (resultData.error.includes("token")) {
+                    if (resultData.error.includes("token") || resultData.error.includes("jwt") || resultData.errorMessage.includes("jwt")) {
                         alert("Invalid token. Please log in again.");
                     } else throw new Error(resultData.error || resultData.errorMessage || "Unknown error")
                 }
