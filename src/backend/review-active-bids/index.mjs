@@ -1,6 +1,19 @@
-import { createPool, verifyToken, getAccountByUsername } from "../opt/nodejs/index.mjs";
+import { createPool, getAccountByUsername, verifyToken } from "../opt/nodejs/index.mjs";
 
 export const handler = async (event) => {
+  let response;
+  // Verify the token and extract user info
+  const { username, accountType } = await verifyToken(event?.token).catch(error => {
+    if (error.name === 'TokenExpiredError') return {
+      statusCode: 400,
+      error: "Your token has expired. Please log in again."
+    }
+  });
+
+  if (accountType !== "Buyer") {
+    return { statusCode: 400, error: "Insufficient permission to view bids" };
+  }
+
   let pool;
 
   try {
@@ -10,25 +23,10 @@ export const handler = async (event) => {
     return { statusCode: 500, error: "Could not make database connection" };
   }
 
-  let response;
-
   try {
-    // Verify the token and extract user info
-    let userData = undefined;
-    let username = undefined;
-    let accountType = undefined;
-    if (event.token) {
-      userData = await verifyToken(event.token);
-      username = userData.username;
-      accountType = userData.accountType;
-    }
- 
-    if (accountType !== "Buyer") {
-      return { statusCode: 400, error: "Insufficient permission to view bids" };
-    }
 
     // Check if user exists
-    const account = await getAccountByUsername(username,pool);
+    const account = await getAccountByUsername(username, pool);
 
     // Query to get active bids for the user
     const fetchActiveBids = () => {
@@ -93,7 +91,11 @@ export const handler = async (event) => {
       error: "An error occurred while processing your request.",
     };
   } finally {
-    pool.end();
+    pool.end((err) => {
+      if (err) {
+        console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+      }
+    });
   }
 
   return response;

@@ -14,7 +14,7 @@ export const handler = async (event) => {
       };
     }
   });
-  
+
   if (isNaN(+event.bid)) {
     return {
       statusCode: 400,
@@ -57,25 +57,27 @@ export const handler = async (event) => {
           console.log("Equal usernames")
           return reject("Permission denied. Cannot outbid yourself.");
         }
-      });
 
-      let sqlQuery = `
+        // As much as I hate to nest 3 query statements into one, it is necessary.
+        let sqlQuery = `
         INSERT INTO Bid
         VALUES (null, ?, NOW(), ?, ?)
       `;
-      pool.query(sqlQuery, [bid, username, id], (error, rows) => {
-        if (error) {
-          console.error(JSON.stringify(error));
-          return reject(error);
-        }
-
-        let updateQuery = `UPDATE Item SET price = ? WHERE id = ?`;
-        pool.query(updateQuery, [bid, id], (error, rows) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        pool.query(sqlQuery, [bid, username, id], (error, _rows) => {
           if (error) {
-            console.log("DB error");
+            console.error(JSON.stringify(error));
             return reject(error);
           }
-          return resolve(rows);
+
+          let updateQuery = `UPDATE Item SET price = ? WHERE id = ?`;
+          pool.query(updateQuery, [bid, id], (error, rows) => {
+            if (error) {
+              console.error(error);
+              return reject(error);
+            }
+            return resolve(rows);
+          });
         });
       });
     });
@@ -98,10 +100,10 @@ export const handler = async (event) => {
       const sqlQuery = `SELECT SUM(b.bid) AS totalBidCost
         FROM MostRecentBids b
         INNER JOIN Item i ON b.item_id = i.id
-        WHERE b.buyer_username = '${username}' AND (i.status = 'Active' OR i.status = 'Completed')`;
-      pool.query(sqlQuery, [], (error, result) => {
+        WHERE b.buyer_username = ? AND (i.status = 'Active' OR i.status = 'Completed')`;
+      pool.query(sqlQuery, [username], (error, result) => {
         if (error) {
-          console.log("DB sum error");
+          console.error(error);
           return reject(error);
         }
         const totalBidCost = result[0].totalBidCost || 0;
@@ -119,7 +121,7 @@ export const handler = async (event) => {
     if (item.forSale) {
       // Handle forSale items
       if (account.balance < item.price + totalBidCost) {
-        response = { statusCode: 400, error: "Insufficient balance to purchase this item!" }
+        return { statusCode: 400, error: "Insufficient balance to purchase this item!" }
       }
 
       // account.balance >= item.price + totalBidCost
@@ -132,7 +134,7 @@ export const handler = async (event) => {
           console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
         }
       });
-      return response || { statusCode: 200, response: "Item purchased" };
+      return { statusCode: 200, response: "Item purchased" };
     }
 
     // Handle bids
@@ -141,7 +143,7 @@ export const handler = async (event) => {
     }
 
     // account.balance >= item.price + totalBidCost
-    if ((event.bid <= item.price && item.price != item.initialPrice) || event.bid < item.initialPrice) {
+    if (event.bid <= item.price || (item.initialPrice !== item.price && event.bid <= item.price)) {
       return { statusCode: 400, error: "Must increase the bid on the item!" }
     }
 

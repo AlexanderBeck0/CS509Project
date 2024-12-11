@@ -15,7 +15,6 @@ export default function SellerPage(props: SellerPageProps) {
     /*get JSON of seller id from database*/
     const [selectedOption, setSelectedOption] = useState("All");
     const [filteredItemresult, setFilteredItemresult] = useState<Item[]>([]);
-    const [reload, setReload] = useState(0);
 
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(event.target.value);
@@ -56,7 +55,7 @@ export default function SellerPage(props: SellerPageProps) {
             }
         }
         fetchData();
-    }, [props.userData.username, selectedOption, reload]); // Changed to include props.userData.username because ESLint wasn't happy about it
+    }, [props.userData.username, selectedOption]); // Changed to include props.userData.username because ESLint wasn't happy about it
     // #endregion
 
     const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -81,31 +80,6 @@ export default function SellerPage(props: SellerPageProps) {
      */
     const handleCloseAccount = () => {
         props.closeAccount();
-    }
-
-    const handleRequestUnfreeze = (id: number) => {
-        const fetchData = async () => {
-            const payload = {
-                token: localStorage.getItem('token'),
-                id: id,
-            };
-            try {
-                const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/requestUnfreezeItem',
-                    {
-                        method: 'POST',
-                        body: JSON.stringify(payload),
-                    });
-
-                const resultData = await response.json();
-                if (resultData.statusCode == 200) {
-                    console.log("item status is requested");
-                    setReload(reload+1);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-        fetchData();
     }
 
     return (
@@ -150,7 +124,6 @@ export default function SellerPage(props: SellerPageProps) {
                                                     {getItemAction(item).text}
                                                 </button>
                                             </Link>
-                                            {item.status === "Frozen" && <button onClick={() => handleRequestUnfreeze(item.id)} className='accountButton'>Request Unfreeze</button>}
                                         </div>
                                     </ItemDisplay>
                                 ))

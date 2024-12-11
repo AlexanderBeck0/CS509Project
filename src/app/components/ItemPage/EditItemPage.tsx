@@ -197,7 +197,6 @@ export default function ItemPage(props: ItemPageProps) {
                 newItem[key as keyof Item] = value;
             }
         });
-        console.log(newItem)
 
         return new Promise((resolve, reject) => {
             fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/saveItem", {
@@ -260,6 +259,28 @@ export default function ItemPage(props: ItemPageProps) {
         });
     }
 
+    async function handleRequestUnfreeze() {
+        const payload = {
+            token: localStorage.getItem('token'),
+            id: id,
+        };
+        try {
+            const response = await fetch('https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/requestUnfreezeItem',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                });
+
+            const resultData = await response.json();
+            if (resultData.statusCode == 200) {
+                console.log("item status is requested");
+                fetchItem();
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
     return (
         <div style={{ display: 'flex', padding: '2rem', gap: '2rem' }}>
             {/* Would probably be better to use an ErrorBoundary but I do not have the time to look into it */}
@@ -301,7 +322,13 @@ export default function ItemPage(props: ItemPageProps) {
                     </div>
                     {/* Controls */}
                     <div style={{ width: '33%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {/* TODO: Add a request unfreeze here and hide publish/unpublish if it is frozen/requested */}
+                        {(item.status === "Frozen" || item.status === "Requested") && (
+                            <button className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
+                                disabled={item.status === "Requested"}
+                                onClick={handleRequestUnfreeze}>{item.status === "Frozen" ? "Request Unfreeze" : "Requested!"}</button>
+
+                        )}
+
                         {/* for sale button: */}
                         {!published &&
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', }}>
@@ -310,6 +337,7 @@ export default function ItemPage(props: ItemPageProps) {
                                     checked={forSale}
                                     onChange={(e) => setForSale(e.target.checked)}
                                     style={{ width: '20px', height: '20px' }}
+                                    disabled={(item.status === "Frozen" || item.status === "Requested")}
                                 />
                                 <label><strong>For Sale</strong></label>
                             </div>
@@ -318,23 +346,25 @@ export default function ItemPage(props: ItemPageProps) {
                         <button
                             className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
                             onClick={handlePublishClick}
-                            disabled={bids.length > 0}
+                            disabled={bids.length > 0 || item.status === "Frozen" || item.status === "Requested"}
                         >
                             {published ? "Unpublish" : "Publish"}
                         </button>
                         {!published &&
                             <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
-                                onClick={handleRemoveClick}>Remove Item</button>}
+                                onClick={handleRemoveClick} disabled={(item.status === "Frozen" || item.status === "Requested")}>Remove Item</button>}
 
                         {/* archive item */}
                         {!archived && !published && (
                             <button
                                 className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:cursor-not-allowed disabled:bg-gray-500"
                                 onClick={handleArchiveClick}
+                                disabled={(item.status === "Frozen" || item.status === "Requested")}
                             >
                                 Archive
                             </button>
                         )}
+                    
                         {!!errorMessage && <p className="text-sm">{errorMessage}</p>}
                     </div>
                 </>

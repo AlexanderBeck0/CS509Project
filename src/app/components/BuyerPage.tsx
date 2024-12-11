@@ -12,15 +12,9 @@ interface BuyerPageProps {
 
 export default function BuyerPage(props: BuyerPageProps) {
   const fundsRef = useRef<HTMLInputElement | null>(null);
-  const [selectedOption, setSelectedOption] = useState("All");
   const [activeBids, setActiveBids] = useState<Item[]>([]);
   const [fulfilledPurchases, setFulfilledPurchases] = useState<Item[]>([]);
-  // const [bids, setBids] = useState<Bid[]>([]);
   const [funds, setFunds] = useState<number>(props.userData.balance);
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(event.target.value);
-  };
 
   const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
     const container = event.target as HTMLDivElement;
@@ -86,21 +80,17 @@ export default function BuyerPage(props: BuyerPageProps) {
           token: localStorage.getItem('token'),
           status: option,
         };
-        console.log(payload)
         const response = await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/reviewActiveBids", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         const data = await response.json();
-        console.log(data);
         if (data.statusCode === 200 && data.body.bids) {
           const mappedItems = data.body.bids.map((bid: { item: Item } & Bid) => bid.item);
-          // const mappedBids = data.body.bids.map((bid: Bid) => (bid.id, bid.bid, bid.timeOfBid, bid.item_id))
           setItems(mappedItems);
-          // setBids(mappedBids);
         } else {
-          console.error(data.error || "Failed to fetch active bids.");
+          console.error(data.error || data.errorMessage || "Failed to fetch active bids.");
         }
       } catch (error) {
         if (error instanceof Error) console.error(error);
@@ -112,8 +102,8 @@ export default function BuyerPage(props: BuyerPageProps) {
       }
     };
 
-    fetchActiveBids("Active",setActiveBids);
-    fetchActiveBids("Fulfilled",setFulfilledPurchases);
+    fetchActiveBids("Active", setActiveBids);
+    fetchActiveBids("Fulfilled", setFulfilledPurchases);
   }, [props]);
 
   return (
@@ -142,7 +132,7 @@ export default function BuyerPage(props: BuyerPageProps) {
         </div>
 
         <div className="pageContentColumn" style={{ width: "60%" }}>
-        <p><b>Active Bids:</b></p>
+          <p><b>Active Bids:</b></p>
           <div className="flex row container" onWheel={handleScroll}>
             {activeBids.length > 0 ? (
               activeBids.map((item, index) => (

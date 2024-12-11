@@ -9,11 +9,9 @@ export default function AddItemPage() {
     const nameRef = useRef<HTMLInputElement | null>(null);
     const descriptionRef = useRef<HTMLInputElement | null>(null);
     const priceRef = useRef<HTMLInputElement | null>(null);
-    const startDateRef = useRef<HTMLInputElement | null>(null);
     const endDateRef = useRef<HTMLInputElement | null>(null);
 
     const handleURLChange = (e: ChangeEvent<HTMLInputElement>) => {
-        //if(e.target.value === "") setUserImage(undefined);
         setUserImage(e.target.value);
     }
 
@@ -27,7 +25,6 @@ export default function AddItemPage() {
                     description: descriptionRef.current!.value,
                     image: userImage,
                     initialPrice: Math.max(1, parseFloat(priceRef.current!.value) || 1),
-                    startDate: new Date(startDateRef.current!.value).toISOString().slice(0, -8),
                     endDate: endDateRef.current!.value === "" ? null : new Date(endDateRef.current!.value).toISOString().slice(0, -8)
                 }
             };
@@ -72,20 +69,13 @@ export default function AddItemPage() {
                     </div>
                     <input className="itemPageInput" style={{ fontSize: "16px" }} type="url" name="ItemURL" data-length="20"
                         placeholder="Image URL" value={userImage} onChange={handleURLChange} maxLength={200} />
-                    <input className="itemPageInput" ref={descriptionRef} style={{ fontSize: "16px" }} type="text" name="ItemURL" data-length="20"
+                    <input className="itemPageInput" ref={descriptionRef} style={{ fontSize: "16px" }} type="text" name="ItemDescription" data-length="20"
                         placeholder="Item Description" maxLength={100} />
                     <input className="itemPageInput" ref={priceRef} style={{ fontSize: "16px" }} type="number" name="ItemPrice" data-length="20"
                         step={1} min={0} maxLength={10} placeholder="Item Price" />
                     <div className='flex row'> {/* dates */}
                         <p style={{ fontSize: "50px" }}>🕒</p>
                         <div className='dateContainer'>
-                            <div className='dateLabel' style={{ width: "100%" }}>
-                                <b>Start Date:</b>
-                                <input className="itemPageInput" ref={startDateRef} style={{ fontSize: "12px" }} type="datetime-local" name="StartDate" data-length="10" required
-                                    placeholder="MM/DD/YYYY"
-                                    min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)}
-                                    defaultValue={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)} />
-                            </div>
                             <div className='dateLabel' style={{ width: "100%" }}>
                                 <b>End Date:</b>
                                 <input className="itemPageInput" ref={endDateRef} style={{ fontSize: "12px" }} type="datetime-local" name="EndDate" data-length="10"

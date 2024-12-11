@@ -1,7 +1,8 @@
-import { useState } from "react";
+import type { ItemStatus } from "@/utils/types";
+import { useRef } from "react";
 
 interface BuyerItemPageProps {
-    status: string;
+    status: ItemStatus;
     item_id: number;
     itemForSale: boolean;
     price: number;
@@ -9,14 +10,14 @@ interface BuyerItemPageProps {
 }
 
 export default function BuyerItemPage(props: BuyerItemPageProps) {
-    const [newBid, setNewBid] = useState<number>(props.price);
+    const bidRef = useRef<HTMLInputElement | null>(null);
     // get funds from getToken
     const handlePlaceBid = () => {
         const placeBid = async () => {
             const payload = {
                 token: localStorage.getItem('token'),
                 id: props.item_id,
-                bid: newBid,
+                bid: props.itemForSale ? props.price : bidRef.current!.valueAsNumber,
             };
 
             await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/placeBid", {
@@ -37,14 +38,13 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                 // Log actual errors and not just insufficient permission errors
                 if (error instanceof Error) console.error(error);
                 if (typeof error === 'string' && error.includes("Insufficient funds")) {
-                    alert(`Insufficient funds to ${props.itemForSale ? "purchase": "bid on"} this item`);
+                    alert(`Insufficient funds to ${props.itemForSale ? "purchase" : "bid on"} this item`);
                 }
                 if (typeof error === 'string') alert(error)
             });
         };
 
         placeBid();
-        // setReload(reload+1);
     };
 
     if (props.status === "Active") {
@@ -55,10 +55,10 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                         Place bid of: $
                         <input
                             type="number"
-                            value={newBid}
-                            onChange={(e) => setNewBid(Number(e.target.value))}
+                            ref={bidRef}
+                            defaultValue={props.price + 1}
                             style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
-                            min={props.price}
+                            min={props.price + 1}
                             step={1}
                         />
                     </label>

@@ -1,30 +1,30 @@
-import { createPool, getAccountByUsername } from "../opt/nodejs/index.mjs";
+import { createPool } from "../opt/nodejs/index.mjs";
 
-export const handler = async (event)  => {
+export const handler = async (event) => {
   let pool;
 
   try {
-      pool = await createPool();
+    pool = await createPool();
   } catch (error) {
-      console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
-      return { statusCode: 500, error: "Could not make database connection" };
+    console.error("Failed to create MySQL Pool. Error: " + JSON.stringify(error));
+    return { statusCode: 500, error: "Could not make database connection" };
   }
   let SearchDB = (query, sortBy, recentlySold) => {
     console.log("Searching...");
     let [sort, order] = sortBy.split('_');
-    
+
     sort = sort != "" ? sort : "startDate";
 
     order = (order && order.toUpperCase() === 'DESC') ? 'DESC' : 'ASC';
-    console.log("Searching: "+query);
-    console.log("Sort by: "+sort);
-    console.log("Order: "+order);
+    console.log("Searching: " + query);
+    console.log("Sort by: " + sort);
+    console.log("Order: " + order);
 
     let formattedDate = null;
     let priceRange = null;
     const pricePattern = /\b(\d+)-(\d+)\b/;
     const datePattern = /\b(\d{2}\/\d{2}\/\d{4})\b/;
-    
+
     const priceMatch = query.match(pricePattern);
     if (priceMatch) {
       priceRange = {
@@ -58,7 +58,7 @@ export const handler = async (event)  => {
       let sqlQuery = `
       SELECT * FROM Item
       `;
-            
+
       const conditions = [];
       const params = [];
 
@@ -99,11 +99,11 @@ export const handler = async (event)  => {
   let response = undefined;
 
   try {
-    let results  = await SearchDB(event.query, event.sortBy, event.recentlySold);
+    let results = await SearchDB(event.query, event.sortBy, event.recentlySold);
     console.log(results);
     const filteredResults = results.map(({ id, image, name, description, price, startDate, endDate }) => ({
-        id, image, name, description, price, startDate, endDate
-      }));
+      id, image, name, description, price, startDate, endDate
+    }));
     response = {
       statusCode: 200,
       items: filteredResults
@@ -116,7 +116,11 @@ export const handler = async (event)  => {
     };
   }
   finally {
-    pool.end();
+    pool.end((err) => {
+      if (err) {
+        console.error("Failed to close MySQL Pool. Blantantly ignoring... Error: " + JSON.stringify(err));
+      }
+    });
   }
   return response;
 };
