@@ -138,7 +138,7 @@ export const handler = async (event) => {
     const item = await getItemFromID(Number.parseInt(event.id), pool, username);
     const account = await getAccountByUsername(username, pool);
     const totalBidCost = await getTotalBidCost(username);
-    const bidsOnItem = getBidsOnItemID(event.id);
+    const bidsOnItem = await getBidsOnItemID(event.id);
 
     if (item.forSale) {
       // Handle forSale items
@@ -149,7 +149,8 @@ export const handler = async (event) => {
 
       // account.balance >= item.price + totalBidCost
       await makeBid(item.price, username, event.id).catch(error => {
-        throw (typeof error === "string" ? new Error(error) : error)
+        closePool(pool);
+        return { statusCode: 400, error: typeof error === "string" ? error : JSON.stringify(error) }
       });
       await buyItem(event.id);
       closePool(pool);
@@ -170,7 +171,8 @@ export const handler = async (event) => {
 
     // event.bid > item.price
     await makeBid(event.bid, username, event.id).catch(error => {
-      throw (typeof error === "string" ? new Error(error) : error)
+      closePool(pool);
+      return { statusCode: 400, error: typeof error === "string" ? error : JSON.stringify(error) }
     });
 
     response = response || { statusCode: 200, response: "Item bid on" };
