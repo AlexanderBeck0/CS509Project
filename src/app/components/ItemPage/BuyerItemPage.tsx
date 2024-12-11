@@ -1,7 +1,8 @@
+import type { ItemStatus } from "@/utils/types";
 import { useRef } from "react";
 
 interface BuyerItemPageProps {
-    status: string;
+    status: ItemStatus;
     item_id: number;
     itemForSale: boolean;
     price: number;
@@ -16,7 +17,7 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
             const payload = {
                 token: localStorage.getItem('token'),
                 id: props.item_id,
-                bid: bidRef.current!.valueAsNumber,
+                bid: props.itemForSale ? props.price : bidRef.current!.valueAsNumber,
             };
 
             await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/placeBid", {
