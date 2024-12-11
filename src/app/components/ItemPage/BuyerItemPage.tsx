@@ -12,7 +12,8 @@ interface BuyerItemPageProps {
 export default function BuyerItemPage(props: BuyerItemPageProps) {
     const bidRef = useRef<HTMLInputElement | null>(null);
     // get funds from getToken
-    const handlePlaceBid = () => {
+    const handlePlaceBid = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         const placeBid = async () => {
             const payload = {
                 token: localStorage.getItem('token'),
@@ -49,14 +50,13 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
 
     if (props.status === "Active") {
         return (
-            <form onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={handlePlaceBid}>
                 {!props.itemForSale &&
                     <label>
                         Place bid of: $
                         <input
                             type="number"
                             ref={bidRef}
-                            pattern="[0-9]+"
                             defaultValue={props.price}
                             style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
                             min={props.price}
@@ -64,11 +64,10 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                         />
                     </label>
                 }
-                <button type="submit" className="accountButton" onClick={handlePlaceBid} style={{ marginLeft: '0.5rem' }}>
+                <button type="submit" className="accountButton" style={{ marginLeft: '0.5rem' }}>
                     {props.itemForSale ? "Buy" : "Place Bid"}
                 </button>
 
-                {/* <p><strong>Available Funds:</strong> ${availableFunds}</p> */}
             </form>
         );
     } else if (props.status === "Completed") {
