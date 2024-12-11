@@ -86,11 +86,11 @@ export const handler = async (event)  => {
 
     completedItems.forEach(item => addWarning(item, "Item has been completed for more than 3 days"));
     
-    longTimerItems.forEach(item => addWarning(item, "Bid timer is really long"));
+    longTimerItems.forEach(item => addWarning(item, "Item is available to bid for 10+ days"));
     
     highPriceItems.forEach(item => addWarning(item, "Price is higher than 10,000"));
     
-    manyBids.forEach(item => addWarning(item, "Many bids on this item"));
+    manyBids.forEach(item => addWarning(item, "Item has 5 or more bids"));
 
     const items = Object.values(itemsMap);
     
