@@ -85,7 +85,7 @@ export const handler = async (event) => {
 
   let buyItem = (id) => {
     return new Promise((resolve, reject) => {
-      const updateItemStatusQuery = `UPDATE Item SET status = 'Completed' WHERE id = ?`;
+      const updateItemStatusQuery = `UPDATE Item SET status = 'Completed', endDate = NOW() WHERE id = ?`;
       pool.query(updateItemStatusQuery, [id], (error, result) => {
         if (error) {
           return reject(error);
