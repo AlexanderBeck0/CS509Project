@@ -1,9 +1,9 @@
 import { Item, ItemStatus } from '@/utils/types';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import AdminSQL from './AdminSQL';
-import ItemDisplay from '../ItemDisplay';
 import { Link } from 'react-router-dom';
+import ItemDisplay from '../ItemDisplay';
+import AdminSQL from './AdminSQL';
 
 interface AccountPageProps {
     logout: () => void;
@@ -36,13 +36,19 @@ export default function AdminPage(props: AccountPageProps) {
                 const resultData = await response.json();
                 if (resultData.statusCode === 200) {
                     setFilteredItemresult(resultData.items);
-                } else throw Error;
+                }
+                if (resultData.statusCode === 400 || resultData.statusCode === 500) {
+                    if (resultData.error.includes("token") || resultData.error.includes("jwt") || resultData.errorMessage.includes("jwt")) {
+                        alert("Invalid token. Please log in again.");
+                        props.logout();
+                    } else throw new Error(resultData.error || resultData.errorMessage || "Unknown error")
+                }
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
         fetchData();
-    }, [selectedOption, reload]);
+    }, [selectedOption, reload, props]);
 
     const handleLogout = () => {
         props.logout();
@@ -80,7 +86,13 @@ export default function AdminPage(props: AccountPageProps) {
                 const resultData = await response.json();
                 if (resultData.statusCode === 200) {
                     setReload(reload + 1);
-                } else throw Error;
+                }
+                if (resultData.statusCode === 400 || resultData.statusCode === 500) {
+                    if (resultData.error.includes("token") || resultData.error.includes("jwt") || resultData.errorMessage.includes("jwt")) {
+                        alert("Invalid token. Please log in again.");
+                        props.logout();
+                    } else throw new Error(resultData.error || resultData.errorMessage || "Unknown error")
+                }
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
