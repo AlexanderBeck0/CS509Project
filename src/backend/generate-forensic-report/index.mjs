@@ -21,7 +21,7 @@ export const handler = async (event)  => {
 
   let LongTimer = () => {
     return new Promise((resolve, reject) => {
-      let sqlQuery = `SELECT * FROM Item WHERE DATEDIFF(endDate, startDate) > 10`
+      let sqlQuery = `SELECT * FROM Item WHERE DATEDIFF(endDate, startDate) > 10 AND status='Active'`
       pool.query(sqlQuery, [], (error, rows) => {
         if (error) { console.log("DB error"); return reject(error); }
         return resolve(rows);
@@ -31,7 +31,7 @@ export const handler = async (event)  => {
 
   let HighPrices = () => {
     return new Promise((resolve, reject) => {
-      let sqlQuery = `SELECT * FROM Item WHERE price > 10000`
+      let sqlQuery = `SELECT * FROM Item WHERE price > 10000 AND status='Active'`
       pool.query(sqlQuery, [], (error, rows) => {
         if (error) { console.log("DB error"); return reject(error); }
         return resolve(rows);
@@ -43,8 +43,9 @@ export const handler = async (event)  => {
     return new Promise((resolve, reject) => {
       let sqlQuery = `SELECT i.* FROM Item i 
       JOIN Bid b ON i.id = b.item_id
+      WHERE i.status = 'Active'
       GROUP BY i.id
-      HAVING COUNT(b.id) >= 5;`
+      HAVING COUNT(b.id) >= 5`
       pool.query(sqlQuery, [], (error, rows) => {
         if (error) { console.log("DB error"); return reject(error); }
         return resolve(rows);
@@ -85,11 +86,11 @@ export const handler = async (event)  => {
 
     completedItems.forEach(item => addWarning(item, "Item has been completed for more than 3 days"));
     
-    longTimerItems.forEach(item => addWarning(item, "Bid timer is really long"));
+    longTimerItems.forEach(item => addWarning(item, "Item is available to bid for 10+ days"));
     
     highPriceItems.forEach(item => addWarning(item, "Price is higher than 10,000"));
     
-    manyBids.forEach(item => addWarning(item, "Many bids on this item"));
+    manyBids.forEach(item => addWarning(item, "Item has 5 or more bids"));
 
     const items = Object.values(itemsMap);
     

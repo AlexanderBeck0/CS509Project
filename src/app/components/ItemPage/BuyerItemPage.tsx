@@ -12,12 +12,13 @@ interface BuyerItemPageProps {
 export default function BuyerItemPage(props: BuyerItemPageProps) {
     const bidRef = useRef<HTMLInputElement | null>(null);
     // get funds from getToken
-    const handlePlaceBid = () => {
+    const handlePlaceBid = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         const placeBid = async () => {
             const payload = {
                 token: localStorage.getItem('token'),
                 id: props.item_id,
-                bid: props.itemForSale ? props.price : bidRef.current!.valueAsNumber,
+                bid: props.itemForSale ? props.price : Number(bidRef.current!.valueAsNumber),
             };
 
             await fetch("https://bgsfn1wls6.execute-api.us-east-1.amazonaws.com/initial/placeBid", {
@@ -27,7 +28,7 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
                 },
                 body: JSON.stringify(payload),
             }).then(response => response.json()).then(data => {
-                console.log(data);
+
                 if (data.statusCode !== 200) throw data.error;
                 if (data.statusCode === 200) {
                     alert(data.response);
@@ -49,26 +50,25 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
 
     if (props.status === "Active") {
         return (
-            <div>
+            <form onSubmit={handlePlaceBid}>
                 {!props.itemForSale &&
                     <label>
                         Place bid of: $
                         <input
                             type="number"
                             ref={bidRef}
-                            defaultValue={props.price + 1}
+                            defaultValue={props.price}
                             style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
-                            min={props.price + 1}
+                            min={props.price}
                             step={1}
                         />
                     </label>
                 }
-                <button className="accountButton" onClick={handlePlaceBid} style={{ marginLeft: '0.5rem' }}>
+                <button type="submit" className="accountButton" style={{ marginLeft: '0.5rem' }}>
                     {props.itemForSale ? "Buy" : "Place Bid"}
                 </button>
 
-                {/* <p><strong>Available Funds:</strong> ${availableFunds}</p> */}
-            </div>
+            </form>
         );
     } else if (props.status === "Completed") {
         return (<div>Item has been purchased</div>);

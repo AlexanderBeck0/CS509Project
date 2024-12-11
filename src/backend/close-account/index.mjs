@@ -80,7 +80,7 @@ export const handler = async (event) => {
             SELECT COUNT(*) as itemCount 
             FROM Item 
             WHERE seller_username = ?
-            AND status = 'Active'
+            AND status in ('Active', 'Completed', 'Frozen', 'Requested')
         `;
         console.log('Executing item query:', itemQuery);
 

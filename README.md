@@ -11,49 +11,6 @@ Link to active site: [Auction House](http://auctionhouse2024.s3-website-us-east-
 * Nate Prickitt ([GitHub](https://github.com/prickittn))
 * Brent Weiffenbach ([GitHub](https://github.com/BrentWeiffenbach))
 
-## Iteration One Use Cases
-
-Here are the Use Cases we have completed for Iteration One:
-
-* [Seller: Create Account](#create-account)
-* [Seller: Close Account](#close-account)
-* [Seller: Login Account](#login-account)
-* [Seller: Add Item](#login-account)
-* [Buyer: Open Account](#open-account)
-* [Buyer: Close an Account](#close-an-account)
-* [Buyer: Login](#login)
-* [Buyer: Add Funds](#add-funds)
-* [Customer: Search Items](#search-items)
-* [Customer: Sort Items](#sort-items)
-* [Customer: View Items](#view-items)
-
-## Iteration Two Use Cases
-
-Here are the Use Cases we have completed for grading in Iteration Two:
-
-* [Seller: Edit Item](#edit-item)
-* [Seller: Publish Item](#publish-item)
-* [Seller: Unpublish Item](#unpublish-item)
-* [Seller: Fulfill Item](#fulfill-item)
-* [Seller: Remove Inactive Item](#remove-inactive-item)
-* [Buyer: Review Purchases](#review-purchases)
-* [Buyer: View Item](#view-item)
-* [Buyer: Review Active Bids](#review-active-bids)
-* [Buyer: Place Bid](#place-bid)
-* [Buyer: Purchase Item (For Sale use case)](#purchase-item)
-
-We have also completed these use cases:
-
-* [Buyer: Search Recently Sold](#search-recently-sold)
-* [Buyer: Sort Recently Sold](#sort-recently-sold)
-* [Admin: Freeze Item](#freeze-item)
-* [Admin: Unfreeze Item](#unfreeze-item)
-
-## Missing
-
-* [Seller: Review Items](#review-items)
-* [Seller: Archive Item](#archive-item)
-
 ## Project Details
 
 The Auction House consists of three main actors: [Seller](#seller), [Buyer](#buyer), and [Customer](#customer). Additionally, there is a fourth actor, [Admin](#admin), which controls the freezing and unfreezing of items and managing the Auction House itself.

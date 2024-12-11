@@ -19,7 +19,7 @@ export const handler = async () => {
         SELECT Item.* 
         FROM Item 
         JOIN Bid ON Item.id = Bid.item_id 
-        WHERE Item.endDate < NOW() AND Item.status IN ('Active', 'Frozen')`;
+        WHERE Item.endDate < NOW() AND Item.status IN ('Active', 'Frozen', 'Requested')`;
 
         console.log('getActiveItemsWithBidsQuery:', getActiveItemsWithBidsQuery);
 
@@ -54,7 +54,7 @@ export const handler = async () => {
         SELECT Item.* 
         FROM Item 
         LEFT JOIN Bid ON Item.id = Bid.item_id 
-        WHERE Item.endDate < NOW() AND Item.status IN ('Active', 'Frozen') AND Bid.item_id IS NULL`;
+        WHERE Item.endDate < NOW() AND Item.status IN ('Active', 'Frozen', 'Requested') AND Bid.item_id IS NULL`;
 
         const failedItemsResults = await new Promise((resolve, reject) => {
             pool.query(getActiveItemsWithoutBidsQuery, async (error, results) => {
