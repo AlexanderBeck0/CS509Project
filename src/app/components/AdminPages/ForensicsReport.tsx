@@ -39,7 +39,7 @@ export default function ForensicsReport() {
                     </div>
                     {accounts.length > 0 ? (
                         accounts.map((user: any, index: number) => (
-                            <TableItem image={"/accountSymbol.png"} name={user.username} warnings={user.warnings}/>
+                            <TableItem key={index} image={"/accountSymbol.png"} name={user.username} warnings={user.warnings}/>
                         ))
                     ) : (
                         <p>No Users</p>
@@ -52,7 +52,7 @@ export default function ForensicsReport() {
                     </div>
                     {items.length > 0 ? (
                         items.map((item: any, index: number) => (
-                            <TableItem image={item.image} name={item.name} warnings={item.warnings}/>
+                            <TableItem key={index} image={item.image} name={item.name} warnings={item.warnings}/>
                         ))
                     ) : (
                         <p>No Items</p>
@@ -76,7 +76,7 @@ function TableItem({ image, name, warnings }: { image: string; name: string; war
             <div style={{ display: "flex", flexDirection: "column", marginLeft: "10px" }}>
                 {warnings.length > 0 ? (
                     warnings.map((warning: any, index: number) => (
-                        <p style={{textAlign: "right"}}>{warning}</p>
+                        <p key={index} style={{textAlign: "right"}}>{warning}</p>
                     ))
                 ) : <p>No warnings</p>}
             </div>
