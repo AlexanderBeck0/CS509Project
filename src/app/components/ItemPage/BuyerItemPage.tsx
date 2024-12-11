@@ -49,26 +49,27 @@ export default function BuyerItemPage(props: BuyerItemPageProps) {
 
     if (props.status === "Active") {
         return (
-            <div>
+            <form onSubmit={(e) => e.preventDefault()}>
                 {!props.itemForSale &&
                     <label>
                         Place bid of: $
                         <input
                             type="number"
                             ref={bidRef}
-                            defaultValue={props.price + 1}
+                            pattern="[0-9]+"
+                            defaultValue={props.price}
                             style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
-                            min={props.price + 1}
+                            min={props.price}
                             step={1}
                         />
                     </label>
                 }
-                <button className="accountButton" onClick={handlePlaceBid} style={{ marginLeft: '0.5rem' }}>
+                <button type="submit" className="accountButton" onClick={handlePlaceBid} style={{ marginLeft: '0.5rem' }}>
                     {props.itemForSale ? "Buy" : "Place Bid"}
                 </button>
 
                 {/* <p><strong>Available Funds:</strong> ${availableFunds}</p> */}
-            </div>
+            </form>
         );
     } else if (props.status === "Completed") {
         return (<div>Item has been purchased</div>);
