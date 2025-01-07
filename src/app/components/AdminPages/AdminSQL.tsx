@@ -31,7 +31,7 @@ export default function AdminSQL() {
         { name: "Activate Account", query: "UPDATE Account SET isActive = 1 WHERE username = '___'" },
         { name: "Find Item", query: "SELECT * FROM Item WHERE id = ___" },
         { name: "Delete Item", query: "DELETE FROM Item WHERE id = ___" },
-        { name: "Publish Item", query: "UPDATE Item SET status = 'Active' WHERE id = ___" },
+        { name: "Publish Item", query: "UPDATE Item SET status = 'Active', archived = 0 WHERE id = ___" },
         { name: "Unpublish Item", query: "UPDATE Item SET status = 'Inactive' WHERE id = ___" },
         { name: "Create Item", query: "INSERT IGNORE INTO Item (id, name, description, image, initialPrice, price, startDate, endDate, archived, status, seller_username, forSale) VALUES (null, '___', '___', '___', ___, ___, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR), ___, '___', '___', ___)" },
         { name: "Edit Item", query: "UPDATE Item SET name = '___', description = '___', image = '___', initialPrice = ___, price = ___, startDate = NOW(), endDate = '___', archived = ___, forSale = ___ WHERE id = ___" },
